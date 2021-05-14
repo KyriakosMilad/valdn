@@ -6,8 +6,8 @@ import (
 
 func TestValidate(t *testing.T) {
 	type args struct {
-		jsonData string
-		rules    map[string]string
+		jsonData        string
+		validationRules map[string][]string
 	}
 	tests := []struct {
 		name                 string
@@ -18,8 +18,8 @@ func TestValidate(t *testing.T) {
 		{
 			name: `test validate json`,
 			args: args{
-				jsonData: `{"name":"Ramses", "city":"Tiba"}`,
-				rules:    map[string]string{"name": "required|string", "city": "required|string"},
+				jsonData:        `{"name":"Ramses", "city":"Tiba"}`,
+				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}},
 			},
 			wantErr:              false,
 			wantValidationErrors: false,
@@ -27,8 +27,8 @@ func TestValidate(t *testing.T) {
 		{
 			name: `test validate json with unsuitable data`,
 			args: args{
-				jsonData: `{"name":"Ramses", "age":90}`,
-				rules:    map[string]string{"name": "required|string", "city": "required|string", "age": "required|numerical"},
+				jsonData:        `{"name":"Ramses", "age":90}`,
+				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}, "age": {"required", "numerical"}},
 			},
 			wantErr:              true,
 			wantValidationErrors: true,
@@ -36,7 +36,7 @@ func TestValidate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := Validate(tt.args.jsonData, tt.args.rules)
+			err, validationErrors := Validate(tt.args.jsonData, tt.args.validationRules)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v, args %v", err, tt.wantErr, tt.args)
 			}

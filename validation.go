@@ -3,12 +3,10 @@ package validation
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"reflect"
-	"strings"
 )
 
-func Validate(jsonData string, rules map[string]string) (err error, validationErrors map[string]string) {
+func Validate(jsonData string, validationRules map[string][]string) (err error, validationErrors map[string]string) {
 	validationErrors = make(map[string]string)
 	var decodedJson map[string]interface{}
 
@@ -17,19 +15,19 @@ func Validate(jsonData string, rules map[string]string) (err error, validationEr
 		return err, nil
 	}
 
-	for ruleKey, ruleValue := range rules {
-		val, ok := decodedJson[ruleKey]
+	for key, rules := range validationRules {
+		val, ok := decodedJson[key]
 
-		for _, v := range strings.Split(fmt.Sprintf("%v", ruleValue), "|") {
+		for _, v := range rules {
 			switch v {
 			case "required":
 				if !ok {
-					validationErrors[ruleKey] = ruleKey + " is required"
+					validationErrors[key] = key + " is required"
 					continue
 				}
 			case "string":
 				if reflect.TypeOf(val) != reflect.TypeOf("") {
-					validationErrors[ruleKey] = ruleKey + " must be a string"
+					validationErrors[key] = key + " must be a string"
 					continue
 				}
 			default:
