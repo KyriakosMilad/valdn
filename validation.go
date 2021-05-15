@@ -26,7 +26,7 @@ func Validate(jsonData string, validationRules map[string][]string) (err error, 
 					continue
 				}
 			case "string":
-				if reflect.TypeOf(val) != reflect.TypeOf("") {
+				if reflect.ValueOf(val).Kind() != reflect.String {
 					validationErrors[key] = key + " must be a string"
 					continue
 				}
