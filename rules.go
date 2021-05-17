@@ -27,4 +27,12 @@ func init() {
 		}
 		return
 	})
+
+	AddRule("string", func(field string, fieldValue interface{}, fieldExists bool, ruleValue string) (err error, validationError string) {
+		if reflect.ValueOf(fieldValue).Kind() != reflect.String {
+			validationError = field + " must be a string"
+			return
+		}
+		return
+	})
 }
