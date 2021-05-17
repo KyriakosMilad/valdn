@@ -130,11 +130,11 @@ func TestStringRule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			requiredFunc, requiredExists := rules["required"]
-			if !requiredExists {
+			stringFunc, stringExists := rules["string"]
+			if !stringExists {
 				panic("string rule is not exist")
 			}
-			err, validationError := requiredFunc(tt.args.field, tt.args.fieldValue, tt.args.fieldExists, tt.args.ruleValue)
+			err, validationError := stringFunc(tt.args.field, tt.args.fieldValue, tt.args.fieldExists, tt.args.ruleValue)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("string rule: err: %v, wantErr: %v, validationError: %v, wantValidationError: %v, args: %v", err, validationError, tt.wantErr, tt.wantValidationErr, tt.args)
 			}
