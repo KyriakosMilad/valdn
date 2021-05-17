@@ -3,7 +3,7 @@ package validation
 import (
 	"encoding/json"
 	"errors"
-	"reflect"
+	"strings"
 )
 
 func ValidateJson(jsonData string, validationRules map[string][]string) (err error, validationErrors map[string]string) {
@@ -20,25 +20,32 @@ func ValidateJson(jsonData string, validationRules map[string][]string) (err err
 func ValidateMap(mapData map[string]interface{}, validationRules map[string][]string) (err error, validationErrors map[string]string) {
 	validationErrors = make(map[string]string)
 
-	for key, rules := range validationRules {
-		val, ok := mapData[key]
+FIELDS:
+	for field, fieldRules := range validationRules {
+		fieldVal, fieldExists := mapData[field]
 
-		for _, v := range rules {
-			switch v {
-			case "required":
-				if !ok {
-					validationErrors[key] = key + " is required"
-					continue
-				}
-			case "string":
-				if reflect.ValueOf(val).Kind() != reflect.String {
-					validationErrors[key] = key + " must be a string"
-					continue
-				}
-			default:
-				err = errors.New("unknown validation rule: " + v)
+		for _, rule := range fieldRules {
+			ruleFunc, ruleExists := rules[rule]
+			if !ruleExists {
+				err = errors.New("unknown validation rule: " + rule)
 				return err, validationErrors
 			}
+
+			var ruleVal string
+			if strings.ContainsRune(rule, ':') {
+				ruleVal = strings.Split(rule, ":")[1]
+			}
+
+			err, validationError := ruleFunc(field, fieldVal, fieldExists, ruleVal)
+			if err != nil {
+				return err, validationErrors
+			}
+
+			if validationError != "" {
+				validationErrors[field] = validationError
+				continue FIELDS
+			}
+
 		}
 	}
 
