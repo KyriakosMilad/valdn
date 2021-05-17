@@ -28,7 +28,7 @@ func TestAddRule(t *testing.T) {
 	}
 }
 
-func TestRequired(t *testing.T) {
+func TestRequiredRule(t *testing.T) {
 	type args struct {
 		field       string
 		fieldValue  interface{}
