@@ -1,5 +1,7 @@
 package validation
 
+import "reflect"
+
 var rules = make(map[string]func(field string, fieldValue interface{}, fieldExists bool, ruleValue string) (err error, validationError string))
 
 func AddRule(ruleName string, ruleFunc func(field string, fieldValue interface{}, fieldExists bool, ruleValue string) (err error, validationError string)) {
@@ -11,4 +13,18 @@ func AddRule(ruleName string, ruleFunc func(field string, fieldValue interface{}
 	rules[ruleName] = ruleFunc
 
 	return
+}
+
+func init() {
+	AddRule("required", func(field string, fieldValue interface{}, fieldExists bool, ruleValue string) (err error, validationError string) {
+		if !fieldExists {
+			validationError = field + " is required"
+			return
+		}
+		if reflect.ValueOf(fieldValue).IsZero() {
+			validationError = field + " is required"
+			return
+		}
+		return
+	})
 }
