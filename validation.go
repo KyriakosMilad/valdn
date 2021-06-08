@@ -25,15 +25,17 @@ FIELDS:
 		fieldVal, fieldExists := mapData[field]
 
 		for _, rule := range fieldRules {
+			var ruleVal string
+			if strings.ContainsRune(rule, ':') {
+				ruleDetailed := strings.Split(rule, ":")
+				ruleVal = ruleDetailed[1]
+				rule = ruleDetailed[0]
+			}
+
 			ruleFunc, ruleExists := rules[rule]
 			if !ruleExists {
 				err = errors.New("unknown validation rule: " + rule)
 				return err, validationErrors
-			}
-
-			var ruleVal string
-			if strings.ContainsRune(rule, ':') {
-				ruleVal = strings.Split(rule, ":")[1]
 			}
 
 			err, validationError := ruleFunc(field, fieldVal, fieldExists, ruleVal)
@@ -45,7 +47,6 @@ FIELDS:
 				validationErrors[field] = validationError
 				continue FIELDS
 			}
-
 		}
 	}
 
