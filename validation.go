@@ -3,8 +3,96 @@ package validation
 import (
 	"encoding/json"
 	"errors"
+	"reflect"
 	"strings"
 )
+
+func ValidateStruct(structData interface{}, validationRules map[string][]string) (err error, validationErrors map[string]string) {
+	t := reflect.TypeOf(structData)
+	v := reflect.ValueOf(structData)
+	if t.Kind() != reflect.Struct {
+		err = errors.New("can only proceed `struct` kind")
+		return err, validationErrors
+	}
+
+	var validateNestedStruct func(t reflect.Type, v reflect.Value, parentName string) (err error, validationErrors map[string]string)
+	validateNestedStruct = func(t reflect.Type, v reflect.Value, parentName string) (err error, validationErrors map[string]string) {
+		validationErrors = make(map[string]string)
+
+		if parentName != "" {
+			parentName += "."
+		}
+
+	FIELDS:
+		for i := 0; i < t.NumField(); i++ {
+			field := t.Field(i)
+			fieldValidationTag := field.Tag.Get("validation")
+			fieldName := parentName + field.Name
+			fieldType := field.Type
+			fieldValue := v.Field(i)
+
+			if fieldType.Kind() == reflect.Struct {
+				err, nestedStructValidationErrors := validateNestedStruct(fieldType, fieldValue, fieldName)
+				for key, val := range nestedStructValidationErrors {
+					validationErrors[key] = val
+				}
+
+				if err != nil {
+					return err, validationErrors
+				}
+				continue
+			}
+
+			if _, ok := validationRules[fieldName]; !ok && fieldValidationTag == "" {
+				continue
+			}
+
+			fieldExists := true
+			if fieldValue.IsZero() {
+				fieldExists = false
+			}
+
+			var fieldRules []string
+			if validationRules[fieldName] != nil {
+				fieldRules = validationRules[fieldName]
+			} else {
+				fieldRules = strings.Split(fieldValidationTag, "|")
+			}
+
+			for _, rule := range fieldRules {
+				if rule == "" {
+					continue
+				}
+				var ruleValue string
+				if strings.ContainsRune(rule, ':') {
+					ruleDetailed := strings.Split(rule, ":")
+					ruleValue = ruleDetailed[1]
+					rule = ruleDetailed[0]
+				}
+
+				ruleFunc, ruleExists := rules[rule]
+				if !ruleExists {
+					err = errors.New("unknown validation rule: " + rule)
+					return err, validationErrors
+				}
+
+				err, validationError := ruleFunc(fieldName, fieldValue.Interface(), fieldExists, ruleValue)
+				if err != nil {
+					return err, validationErrors
+				}
+
+				if validationError != "" {
+					validationErrors[fieldName] = validationError
+					continue FIELDS
+				}
+			}
+
+		}
+		return err, validationErrors
+	}
+
+	return validateNestedStruct(t, v, "")
+}
 
 func ValidateJson(jsonData string, validationRules map[string][]string) (err error, validationErrors map[string]string) {
 	var decodedJson map[string]interface{}

@@ -89,3 +89,101 @@ func TestValidateMap(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateStruct(t *testing.T) {
+	type Child struct {
+		Name string `validation:"required|string"`
+	}
+	type Parent struct {
+		Name string `validation:"required|string"`
+		Age  int    `validation:"required"`
+		Child
+	}
+	type args struct {
+		structData      interface{}
+		validationRules map[string][]string
+	}
+	tests := []struct {
+		name                 string
+		args                 args
+		wantErr              bool
+		wantValidationErrors bool
+	}{
+		{
+			name: "validate struct",
+			args: args{
+				structData:      Parent{Name: "Mina", Age: 26},
+				validationRules: map[string][]string{"Name": {"required", "string"}, "Age": {"required"}, "Child.Name": {""}},
+			},
+			wantErr:              false,
+			wantValidationErrors: false,
+		},
+		{
+			name: "validate struct with unsuitable data",
+			args: args{
+				structData:      Parent{Name: "Mina"},
+				validationRules: map[string][]string{"Name": {"required", "string"}, "Age": {"required"}},
+			},
+			wantErr:              false,
+			wantValidationErrors: true,
+		},
+		{
+			name: "validate nested struct",
+			args: args{
+				structData: Parent{
+					Name:  "Ikhnaton",
+					Child: Child{Name: "Tut"},
+				},
+				validationRules: map[string][]string{"Name": {"required", "string"}, "Age": {""}, "Child.Name": {"required", "string"}},
+			},
+			wantErr:              false,
+			wantValidationErrors: false,
+		},
+		{
+			name: "validate nested struct with unsuitable data",
+			args: args{
+				structData: Parent{
+					Name: "Ikhnaton",
+				},
+				validationRules: map[string][]string{"Name": {"required", "string"}, "Child.Name": {"required", "string"}},
+			},
+			wantErr:              false,
+			wantValidationErrors: true,
+		},
+		{
+			name: "validate nested struct (validation tag)",
+			args: args{
+				structData: Parent{
+					Name:  "Ikhnaton",
+					Age:   1,
+					Child: Child{Name: "tut"},
+				},
+				validationRules: map[string][]string{},
+			},
+			wantErr:              false,
+			wantValidationErrors: false,
+		},
+		{
+			name: "validate nested struct with unsuitable data (validation tag)",
+			args: args{
+				structData: Parent{
+					Name: "Ikhnaton",
+				},
+				validationRules: map[string][]string{},
+			},
+			wantErr:              false,
+			wantValidationErrors: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErrors := ValidateStruct(tt.args.structData, tt.args.validationRules)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateStruct() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
+			}
+			if (len(validationErrors) > 0) != tt.wantValidationErrors {
+				t.Errorf("ValidateStruct() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
+			}
+		})
+	}
+}
