@@ -7,6 +7,39 @@ import (
 	"strings"
 )
 
+func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string) (err error, validationErrors map[string]string) {
+	validationErrors = make(map[string]string)
+
+	for _, rule := range fieldRules {
+		if rule == "" {
+			continue
+		}
+		ruleFunc, ruleExists := rules[rule]
+		if !ruleExists {
+			err = errors.New("unknown validation rule: " + rule)
+			return err, validationErrors
+		}
+
+		var ruleValue string
+		if strings.ContainsRune(rule, ':') {
+			ruleValue = strings.Split(rule, ":")[1]
+		}
+
+		err, validationError := ruleFunc(fieldName, fieldValue, ruleValue)
+		if err != nil {
+			return err, validationErrors
+		}
+
+		if validationError != "" {
+			validationErrors[fieldName] = validationError
+			break
+		}
+
+	}
+
+	return
+}
+
 func ValidateStruct(structData interface{}, validationRules map[string][]string) (err error, validationErrors map[string]string) {
 	t := reflect.TypeOf(structData)
 	v := reflect.ValueOf(structData)
