@@ -14,15 +14,16 @@ func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string
 		if rule == "" {
 			continue
 		}
-		ruleFunc, ruleExists := rules[rule]
-		if !ruleExists {
-			err = errors.New("unknown validation rule: " + rule)
-			return err, validationErrors
-		}
 
 		var ruleValue string
 		if strings.ContainsRune(rule, ':') {
 			ruleValue = strings.Split(rule, ":")[1]
+		}
+
+		ruleFunc, ruleExists := rules[rule]
+		if !ruleExists {
+			err = errors.New("unknown validation rule: " + rule)
+			return err, validationErrors
 		}
 
 		err, validationError := ruleFunc(fieldName, fieldValue, ruleValue)
@@ -56,7 +57,6 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 			parentName += "."
 		}
 
-	FIELDS:
 		for i := 0; i < t.NumField(); i++ {
 			field := t.Field(i)
 			fieldValidationTag := field.Tag.Get("validation")
@@ -80,11 +80,6 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 				continue
 			}
 
-			fieldExists := true
-			if fieldValue.IsZero() {
-				fieldExists = false
-			}
-
 			var fieldRules []string
 			if validationRules[fieldName] != nil {
 				fieldRules = validationRules[fieldName]
@@ -92,34 +87,17 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 				fieldRules = strings.Split(fieldValidationTag, "|")
 			}
 
-			for _, rule := range fieldRules {
-				if rule == "" {
-					continue
-				}
-				var ruleValue string
-				if strings.ContainsRune(rule, ':') {
-					ruleDetailed := strings.Split(rule, ":")
-					ruleValue = ruleDetailed[1]
-					rule = ruleDetailed[0]
-				}
+			err, fieldValidationErrors := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
 
-				ruleFunc, ruleExists := rules[rule]
-				if !ruleExists {
-					err = errors.New("unknown validation rule: " + rule)
-					return err, validationErrors
-				}
-
-				err, validationError := ruleFunc(fieldName, fieldValue.Interface(), fieldExists, ruleValue)
-				if err != nil {
-					return err, validationErrors
-				}
-
-				if validationError != "" {
-					validationErrors[fieldName] = validationError
-					continue FIELDS
+			if len(fieldValidationErrors) > 0 {
+				for k, v := range fieldValidationErrors {
+					validationErrors[k] = v
 				}
 			}
 
+			if err != nil {
+				return err, validationErrors
+			}
 		}
 		return err, validationErrors
 	}
@@ -141,33 +119,23 @@ func ValidateJson(jsonData string, validationRules map[string][]string) (err err
 func ValidateMap(mapData map[string]interface{}, validationRules map[string][]string) (err error, validationErrors map[string]string) {
 	validationErrors = make(map[string]string)
 
-FIELDS:
-	for field, fieldRules := range validationRules {
-		fieldVal, fieldExists := mapData[field]
+	for fieldName, fieldRules := range validationRules {
+		fieldValue, fieldExists := mapData[fieldName]
 
-		for _, rule := range fieldRules {
-			var ruleVal string
-			if strings.ContainsRune(rule, ':') {
-				ruleDetailed := strings.Split(rule, ":")
-				ruleVal = ruleDetailed[1]
-				rule = ruleDetailed[0]
-			}
+		if !fieldExists {
+			fieldValue = ""
+		}
 
-			ruleFunc, ruleExists := rules[rule]
-			if !ruleExists {
-				err = errors.New("unknown validation rule: " + rule)
-				return err, validationErrors
-			}
+		err, fieldValidationErrors := ValidateField(fieldName, fieldValue, fieldRules)
 
-			err, validationError := ruleFunc(field, fieldVal, fieldExists, ruleVal)
-			if err != nil {
-				return err, validationErrors
+		if len(fieldValidationErrors) > 0 {
+			for k, v := range fieldValidationErrors {
+				validationErrors[k] = v
 			}
+		}
 
-			if validationError != "" {
-				validationErrors[field] = validationError
-				continue FIELDS
-			}
+		if err != nil {
+			return err, validationErrors
 		}
 	}
 
