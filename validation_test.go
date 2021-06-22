@@ -28,9 +28,9 @@ func TestValidateJson(t *testing.T) {
 			name: `test validate json with unsuitable data`,
 			args: args{
 				jsonData:        `{"name":"Ramses", "age":90}`,
-				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}, "age": {"required", "blabla"}},
+				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}},
 			},
-			wantErr:              true,
+			wantErr:              false,
 			wantValidationErrors: true,
 		},
 	}
@@ -71,9 +71,9 @@ func TestValidateMap(t *testing.T) {
 			name: "test validate map with unsuitable data",
 			args: args{
 				mapData:         map[string]interface{}{"name": "Ramses", "age": 90},
-				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}, "age": {"required", "blabla"}},
+				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}},
 			},
-			wantErr:              true,
+			wantErr:              false,
 			wantValidationErrors: true,
 		},
 	}
@@ -219,6 +219,16 @@ func TestValidateField(t *testing.T) {
 			},
 			wantErr:              false,
 			wantValidationErrors: true,
+		},
+		{
+			name: "test validate field with not exists rule",
+			args: args{
+				fieldName:  "Name",
+				fieldValue: 55,
+				fieldRules: []string{"bla:bla"},
+			},
+			wantErr:              true,
+			wantValidationErrors: false,
 		},
 	}
 	for _, tt := range tests {

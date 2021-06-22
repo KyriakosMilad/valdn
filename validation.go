@@ -23,12 +23,12 @@ func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string
 		ruleFunc, ruleExists := rules[rule]
 		if !ruleExists {
 			err = errors.New("unknown validation rule: " + rule)
-			return err, validationErrors
+			return err, nil
 		}
 
 		err, validationError := ruleFunc(fieldName, fieldValue, ruleValue)
 		if err != nil {
-			return err, validationErrors
+			return err, nil
 		}
 
 		if validationError != "" {
@@ -46,7 +46,7 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 	v := reflect.ValueOf(structData)
 	if t.Kind() != reflect.Struct {
 		err = errors.New("can only proceed `struct` kind")
-		return err, validationErrors
+		return err, nil
 	}
 
 	var validateNestedStruct func(t reflect.Type, v reflect.Value, parentName string) (err error, validationErrors map[string]string)
@@ -71,7 +71,7 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 				}
 
 				if err != nil {
-					return err, validationErrors
+					return err, nil
 				}
 				continue
 			}
@@ -96,7 +96,7 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 			}
 
 			if err != nil {
-				return err, validationErrors
+				return err, nil
 			}
 		}
 		return err, validationErrors
@@ -128,14 +128,14 @@ func ValidateMap(mapData map[string]interface{}, validationRules map[string][]st
 
 		err, fieldValidationErrors := ValidateField(fieldName, fieldValue, fieldRules)
 
+		if err != nil {
+			return err, nil
+		}
+
 		if len(fieldValidationErrors) > 0 {
 			for k, v := range fieldValidationErrors {
 				validationErrors[k] = v
 			}
-		}
-
-		if err != nil {
-			return err, validationErrors
 		}
 	}
 
