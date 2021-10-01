@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string) (err error, validationErrors map[string]string) {
-	validationErrors = make(map[string]string)
+func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string) (error, map[string]string) {
+	validationErrors := make(map[string]string)
 
 	for _, rule := range fieldRules {
 		if rule == "" {
@@ -20,9 +20,9 @@ func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string
 			ruleValue = strings.Split(rule, ":")[1]
 		}
 
-		ruleFunc, ruleExists := rules[rule]
-		if !ruleExists {
-			err = errors.New("unknown validation rule: " + rule)
+		ruleFunc, ruleExist := rules[rule]
+		if !ruleExist {
+			err := errors.New("unknown validation rule: " + rule)
 			return err, nil
 		}
 
@@ -38,7 +38,7 @@ func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string
 
 	}
 
-	return
+	return nil, validationErrors
 }
 
 func ValidateStruct(structData interface{}, validationRules map[string][]string) (err error, validationErrors map[string]string) {

@@ -4,6 +4,62 @@ import (
 	"testing"
 )
 
+func TestValidateField(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		fieldRules []string
+	}
+	tests := []struct {
+		name                 string
+		args                 args
+		wantErr              bool
+		wantValidationErrors bool
+	}{
+		{
+			name: "test validate field",
+			args: args{
+				fieldName:  "Name",
+				fieldValue: "Kyria",
+				fieldRules: []string{"required", "string"},
+			},
+			wantErr:              false,
+			wantValidationErrors: false,
+		},
+		{
+			name: "test validate field with unsuitable data",
+			args: args{
+				fieldName:  "Name",
+				fieldValue: 55,
+				fieldRules: []string{"required", "string"},
+			},
+			wantErr:              false,
+			wantValidationErrors: true,
+		},
+		{
+			name: "test validate field with not exists rule",
+			args: args{
+				fieldName:  "Name",
+				fieldValue: 55,
+				fieldRules: []string{"bla:bla"},
+			},
+			wantErr:              true,
+			wantValidationErrors: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErrors := ValidateField(tt.args.fieldName, tt.args.fieldValue, tt.args.fieldRules)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateField() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
+			}
+			if (len(validationErrors) > 0) != tt.wantValidationErrors {
+				t.Errorf("ValidateField() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
+			}
+		})
+	}
+}
+
 func TestValidateJson(t *testing.T) {
 	type args struct {
 		jsonData        string
@@ -183,62 +239,6 @@ func TestValidateStruct(t *testing.T) {
 			}
 			if (len(validationErrors) > 0) != tt.wantValidationErrors {
 				t.Errorf("ValidateStruct() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
-			}
-		})
-	}
-}
-
-func TestValidateField(t *testing.T) {
-	type args struct {
-		fieldName  string
-		fieldValue interface{}
-		fieldRules []string
-	}
-	tests := []struct {
-		name                 string
-		args                 args
-		wantErr              bool
-		wantValidationErrors bool
-	}{
-		{
-			name: "test validate field",
-			args: args{
-				fieldName:  "Name",
-				fieldValue: "Kyria",
-				fieldRules: []string{"required", "string"},
-			},
-			wantErr:              false,
-			wantValidationErrors: false,
-		},
-		{
-			name: "test validate field with unsuitable data",
-			args: args{
-				fieldName:  "Name",
-				fieldValue: 55,
-				fieldRules: []string{"required", "string"},
-			},
-			wantErr:              false,
-			wantValidationErrors: true,
-		},
-		{
-			name: "test validate field with not exists rule",
-			args: args{
-				fieldName:  "Name",
-				fieldValue: 55,
-				fieldRules: []string{"bla:bla"},
-			},
-			wantErr:              true,
-			wantValidationErrors: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := ValidateField(tt.args.fieldName, tt.args.fieldValue, tt.args.fieldRules)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateField() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
-			}
-			if (len(validationErrors) > 0) != tt.wantValidationErrors {
-				t.Errorf("ValidateField() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
 			}
 		})
 	}
