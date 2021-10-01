@@ -105,10 +105,10 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 	return validateNestedStruct(t, v, "")
 }
 
-func ValidateJson(jsonData string, validationRules map[string][]string) (err error, validationErrors map[string]string) {
+func ValidateJson(jsonData string, validationRules map[string][]string) (error, map[string]string) {
 	var decodedJson map[string]interface{}
 
-	err = json.Unmarshal([]byte(jsonData), &decodedJson)
+	err := json.Unmarshal([]byte(jsonData), &decodedJson)
 	if err != nil {
 		return err, nil
 	}
