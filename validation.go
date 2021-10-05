@@ -3,6 +3,7 @@ package validation
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -113,20 +114,62 @@ func ValidateJson(jsonData string, validationRules map[string][]string) (error, 
 		return err, nil
 	}
 
-	return ValidateMap(decodedJson, validationRules)
+	return ValidateMap(decodedJson, validationRules, "")
 }
 
-func ValidateMap(mapData map[string]interface{}, validationRules map[string][]string) (err error, validationErrors map[string]string) {
-	validationErrors = make(map[string]string)
+func ValidateMap(mapData map[string]interface{}, validationRules map[string][]string, parentName string) (error, map[string]string) {
+	validationErrors := make(map[string]string)
+	var fieldValidationErrors map[string]string
+	var err error
+	fieldsExist := make(map[string]bool)
 
-	for fieldName, fieldRules := range validationRules {
-		fieldValue, fieldExists := mapData[fieldName]
-
-		if !fieldExists {
-			fieldValue = ""
+	for fieldName, fieldValue := range mapData {
+		var fullName string
+		if parentName == "" {
+			fullName = fieldName
+		} else {
+			fullName = parentName + "." + fieldName
 		}
 
-		err, fieldValidationErrors := ValidateField(fieldName, fieldValue, fieldRules)
+		fieldsExist[fullName] = true
+
+		fieldRules, fieldHasRules := validationRules[fullName]
+
+		if !fieldHasRules {
+			continue
+		}
+
+		switch fieldValue.(type) {
+		// uncomment after refactor ValidateStruct()
+		//case struct{}:
+		//	structRules := make(map[string][]string)
+		//	for k, v := range validationRules {
+		//		if strings.Contains(k, fullName + ".") {
+		//			structRules[k] = v
+		//		}
+		//	}
+		//	err, fieldValidationErrors = ValidateStruct(fieldValue, structRules)
+		case map[string]interface{}:
+			mapRules := make(map[string][]string)
+			for k, v := range validationRules {
+				if strings.Contains(k, fullName+".") {
+					mapRules[k] = v
+				}
+			}
+			mapFields := make(map[string]interface{})
+			if val, ok := fieldValue.(map[string]interface{}); ok {
+				for k, v := range val {
+					mapFields[k] = v
+					fieldsExist[fullName+"."+k] = true
+				}
+			}
+			err, fieldValidationErrors = ValidateMap(mapFields, mapRules, fullName)
+		default:
+			if reflect.TypeOf(fieldValue).Kind() == reflect.Map {
+				return fmt.Errorf("error validating %v: type %v is not supported", fullName, reflect.TypeOf(fieldValue)), nil
+			}
+			err, fieldValidationErrors = ValidateField(fieldName, fieldValue, fieldRules)
+		}
 
 		if err != nil {
 			return err, nil
@@ -139,5 +182,16 @@ func ValidateMap(mapData map[string]interface{}, validationRules map[string][]st
 		}
 	}
 
-	return
+	for k, v := range validationRules {
+		for _, val := range v {
+			if val == "required" {
+				_, ok := fieldsExist[k]
+				if !ok {
+					validationErrors[k] = k + " is required"
+				}
+			}
+		}
+	}
+
+	return err, validationErrors
 }

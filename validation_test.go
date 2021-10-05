@@ -132,10 +132,37 @@ func TestValidateMap(t *testing.T) {
 			wantErr:              false,
 			wantValidationErrors: true,
 		},
+		{
+			name: "test validate nested map",
+			args: args{
+				mapData:         map[string]interface{}{"user": map[string]interface{}{"name": "Kyriakos M.", "country": "Egypt"}},
+				validationRules: map[string][]string{"user": {"required"}, "user.name": {"required", "string"}, "user.country": {"required", "string"}},
+			},
+			wantErr:              false,
+			wantValidationErrors: false,
+		},
+		{
+			name: "test validate nested map with unsuitable data",
+			args: args{
+				mapData:         map[string]interface{}{"user": map[string]interface{}{"name": 1, "country": "Egypt"}},
+				validationRules: map[string][]string{"user": {"required"}, "user.name": {"required", "string"}, "user.country": {"required", "string"}},
+			},
+			wantErr:              false,
+			wantValidationErrors: true,
+		},
+		{
+			name: "test validate nested map with non-string key",
+			args: args{
+				mapData:         map[string]interface{}{"user": map[int]interface{}{1: 2}},
+				validationRules: map[string][]string{"user": {"required"}},
+			},
+			wantErr:              true,
+			wantValidationErrors: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := ValidateMap(tt.args.mapData, tt.args.validationRules)
+			err, validationErrors := ValidateMap(tt.args.mapData, tt.args.validationRules, "")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateMap() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
 			}
