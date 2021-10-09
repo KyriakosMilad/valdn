@@ -42,7 +42,7 @@ func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string
 	return nil, validationErrors
 }
 
-func ValidateStruct(structData interface{}, validationRules map[string][]string) (error, map[string]string) {
+func ValidateStruct(structData interface{}, validationRules map[string][]string, parentName string) (error, map[string]string) {
 	var err error
 	validationErrors := make(map[string]string)
 	fieldsExist := make(map[string]bool)
@@ -133,7 +133,7 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 					fieldsExist[fieldName+"."+reflect.TypeOf(fieldValue).Field(i).Name] = true
 				}
 				err, fieldValidationErrors = validateNestedStruct(fieldType, fieldValue, fieldName)
-			case reflect.TypeOf(fieldValue) == reflect.TypeOf(map[string]interface{}{}):
+			case fieldType == reflect.TypeOf(map[string]interface{}{}):
 				err, mapFieldErrors := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
 				if err != nil {
 					return err, nil
@@ -190,7 +190,7 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 		return err, validationErrors
 	}
 
-	return validateNestedStruct(baseT, baseV, "")
+	return validateNestedStruct(baseT, baseV, parentName)
 }
 
 func ValidateJson(jsonData string, validationRules map[string][]string) (error, map[string]string) {
@@ -226,17 +226,35 @@ func ValidateMap(mapData map[string]interface{}, validationRules map[string][]st
 			continue
 		}
 
-		switch fieldValue.(type) {
-		// uncomment after refactor ValidateStruct()
-		//case struct{}:
-		//	structRules := make(map[string][]string)
-		//	for k, v := range validationRules {
-		//		if strings.Contains(k, fullName + ".") {
-		//			structRules[k] = v
-		//		}
-		//	}
-		//	err, fieldValidationErrors = ValidateStruct(fieldValue, structRules)
-		case map[string]interface{}:
+		switch {
+		case reflect.TypeOf(fieldValue).Kind() == reflect.Struct:
+			var structFieldErrors map[string]string
+			err, structFieldErrors = ValidateField(fieldName, fieldValue, fieldRules)
+			if err != nil {
+				return err, nil
+			}
+			if len(structFieldErrors) > 0 {
+				return nil, structFieldErrors
+			}
+			structRules := make(map[string][]string)
+			for k, v := range validationRules {
+				if strings.Contains(k, fullName+".") {
+					structRules[k] = v
+				}
+			}
+			for i := 0; i < reflect.TypeOf(fieldValue).NumField(); i++ {
+				fieldsExist[fullName+"."+reflect.TypeOf(fieldValue).Field(i).Name] = true
+			}
+			err, fieldValidationErrors = ValidateStruct(fieldValue, structRules, fullName)
+		case reflect.TypeOf(fieldValue) == reflect.TypeOf(map[string]interface{}{}):
+			var mapFieldErrors map[string]string
+			err, mapFieldErrors = ValidateField(fieldName, fieldValue, fieldRules)
+			if err != nil {
+				return err, nil
+			}
+			if len(mapFieldErrors) > 0 {
+				return err, mapFieldErrors
+			}
 			mapRules := make(map[string][]string)
 			for k, v := range validationRules {
 				if strings.Contains(k, fullName+".") {

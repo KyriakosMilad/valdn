@@ -104,6 +104,9 @@ func TestValidateJson(t *testing.T) {
 }
 
 func TestValidateMap(t *testing.T) {
+	type User struct {
+		Name int
+	}
 	type args struct {
 		mapData         map[string]interface{}
 		validationRules map[string][]string
@@ -158,6 +161,24 @@ func TestValidateMap(t *testing.T) {
 			},
 			wantErr:                       true,
 			expectedValidationErrorsCount: 0,
+		},
+		{
+			name: "test validate map includes struct",
+			args: args{
+				mapData:         map[string]interface{}{"user": User{Name: 5}},
+				validationRules: map[string][]string{"user": {"required"}, "user.Name": {"required"}},
+			},
+			wantErr:                       false,
+			expectedValidationErrorsCount: 0,
+		},
+		{
+			name: "test validate map includes struct with unsuitable data",
+			args: args{
+				mapData:         map[string]interface{}{"user": User{Name: 5}},
+				validationRules: map[string][]string{"user": {"required"}, "user.Name": {"required", "string"}},
+			},
+			wantErr:                       false,
+			expectedValidationErrorsCount: 1,
 		},
 	}
 	for _, tt := range tests {
@@ -287,7 +308,7 @@ func TestValidateStruct(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := ValidateStruct(tt.args.structData, tt.args.validationRules)
+			err, validationErrors := ValidateStruct(tt.args.structData, tt.args.validationRules, "")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateStruct() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
