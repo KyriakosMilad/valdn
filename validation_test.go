@@ -178,8 +178,10 @@ func TestValidateStruct(t *testing.T) {
 		Name string `validation:"required|string"`
 	}
 	type Parent struct {
-		Name string `validation:"required|string"`
-		Age  int    `validation:"required"`
+		Name            string `validation:"required|string"`
+		Age             int    `validation:"required"`
+		StringKeyMap    map[string]interface{}
+		NonStringKeyMap map[int]interface{}
 		Child
 	}
 	type args struct {
@@ -256,6 +258,31 @@ func TestValidateStruct(t *testing.T) {
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 1,
+		},
+		{
+			name: "validate struct includes string-key-map",
+			args: args{
+				structData: Parent{
+					Name: "Ikhnaton",
+					Age:  2,
+				},
+				validationRules: map[string][]string{"stringKeyMap": {"required"}, "stringKeyMap.val": {"required"}},
+			},
+			wantErr:                       false,
+			expectedValidationErrorsCount: 2,
+		},
+		{
+			name: "validate struct includes non-string-key-map",
+			args: args{
+				structData: Parent{
+					Name:            "Ikhnaton",
+					Age:             2,
+					NonStringKeyMap: map[int]interface{}{1: 2},
+				},
+				validationRules: map[string][]string{"NonStringKeyMap": {"required"}},
+			},
+			wantErr:                       true,
+			expectedValidationErrorsCount: 0,
 		},
 	}
 	for _, tt := range tests {

@@ -42,17 +42,21 @@ func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string
 	return nil, validationErrors
 }
 
-func ValidateStruct(structData interface{}, validationRules map[string][]string) (err error, validationErrors map[string]string) {
-	t := reflect.TypeOf(structData)
-	v := reflect.ValueOf(structData)
-	if t.Kind() != reflect.Struct {
+func ValidateStruct(structData interface{}, validationRules map[string][]string) (error, map[string]string) {
+	var err error
+	validationErrors := make(map[string]string)
+	fieldsExist := make(map[string]bool)
+
+	baseT := reflect.TypeOf(structData)
+	baseV := reflect.ValueOf(structData)
+	if baseT.Kind() != reflect.Struct {
 		err = errors.New("can only proceed `struct` kind")
 		return err, nil
 	}
 
-	var validateNestedStruct func(t reflect.Type, v reflect.Value, parentName string) (err error, validationErrors map[string]string)
-	validateNestedStruct = func(t reflect.Type, v reflect.Value, parentName string) (err error, validationErrors map[string]string) {
-		validationErrors = make(map[string]string)
+	var validateNestedStruct func(t reflect.Type, v reflect.Value, parentName string) (error, map[string]string)
+	validateNestedStruct = func(t reflect.Type, v reflect.Value, parentName string) (error, map[string]string) {
+		var fieldValidationErrors map[string]string
 
 		if parentName != "" {
 			parentName += "."
@@ -64,31 +68,102 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 			fieldName := parentName + field.Name
 			fieldType := field.Type
 			fieldValue := v.Field(i)
+			if !fieldValue.IsZero() {
+				fieldsExist[fieldName] = true
+			}
 
-			if fieldType.Kind() == reflect.Struct {
-				err, nestedStructValidationErrors := validateNestedStruct(fieldType, fieldValue, fieldName)
-				for key, val := range nestedStructValidationErrors {
-					validationErrors[key] = val
+			fieldRules, fieldHasRules := validationRules[fieldName]
+			if !fieldHasRules && fieldValidationTag == "" && fieldType.Kind() != reflect.Struct {
+				continue
+			}
+
+			if !fieldHasRules {
+				fieldRules = strings.Split(fieldValidationTag, "|")
+				fieldRequired := false
+				for _, v := range fieldRules {
+					if v == "required" {
+						fieldRequired = true
+						break
+					}
 				}
+				if fieldRequired && parentName != "" {
+					parentName = strings.Split(parentName, ".")[0]
+					parentRequired := false
+					for j := 0; j < baseT.NumField(); j++ {
+						f := baseT.Field(j)
+						if parentName == f.Name {
+							parentRules, parentHasRules := validationRules[parentName]
+							if !parentHasRules {
+								fTag := f.Tag.Get("validation")
+								if fTag != "" {
+									parentRules = strings.Split(fTag, "|")
+								}
+							}
+						ParentRulesLoop:
+							for _, v := range parentRules {
+								if v == "required" {
+									parentRequired = true
+									break ParentRulesLoop
+								}
+							}
+							if !parentRequired {
+							FieldRulesLoop:
+								for i, v := range fieldRules {
+									if v == "required" {
+										fieldRules = append(fieldRules[:i], fieldRules[i+1:]...)
+										break FieldRulesLoop
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 
+			switch {
+			case fieldType.Kind() == reflect.Struct:
+				err, structFieldErrors := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
 				if err != nil {
 					return err, nil
 				}
-				continue
+				if len(structFieldErrors) > 0 {
+					return nil, structFieldErrors
+				}
+				for i := 0; i < fieldValue.NumField(); i++ {
+					fieldsExist[fieldName+"."+reflect.TypeOf(fieldValue).Field(i).Name] = true
+				}
+				err, fieldValidationErrors = validateNestedStruct(fieldType, fieldValue, fieldName)
+			case reflect.TypeOf(fieldValue) == reflect.TypeOf(map[string]interface{}{}):
+				err, mapFieldErrors := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
+				if err != nil {
+					return err, nil
+				}
+				if len(mapFieldErrors) > 0 {
+					return nil, mapFieldErrors
+				}
+				mapRules := make(map[string][]string)
+				for k, v := range validationRules {
+					if strings.Contains(k, fieldName+".") {
+						mapRules[k] = v
+					}
+				}
+				if len(mapRules) == 0 {
+					continue
+				}
+				mapFields := make(map[string]interface{})
+				if val, ok := fieldValue.Interface().(map[string]interface{}); ok {
+					for k, v := range val {
+						mapFields[k] = v
+						fieldsExist[fieldName+"."+k] = true
+					}
+				}
+				err, fieldValidationErrors = ValidateMap(mapFields, mapRules, fieldName)
+			default:
+				if fieldType.Kind() == reflect.Map {
+					return fmt.Errorf("error validating %v: type %v is not supported", fieldName, fieldType), nil
+				}
+				err, fieldValidationErrors = ValidateField(fieldName, fieldValue.Interface(), fieldRules)
 			}
-
-			if _, ok := validationRules[fieldName]; !ok && fieldValidationTag == "" {
-				continue
-			}
-
-			var fieldRules []string
-			if validationRules[fieldName] != nil {
-				fieldRules = validationRules[fieldName]
-			} else {
-				fieldRules = strings.Split(fieldValidationTag, "|")
-			}
-
-			err, fieldValidationErrors := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
 
 			if len(fieldValidationErrors) > 0 {
 				for k, v := range fieldValidationErrors {
@@ -100,10 +175,22 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string)
 				return err, nil
 			}
 		}
+
+		for k, v := range validationRules {
+			for _, val := range v {
+				if val == "required" {
+					_, ok := fieldsExist[k]
+					if !ok {
+						validationErrors[k] = k + " is required"
+					}
+				}
+			}
+		}
+
 		return err, validationErrors
 	}
 
-	return validateNestedStruct(t, v, "")
+	return validateNestedStruct(baseT, baseV, "")
 }
 
 func ValidateJson(jsonData string, validationRules map[string][]string) (error, map[string]string) {
