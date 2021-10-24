@@ -1,8 +1,10 @@
 package validation
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestAddRule(t *testing.T) {
+func Test_AddRule(t *testing.T) {
 	type args struct {
 		ruleName string
 		ruleFunc func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string)
@@ -24,11 +26,14 @@ func TestAddRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddRule(tt.args.ruleName, tt.args.ruleFunc)
+			if _, ok := rules["test"]; !ok {
+				t.Errorf("AddRule() error: failed to add rule, args: %v", tt.args)
+			}
 		})
 	}
 }
 
-func TestRequiredRule(t *testing.T) {
+func Test_requiredRule(t *testing.T) {
 	type args struct {
 		field      string
 		fieldValue interface{}
@@ -78,7 +83,7 @@ func TestRequiredRule(t *testing.T) {
 	}
 }
 
-func TestStringRule(t *testing.T) {
+func Test_stringRule(t *testing.T) {
 	type args struct {
 		field      string
 		fieldValue interface{}

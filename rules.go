@@ -4,9 +4,9 @@ import (
 	"reflect"
 )
 
-var rules = make(map[string]func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string))
+var rules = make(map[string]func(field string, fieldValue interface{}, ruleValue string) (error, string))
 
-func AddRule(ruleName string, ruleFunc func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string)) {
+func AddRule(ruleName string, ruleFunc func(field string, fieldValue interface{}, ruleValue string) (error, string)) {
 	_, ruleExists := rules[ruleName]
 	if ruleExists {
 		panic("rule already registered")
@@ -18,19 +18,19 @@ func AddRule(ruleName string, ruleFunc func(field string, fieldValue interface{}
 }
 
 func init() {
-	AddRule("required", func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string) {
+	AddRule("required", func(field string, fieldValue interface{}, ruleValue string) (error, string) {
 		if reflect.ValueOf(fieldValue).IsZero() {
-			validationError = field + " is required"
-			return
+			validationError := field + " is required"
+			return nil, validationError
 		}
-		return
+		return nil, ""
 	})
 
-	AddRule("string", func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string) {
+	AddRule("string", func(field string, fieldValue interface{}, ruleValue string) (error, string) {
 		if reflect.ValueOf(fieldValue).Kind() != reflect.String {
-			validationError = field + " must be a string"
-			return
+			validationError := field + " must be a string"
+			return nil, validationError
 		}
-		return
+		return nil, ""
 	})
 }
