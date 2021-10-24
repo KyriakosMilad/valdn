@@ -8,38 +8,27 @@ import (
 	"strings"
 )
 
-func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string) (error, map[string]string) {
-	validationErrors := make(map[string]string)
-
+func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string) (error, string) {
 	for _, rule := range fieldRules {
 		if rule == "" {
 			continue
 		}
 
-		var ruleValue string
-		if strings.ContainsRune(rule, ':') {
-			ruleValue = strings.Split(rule, ":")[1]
-		}
-
-		ruleFunc, ruleExist := rules[rule]
-		if !ruleExist {
+		ruleFunc, ruleExists := rules[rule]
+		if !ruleExists {
 			err := errors.New("unknown validation rule: " + rule)
-			return err, nil
+			return err, ""
 		}
-
+		ruleValue := getRuleValue(rule)
 		err, validationError := ruleFunc(fieldName, fieldValue, ruleValue)
 		if err != nil {
-			return err, nil
+			return err, ""
 		}
-
 		if validationError != "" {
-			validationErrors[fieldName] = validationError
-			break
+			return nil, validationError
 		}
-
 	}
-
-	return nil, validationErrors
+	return nil, ""
 }
 
 func ValidateStruct(structData interface{}, validationRules map[string][]string, parentName string) (error, map[string]string) {
@@ -122,24 +111,24 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string,
 
 			switch {
 			case fieldType.Kind() == reflect.Struct:
-				err, structFieldErrors := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
+				err, structFieldError := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
 				if err != nil {
 					return err, nil
 				}
-				if len(structFieldErrors) > 0 {
-					return nil, structFieldErrors
+				if structFieldError != "" {
+					validationErrors[fieldName] = structFieldError
 				}
 				for i := 0; i < fieldValue.NumField(); i++ {
 					fieldsExist[fieldName+"."+reflect.TypeOf(fieldValue).Field(i).Name] = true
 				}
 				err, fieldValidationErrors = validateNestedStruct(fieldType, fieldValue, fieldName)
 			case fieldType == reflect.TypeOf(map[string]interface{}{}):
-				err, mapFieldErrors := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
+				err, mapFieldError := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
 				if err != nil {
 					return err, nil
 				}
-				if len(mapFieldErrors) > 0 {
-					return nil, mapFieldErrors
+				if mapFieldError != "" {
+					validationErrors[fieldName] = mapFieldError
 				}
 				mapRules := make(map[string][]string)
 				for k, v := range validationRules {
@@ -162,7 +151,13 @@ func ValidateStruct(structData interface{}, validationRules map[string][]string,
 				if fieldType.Kind() == reflect.Map {
 					return fmt.Errorf("error validating %v: type %v is not supported", fieldName, fieldType), nil
 				}
-				err, fieldValidationErrors = ValidateField(fieldName, fieldValue.Interface(), fieldRules)
+				err, fieldValidationError := ValidateField(fieldName, fieldValue.Interface(), fieldRules)
+				if err != nil {
+					return err, nil
+				}
+				if fieldValidationError != "" {
+					validationErrors[fieldName] = fieldValidationError
+				}
 			}
 
 			if len(fieldValidationErrors) > 0 {
@@ -228,13 +223,12 @@ func ValidateMap(mapData map[string]interface{}, validationRules map[string][]st
 
 		switch {
 		case reflect.TypeOf(fieldValue).Kind() == reflect.Struct:
-			var structFieldErrors map[string]string
-			err, structFieldErrors = ValidateField(fieldName, fieldValue, fieldRules)
+			err, structFieldError := ValidateField(fieldName, fieldValue, fieldRules)
 			if err != nil {
 				return err, nil
 			}
-			if len(structFieldErrors) > 0 {
-				return nil, structFieldErrors
+			if structFieldError != "" {
+				validationErrors[fieldName] = structFieldError
 			}
 			structRules := make(map[string][]string)
 			for k, v := range validationRules {
@@ -247,13 +241,12 @@ func ValidateMap(mapData map[string]interface{}, validationRules map[string][]st
 			}
 			err, fieldValidationErrors = ValidateStruct(fieldValue, structRules, fullName)
 		case reflect.TypeOf(fieldValue) == reflect.TypeOf(map[string]interface{}{}):
-			var mapFieldErrors map[string]string
-			err, mapFieldErrors = ValidateField(fieldName, fieldValue, fieldRules)
+			err, mapFieldError := ValidateField(fieldName, fieldValue, fieldRules)
 			if err != nil {
 				return err, nil
 			}
-			if len(mapFieldErrors) > 0 {
-				return err, mapFieldErrors
+			if mapFieldError != "" {
+				validationErrors[fieldName] = mapFieldError
 			}
 			mapRules := make(map[string][]string)
 			for k, v := range validationRules {
@@ -273,7 +266,13 @@ func ValidateMap(mapData map[string]interface{}, validationRules map[string][]st
 			if reflect.TypeOf(fieldValue).Kind() == reflect.Map {
 				return fmt.Errorf("error validating %v: type %v is not supported", fullName, reflect.TypeOf(fieldValue)), nil
 			}
-			err, fieldValidationErrors = ValidateField(fieldName, fieldValue, fieldRules)
+			err, fieldValidationError := ValidateField(fieldName, fieldValue, fieldRules)
+			if err != nil {
+				return err, nil
+			}
+			if fieldValidationError != "" {
+				validationErrors[fieldName] = fieldValidationError
+			}
 		}
 
 		if err != nil {

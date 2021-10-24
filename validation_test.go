@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestValidateField(t *testing.T) {
+func Test_ValidateField(t *testing.T) {
 	type args struct {
 		fieldName  string
 		fieldValue interface{}
