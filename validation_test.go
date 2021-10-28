@@ -60,7 +60,7 @@ func Test_ValidateField(t *testing.T) {
 	}
 }
 
-func TestValidateJson(t *testing.T) {
+func Test_ValidateJson(t *testing.T) {
 	type args struct {
 		jsonData        string
 		validationRules map[string][]string
@@ -103,7 +103,7 @@ func TestValidateJson(t *testing.T) {
 	}
 }
 
-func TestValidateMap(t *testing.T) {
+func Test_ValidateMap(t *testing.T) {
 	type User struct {
 		Name int
 	}
@@ -194,7 +194,7 @@ func TestValidateMap(t *testing.T) {
 	}
 }
 
-func TestValidateStruct(t *testing.T) {
+func Test_ValidateStruct(t *testing.T) {
 	type Child struct {
 		Name string `validation:"required|string"`
 	}
