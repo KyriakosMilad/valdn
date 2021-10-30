@@ -219,7 +219,7 @@ func registerMapFields(mapData interface{}, parentName string, fieldsExists map[
 	parentName = makeParentNameJoinable(parentName)
 	mapFields := convertInterfaceToMap(mapData)
 	for k, v := range mapFields {
-		fieldName := parentName+k
+		fieldName := parentName + k
 		fieldType := reflect.TypeOf(v)
 		fieldsExists[fieldName] = true
 		registerNestedFieldsByType(fieldType, v, fieldName, fieldsExists)
