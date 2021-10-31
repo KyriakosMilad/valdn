@@ -517,3 +517,49 @@ func Test_uint16Rule(t *testing.T) {
 		})
 	}
 }
+
+func Test_uint32Rule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test uint32 rule",
+			args: args{
+				fieldName:  "uint32Field",
+				fieldValue: uint32(4294967294),
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test uint32 rule with non-uint32 value",
+			args: args{
+				fieldName:  "uint32Field",
+				fieldValue: uint64(18446744073709551614),
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := uint32Rule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("uint32Rule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("uint32Rule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}

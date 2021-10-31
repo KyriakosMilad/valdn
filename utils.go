@@ -41,3 +41,7 @@ func IsUint8(val interface{}) bool {
 func IsUint16(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Uint16
 }
+
+func IsUint32(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Uint32
+}
