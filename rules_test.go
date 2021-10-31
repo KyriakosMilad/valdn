@@ -635,7 +635,7 @@ func Test_float32Rule(t *testing.T) {
 		{
 			name: "test float32 rule with non-float32 value",
 			args: args{
-				fieldName:  "uint64Field",
+				fieldName:  "float32Field",
 				fieldValue: 55,
 				ruleValue:  "",
 			},
@@ -681,7 +681,7 @@ func Test_float64Rule(t *testing.T) {
 		{
 			name: "test float64 rule with non-float64 value",
 			args: args{
-				fieldName:  "uint64Field",
+				fieldName:  "float64Field",
 				fieldValue: 55,
 				ruleValue:  "",
 			},
