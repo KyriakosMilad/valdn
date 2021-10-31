@@ -1,0 +1,61 @@
+package validation
+
+import "testing"
+
+func Test_IsZero(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test check if zero value is zero",
+			args: args{val: ""},
+			want: true,
+		},
+		{
+			name: "test check if non-zero value is zero",
+			args: args{val: "t"},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsZero(tt.args.val); got != tt.want {
+				t.Errorf("IsZero() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_IsString(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test check if string is string",
+			args: args{val: "s"},
+			want: true,
+		},
+		{
+			name: "test check if non-string is string",
+			args: args{val: 5},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsString(tt.args.val); got != tt.want {
+				t.Errorf("IsString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
