@@ -29,3 +29,7 @@ func IsInt32(val interface{}) bool {
 func IsInt64(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Int64
 }
+
+func IsUint(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Uint
+}

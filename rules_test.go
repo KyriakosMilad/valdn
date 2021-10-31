@@ -379,3 +379,49 @@ func Test_int64Rule(t *testing.T) {
 		})
 	}
 }
+
+func Test_uintRule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test uint rule",
+			args: args{
+				fieldName:  "uintField",
+				fieldValue: uint(15),
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test uint rule with signed int value",
+			args: args{
+				fieldName:  "uintField",
+				fieldValue: -15,
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := uintRule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("uintRule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("uintRule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}

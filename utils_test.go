@@ -204,3 +204,32 @@ func Test_IsInt64(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsUint(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is uint rule",
+			args: args{val: uint(15)},
+			want: true,
+		},
+		{
+			name: "test is uint rule with signed int value",
+			args: args{val: -15},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsUint(tt.args.val); got != tt.want {
+				t.Errorf("IsUint() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
