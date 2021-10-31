@@ -42,9 +42,18 @@ func int8Rule(fieldName string, fieldValue interface{}, ruleValue string) (error
 	return nil, ""
 }
 
+func int16Rule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsInt16(fieldValue) {
+		validationError := fieldName + " must be type of int16"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
 	AddRule("int", intRule)
 	AddRule("int8", int8Rule)
+	AddRule("int16", int16Rule)
 }
