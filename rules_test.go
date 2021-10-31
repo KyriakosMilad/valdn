@@ -563,3 +563,49 @@ func Test_uint32Rule(t *testing.T) {
 		})
 	}
 }
+
+func Test_uint64Rule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test uint64 rule",
+			args: args{
+				fieldName:  "uint64Field",
+				fieldValue: uint64(18446744073709551614),
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test uint64 rule with non-uint64 value",
+			args: args{
+				fieldName:  "uint64Field",
+				fieldValue: int64(9223372036854775806),
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := uint64Rule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("uint64Rule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("uint64Rule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}
