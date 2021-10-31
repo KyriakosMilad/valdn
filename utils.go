@@ -53,3 +53,7 @@ func IsUint64(val interface{}) bool {
 func IsFloat32(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Float32
 }
+
+func IsFloat64(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Float64
+}
