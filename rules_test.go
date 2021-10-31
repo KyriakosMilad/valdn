@@ -863,7 +863,7 @@ func Test_sliceRule(t *testing.T) {
 		wantValidationErr bool
 	}{
 		{
-			name: "test slice rule with false",
+			name: "test slice rule",
 			args: args{
 				fieldName:  "sliceField",
 				fieldValue: []int{4, 2},
