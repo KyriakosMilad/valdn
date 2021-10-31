@@ -141,7 +141,7 @@ func Test_IsInt16(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsInt16(tt.args.val); got != tt.want {
-				t.Errorf("Is16Int() = %v, want %v", got, tt.want)
+				t.Errorf("IsInt16() = %v, want %v", got, tt.want)
 			}
 		})
 	}
