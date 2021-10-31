@@ -195,3 +195,49 @@ func Test_intRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_int8Rule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test int8 rule",
+			args: args{
+				fieldName:  "int8Field",
+				fieldValue: int8(5),
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test int8 rule with non-int8 value",
+			args: args{
+				fieldName:  "int8Field",
+				fieldValue: int16(200),
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := int8Rule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("intRule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("intRule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}

@@ -13,3 +13,7 @@ func IsString(val interface{}) bool {
 func IsInt(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Int
 }
+
+func IsInt8(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Int8
+}
