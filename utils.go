@@ -61,3 +61,7 @@ func IsFloat64(val interface{}) bool {
 func IsComplex64(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Complex64
 }
+
+func IsComplex128(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Complex128
+}

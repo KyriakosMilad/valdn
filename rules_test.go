@@ -747,3 +747,49 @@ func Test_complex64Rule(t *testing.T) {
 		})
 	}
 }
+
+func Test_complex128Rule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test complex128 rule",
+			args: args{
+				fieldName:  "complex128Field",
+				fieldValue: 2 + 2i,
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test complex128 rule with non-complex128 value",
+			args: args{
+				fieldName:  "complex128Field",
+				fieldValue: complex64(456456 + 456456i),
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := complex128Rule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("complex128Rule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("complex128Rule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}

@@ -436,3 +436,32 @@ func Test_IsComplex64(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsComplex128(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is complex128 rule",
+			args: args{val: 2 + 2i},
+			want: true,
+		},
+		{
+			name: "test is complex128 rule with non-complex128 value",
+			args: args{val: complex64(456456 + 456456i)},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsComplex128(tt.args.val); got != tt.want {
+				t.Errorf("IsComplex128() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -130,6 +130,14 @@ func complex64Rule(fieldName string, fieldValue interface{}, ruleValue string) (
 	return nil, ""
 }
 
+func complex128Rule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsComplex128(fieldValue) {
+		validationError := fieldName + " must be type of complex128"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -146,4 +154,5 @@ func init() {
 	AddRule("float32", float32Rule)
 	AddRule("float64", float64Rule)
 	AddRule("complex64", complex64Rule)
+	AddRule("complex128", complex128Rule)
 }
