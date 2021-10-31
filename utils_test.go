@@ -233,3 +233,32 @@ func Test_IsUint(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsUint8(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is uint8 rule",
+			args: args{val: uint8(200)},
+			want: true,
+		},
+		{
+			name: "test is uint8 rule with non-uint8 value",
+			args: args{val: uint16(65534)},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsUint8(tt.args.val); got != tt.want {
+				t.Errorf("IsUint8() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
