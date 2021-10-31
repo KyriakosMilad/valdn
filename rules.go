@@ -170,6 +170,14 @@ func structRule(fieldName string, fieldValue interface{}, ruleValue string) (err
 	return nil, ""
 }
 
+func mapRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsMap(fieldValue) {
+		validationError := fieldName + " must be type of map"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -191,4 +199,5 @@ func init() {
 	AddRule("slice", sliceRule)
 	AddRule("array", arrayRule)
 	AddRule("struct", structRule)
+	AddRule("map", mapRule)
 }

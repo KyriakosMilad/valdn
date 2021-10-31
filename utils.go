@@ -83,3 +83,7 @@ func IsArray(val interface{}) bool {
 func IsStruct(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Struct
 }
+
+func IsMap(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Map
+}

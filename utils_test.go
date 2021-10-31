@@ -586,3 +586,32 @@ func Test_IsStruct(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsMap(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is map rule",
+			args: args{val: make(map[interface{}]interface{})},
+			want: true,
+		},
+		{
+			name: "test is map rule with non-map value",
+			args: args{val: 1},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsMap(tt.args.val); got != tt.want {
+				t.Errorf("IsMap() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
