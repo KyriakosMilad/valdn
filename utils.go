@@ -9,3 +9,7 @@ func IsZero(val interface{}) bool {
 func IsString(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.String
 }
+
+func IsInt(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Int
+}

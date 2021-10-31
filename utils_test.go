@@ -59,3 +59,32 @@ func Test_IsString(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsInt(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is int rule",
+			args: args{val: 1},
+			want: true,
+		},
+		{
+			name: "test is int rule with non-int value",
+			args: args{val: "1"},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsInt(tt.args.val); got != tt.want {
+				t.Errorf("IsInt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

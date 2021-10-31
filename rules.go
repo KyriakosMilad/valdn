@@ -26,7 +26,16 @@ func stringRule(fieldName string, fieldValue interface{}, ruleValue string) (err
 	return nil, ""
 }
 
+func intRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsInt(fieldValue) {
+		validationError := fieldName + " must be an integer"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
+	AddRule("int", intRule)
 }

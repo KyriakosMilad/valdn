@@ -149,3 +149,49 @@ func Test_stringRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_intRule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test int rule",
+			args: args{
+				fieldName:  "intField",
+				fieldValue: 31,
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test int rule with non-int value",
+			args: args{
+				fieldName:  "intField",
+				fieldValue: "s",
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := intRule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("intRule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("intRule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}
