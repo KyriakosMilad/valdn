@@ -407,3 +407,32 @@ func Test_IsFloat64(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsComplex64(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is complex64 rule",
+			args: args{val: complex64(2 + 2i)},
+			want: true,
+		},
+		{
+			name: "test is complex64 rule with non-complex64 value",
+			args: args{val: 456456 + 456456i},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsComplex64(tt.args.val); got != tt.want {
+				t.Errorf("IsComplex64() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
