@@ -106,6 +106,14 @@ func uint64Rule(fieldName string, fieldValue interface{}, ruleValue string) (err
 	return nil, ""
 }
 
+func float32Rule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsFloat32(fieldValue) {
+		validationError := fieldName + " must be type of float32"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -119,4 +127,5 @@ func init() {
 	AddRule("uint16", uint16Rule)
 	AddRule("uint32", uint32Rule)
 	AddRule("uint64", uint64Rule)
+	AddRule("float32", float32Rule)
 }

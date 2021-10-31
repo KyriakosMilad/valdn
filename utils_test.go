@@ -349,3 +349,32 @@ func Test_IsUint64(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsFloat32(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is float32 rule",
+			args: args{val: float32(2.2)},
+			want: true,
+		},
+		{
+			name: "test is float32 rule with non-float32 value",
+			args: args{val: 55},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsFloat32(tt.args.val); got != tt.want {
+				t.Errorf("IsFloat32() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
