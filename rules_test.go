@@ -233,10 +233,10 @@ func Test_int8Rule(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err, validationErr := int8Rule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("intRule() got = %v, want %v", err, tt.wantErr)
+				t.Errorf("int8Rule() got = %v, want %v", err, tt.wantErr)
 			}
 			if (validationErr != "") != tt.wantValidationErr {
-				t.Errorf("intRule() got = %v, want %v", validationErr, tt.wantValidationErr)
+				t.Errorf("int8Rule() got = %v, want %v", validationErr, tt.wantValidationErr)
 			}
 		})
 	}
