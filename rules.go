@@ -92,7 +92,7 @@ func uint16Rule(fieldName string, fieldValue interface{}, ruleValue string) (err
 
 func uint32Rule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
 	if !IsUint32(fieldValue) {
-		validationError := fieldName + " must be type of uint16"
+		validationError := fieldName + " must be type of uint32"
 		return nil, validationError
 	}
 	return nil, ""

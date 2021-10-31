@@ -307,7 +307,7 @@ func Test_IsUint32(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "test is uint16 rule with non-uint32 value",
+			name: "test is uint32 rule with non-uint32 value",
 			args: args{val: uint64(18446744073709551614)},
 			want: false,
 		},
