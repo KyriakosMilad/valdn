@@ -25,3 +25,7 @@ func IsInt16(val interface{}) bool {
 func IsInt32(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Int32
 }
+
+func IsInt64(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Int64
+}
