@@ -82,6 +82,14 @@ func uint8Rule(fieldName string, fieldValue interface{}, ruleValue string) (erro
 	return nil, ""
 }
 
+func uint16Rule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsUint16(fieldValue) {
+		validationError := fieldName + " must be type of uint16"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -92,4 +100,5 @@ func init() {
 	AddRule("int64", int64Rule)
 	AddRule("uint", uintRule)
 	AddRule("uint8", uint8Rule)
+	AddRule("uint16", uint16Rule)
 }
