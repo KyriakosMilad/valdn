@@ -849,3 +849,49 @@ func Test_boolRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_sliceRule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test slice rule with false",
+			args: args{
+				fieldName:  "sliceField",
+				fieldValue: []int{4, 2},
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test slice rule with non-slice value",
+			args: args{
+				fieldName:  "sliceField",
+				fieldValue: 1,
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := sliceRule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("sliceRule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("sliceRule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}

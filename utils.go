@@ -69,3 +69,7 @@ func IsComplex128(val interface{}) bool {
 func IsBool(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Bool
 }
+
+func IsSlice(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Slice
+}

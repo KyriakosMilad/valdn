@@ -499,3 +499,32 @@ func Test_IsBool(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsSlice(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is slice rule",
+			args: args{val: []int{4, 2}},
+			want: true,
+		},
+		{
+			name: "test is slice rule with non-slice value",
+			args: args{val: 1},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsSlice(tt.args.val); got != tt.want {
+				t.Errorf("IsSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

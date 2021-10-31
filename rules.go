@@ -146,6 +146,14 @@ func boolRule(fieldName string, fieldValue interface{}, ruleValue string) (error
 	return nil, ""
 }
 
+func sliceRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsSlice(fieldValue) {
+		validationError := fieldName + " must be type of slice"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -164,4 +172,5 @@ func init() {
 	AddRule("complex64", complex64Rule)
 	AddRule("complex128", complex128Rule)
 	AddRule("bool", boolRule)
+	AddRule("slice", sliceRule)
 }
