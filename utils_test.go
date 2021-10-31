@@ -557,3 +557,32 @@ func Test_IsArray(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsStruct(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is struct rule",
+			args: args{val: struct{}{}},
+			want: true,
+		},
+		{
+			name: "test is struct rule with non-struct value",
+			args: args{val: 1},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsStruct(tt.args.val); got != tt.want {
+				t.Errorf("IsStruct() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

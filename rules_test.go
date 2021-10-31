@@ -941,3 +941,49 @@ func Test_arrayRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_structRule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test struct rule",
+			args: args{
+				fieldName:  "structField",
+				fieldValue: struct{}{},
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test struct rule with non-struct value",
+			args: args{
+				fieldName:  "structField",
+				fieldValue: 1,
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := structRule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("structRule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("structRule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}

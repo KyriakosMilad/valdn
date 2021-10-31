@@ -79,3 +79,7 @@ func IsSlice(val interface{}) bool {
 func IsArray(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Array
 }
+
+func IsStruct(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Struct
+}

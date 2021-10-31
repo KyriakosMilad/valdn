@@ -162,6 +162,14 @@ func arrayRule(fieldName string, fieldValue interface{}, ruleValue string) (erro
 	return nil, ""
 }
 
+func structRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsStruct(fieldValue) {
+		validationError := fieldName + " must be type of struct"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -182,4 +190,5 @@ func init() {
 	AddRule("bool", boolRule)
 	AddRule("slice", sliceRule)
 	AddRule("array", arrayRule)
+	AddRule("struct", structRule)
 }
