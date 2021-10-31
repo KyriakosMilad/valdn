@@ -1,6 +1,8 @@
 package validation
 
-import "reflect"
+import (
+	"reflect"
+)
 
 func IsZero(val interface{}) bool {
 	return reflect.ValueOf(val).IsZero()
@@ -72,4 +74,8 @@ func IsBool(val interface{}) bool {
 
 func IsSlice(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Slice
+}
+
+func IsArray(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Array
 }

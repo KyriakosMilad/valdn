@@ -528,3 +528,32 @@ func Test_IsSlice(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsArray(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is array rule",
+			args: args{val: [2]int{4, 2}},
+			want: true,
+		},
+		{
+			name: "test is array rule with non-array value",
+			args: args{val: 1},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsArray(tt.args.val); got != tt.want {
+				t.Errorf("IsArray() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

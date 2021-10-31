@@ -154,6 +154,14 @@ func sliceRule(fieldName string, fieldValue interface{}, ruleValue string) (erro
 	return nil, ""
 }
 
+func arrayRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsArray(fieldValue) {
+		validationError := fieldName + " must be type of array"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -173,4 +181,5 @@ func init() {
 	AddRule("complex128", complex128Rule)
 	AddRule("bool", boolRule)
 	AddRule("slice", sliceRule)
+	AddRule("array", arrayRule)
 }
