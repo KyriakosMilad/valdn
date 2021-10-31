@@ -65,3 +65,7 @@ func IsComplex64(val interface{}) bool {
 func IsComplex128(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Complex128
 }
+
+func IsBool(val interface{}) bool {
+	return reflect.ValueOf(val).Kind() == reflect.Bool
+}

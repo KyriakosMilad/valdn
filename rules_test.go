@@ -793,3 +793,59 @@ func Test_complex128Rule(t *testing.T) {
 		})
 	}
 }
+
+func Test_boolRule(t *testing.T) {
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test bool rule with true",
+			args: args{
+				fieldName:  "boolField",
+				fieldValue: true,
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test bool rule with false",
+			args: args{
+				fieldName:  "boolField",
+				fieldValue: false,
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test bool rule with non-bool value",
+			args: args{
+				fieldName:  "boolField",
+				fieldValue: 1,
+				ruleValue:  "",
+			},
+			wantErr:           false,
+			wantValidationErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := boolRule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("boolRule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("boolRule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}

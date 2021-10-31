@@ -138,6 +138,14 @@ func complex128Rule(fieldName string, fieldValue interface{}, ruleValue string) 
 	return nil, ""
 }
 
+func boolRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsBool(fieldValue) {
+		validationError := fieldName + " must be type of bool"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -155,4 +163,5 @@ func init() {
 	AddRule("float64", float64Rule)
 	AddRule("complex64", complex64Rule)
 	AddRule("complex128", complex128Rule)
+	AddRule("bool", boolRule)
 }

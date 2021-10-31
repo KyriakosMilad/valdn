@@ -465,3 +465,37 @@ func Test_IsComplex128(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsBool(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is bool rule with true",
+			args: args{val: true},
+			want: true,
+		},
+		{
+			name: "test is bool rule with false",
+			args: args{val: false},
+			want: true,
+		},
+		{
+			name: "test is bool rule with non-bool value",
+			args: args{val: 1},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsBool(tt.args.val); got != tt.want {
+				t.Errorf("IsBool() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
