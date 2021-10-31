@@ -50,10 +50,19 @@ func int16Rule(fieldName string, fieldValue interface{}, ruleValue string) (erro
 	return nil, ""
 }
 
+func int32Rule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	if !IsInt32(fieldValue) {
+		validationError := fieldName + " must be type of int32"
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
 	AddRule("int", intRule)
 	AddRule("int8", int8Rule)
 	AddRule("int16", int16Rule)
+	AddRule("int32", int32Rule)
 }

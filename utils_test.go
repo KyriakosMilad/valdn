@@ -146,3 +146,32 @@ func Test_IsInt16(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsInt32(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test is int32 rule",
+			args: args{val: int32(2147483646)},
+			want: true,
+		},
+		{
+			name: "test is int32 rule with non-int32 value",
+			args: args{val: int64(9223372036854775806)},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsInt32(tt.args.val); got != tt.want {
+				t.Errorf("IsInt32() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
