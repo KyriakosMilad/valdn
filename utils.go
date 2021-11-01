@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"fmt"
 	"reflect"
 )
 
@@ -86,4 +87,8 @@ func IsStruct(val interface{}) bool {
 
 func IsMap(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Map
+}
+
+func toString(val interface{}) string {
+	return fmt.Sprintf("%v", val)
 }

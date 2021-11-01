@@ -1033,3 +1033,132 @@ func Test_mapRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_typeRule(t *testing.T) {
+	type user struct {
+		name string
+	}
+	type args struct {
+		fieldName  string
+		fieldValue interface{}
+		ruleValue  string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantErr           bool
+		wantValidationErr bool
+	}{
+		{
+			name: "test type rule with string",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: "string",
+				ruleValue:  "string",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with uint",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: uint(44),
+				ruleValue:  "uint",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with int",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: -44,
+				ruleValue:  "int",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with float",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: 44.44,
+				ruleValue:  "float64",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with complex number",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: 44 + 22i,
+				ruleValue:  "complex128",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with bool",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: true,
+				ruleValue:  "bool",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with map",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: map[string]interface{}{"key": 55},
+				ruleValue:  "map[string]interface {}",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with struct",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: user{name: "test"},
+				ruleValue:  "user",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with array",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: [2]int{1, 2},
+				ruleValue:  "[2]int",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+		{
+			name: "test type rule with slice",
+			args: args{
+				fieldName:  "typeField",
+				fieldValue: []int{1, 2},
+				ruleValue:  "[]int",
+			},
+			wantErr:           false,
+			wantValidationErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, validationErr := typeRule(tt.args.fieldName, tt.args.fieldValue, tt.args.ruleValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("typeRule() got = %v, want %v", err, tt.wantErr)
+			}
+			if (validationErr != "") != tt.wantValidationErr {
+				t.Errorf("typeRule() got = %v, want %v", validationErr, tt.wantValidationErr)
+			}
+		})
+	}
+}

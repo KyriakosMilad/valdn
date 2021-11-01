@@ -1,5 +1,7 @@
 package validation
 
+import "reflect"
+
 var rules = make(map[string]func(fieldName string, fieldValue interface{}, ruleValue string) (error, string))
 
 func AddRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
@@ -178,6 +180,20 @@ func mapRule(fieldName string, fieldValue interface{}, ruleValue string) (error,
 	return nil, ""
 }
 
+func typeRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+	var typeInString string
+	if t := reflect.TypeOf(fieldValue); t.Kind() == reflect.Struct {
+		typeInString = t.Name()
+	} else {
+		typeInString = toString(t)
+	}
+	if typeInString != ruleValue {
+		validationError := fieldName + " must be type of " + ruleValue
+		return nil, validationError
+	}
+	return nil, ""
+}
+
 func init() {
 	AddRule("required", requiredRule)
 	AddRule("string", stringRule)
@@ -200,4 +216,5 @@ func init() {
 	AddRule("array", arrayRule)
 	AddRule("struct", structRule)
 	AddRule("map", mapRule)
+	AddRule("type", typeRule)
 }
