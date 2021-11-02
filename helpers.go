@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-func getRuleValue(rule string) string {
+func splitRuleNameAndRuleValue(rule string) (string, string) {
 	if strings.ContainsRune(rule, ':') {
-		return strings.Split(rule, ":")[1]
+		return strings.Split(rule, ":")[0], strings.Split(rule, ":")[1]
 	}
-	return ""
+	return rule, ""
 }
 
 func makeParentNameJoinable(parentName string) string {

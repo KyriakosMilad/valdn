@@ -687,6 +687,11 @@ func Test_toString(t *testing.T) {
 			args: args{val: reflect.TypeOf(map[string]interface{}{"key": 5})},
 			want: "map[string]interface {}",
 		},
+		{
+			name: "test to string with Kind value",
+			args: args{val: reflect.String},
+			want: "string",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

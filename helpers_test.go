@@ -5,27 +5,30 @@ import (
 	"testing"
 )
 
-func Test_getRuleValue(t *testing.T) {
+func Test_splitRuleNameAndRuleValue(t *testing.T) {
 	tests := []struct {
-		name string
-		rule string
-		want string
+		name              string
+		rule              string
+		ruleNameExpected  string
+		ruleValueExpected string
 	}{
 		{
-			name: "test get rule value from rule does have value",
-			rule: "val:test",
-			want: "test",
+			name:              "test get rule value from rule does have value",
+			rule:              "val:test",
+			ruleNameExpected:  "val",
+			ruleValueExpected: "test",
 		},
 		{
-			name: "test get rule value from rule does not have value",
-			rule: "val",
-			want: "",
+			name:              "test get rule value from rule does not have value",
+			rule:              "val",
+			ruleNameExpected:  "val",
+			ruleValueExpected: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getRuleValue(tt.rule); got != tt.want {
-				t.Errorf("getRuleValue() = %v, want %v", got, tt.want)
+			if ruleName, ruleValue := splitRuleNameAndRuleValue(tt.rule); (ruleName != tt.ruleNameExpected) || ruleValue != tt.ruleValueExpected {
+				t.Errorf("getRuleValue(): ruleName = %v, ruleValue = %v, ruleNameExpected = %v, ruleValueExpected = %v", ruleName, ruleValue, tt.ruleNameExpected, tt.ruleValueExpected)
 			}
 		})
 	}
@@ -393,7 +396,7 @@ func Test_validateNestedMap(t *testing.T) {
 			args: args{
 				fieldName:       "Parent",
 				fieldValue:      map[string]interface{}{"name": "Beshay"},
-				validationRules: map[string][]string{"Parent.name": {"string"}},
+				validationRules: map[string][]string{"Parent.name": {"kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 0,

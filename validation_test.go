@@ -21,7 +21,7 @@ func Test_ValidateField(t *testing.T) {
 			args: args{
 				fieldName:  "Name",
 				fieldValue: "Kyria",
-				fieldRules: []string{"required", "string"},
+				fieldRules: []string{"required", "kind:string"},
 			},
 			wantErr:              false,
 			wantValidationErrors: false,
@@ -31,7 +31,7 @@ func Test_ValidateField(t *testing.T) {
 			args: args{
 				fieldName:  "Name",
 				fieldValue: 55,
-				fieldRules: []string{"required", "string"},
+				fieldRules: []string{"required", "kind:string"},
 			},
 			wantErr:              false,
 			wantValidationErrors: true,
@@ -75,7 +75,7 @@ func Test_ValidateJson(t *testing.T) {
 			name: `test validate json`,
 			args: args{
 				jsonData:        `{"name":"Ramses", "city":"Tiba"}`,
-				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}},
+				validationRules: map[string][]string{"name": {"required", "kind:string"}, "city": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 0,
@@ -84,7 +84,7 @@ func Test_ValidateJson(t *testing.T) {
 			name: `test validate json with unsuitable data`,
 			args: args{
 				jsonData:        `{"name":"Ramses", "age":90}`,
-				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}},
+				validationRules: map[string][]string{"name": {"required", "kind:string"}, "city": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 1,
@@ -121,7 +121,7 @@ func Test_ValidateMap(t *testing.T) {
 			name: "test validate map",
 			args: args{
 				mapData:         map[string]interface{}{"name": "Ramses", "city": "Tiba"},
-				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}},
+				validationRules: map[string][]string{"name": {"required", "kind:string"}, "city": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 0,
@@ -130,7 +130,7 @@ func Test_ValidateMap(t *testing.T) {
 			name: "test validate map with unsuitable data",
 			args: args{
 				mapData:         map[string]interface{}{"name": "Ramses", "age": 90},
-				validationRules: map[string][]string{"name": {"required", "string"}, "city": {"required", "string"}},
+				validationRules: map[string][]string{"name": {"required", "kind:string"}, "city": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 1,
@@ -139,7 +139,7 @@ func Test_ValidateMap(t *testing.T) {
 			name: "test validate nested map",
 			args: args{
 				mapData:         map[string]interface{}{"user": map[string]interface{}{"name": "Kyriakos M.", "country": "Egypt"}},
-				validationRules: map[string][]string{"user": {"required"}, "user.name": {"required", "string"}, "user.country": {"required", "string"}},
+				validationRules: map[string][]string{"user": {"required"}, "user.name": {"required", "kind:string"}, "user.country": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 0,
@@ -148,7 +148,7 @@ func Test_ValidateMap(t *testing.T) {
 			name: "test validate nested map with unsuitable data",
 			args: args{
 				mapData:         map[string]interface{}{"user": map[string]interface{}{"name": 1, "country": "Egypt"}},
-				validationRules: map[string][]string{"user": {"required"}, "user.name": {"required", "string"}, "user.country": {"required", "string"}},
+				validationRules: map[string][]string{"user": {"required"}, "user.name": {"required", "kind:string"}, "user.country": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 1,
@@ -175,7 +175,7 @@ func Test_ValidateMap(t *testing.T) {
 			name: "test validate map includes struct with unsuitable data",
 			args: args{
 				mapData:         map[string]interface{}{"user": User{Name: 5}},
-				validationRules: map[string][]string{"user": {"required"}, "user.Name": {"required", "string"}},
+				validationRules: map[string][]string{"user": {"required"}, "user.Name": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 1,
@@ -196,10 +196,10 @@ func Test_ValidateMap(t *testing.T) {
 
 func Test_ValidateStruct(t *testing.T) {
 	type Child struct {
-		Name string `validation:"required|string"`
+		Name string `validation:"required|kind:string"`
 	}
 	type Parent struct {
-		Name            string `validation:"required|string"`
+		Name            string `validation:"required|kind:string"`
 		Age             int    `validation:"required"`
 		StringKeyMap    map[string]interface{}
 		NonStringKeyMap map[int]interface{}
@@ -219,7 +219,7 @@ func Test_ValidateStruct(t *testing.T) {
 			name: "validate struct",
 			args: args{
 				structData:      Parent{Name: "Mina", Age: 26},
-				validationRules: map[string][]string{"Name": {"required", "string"}, "Child.Name": {""}},
+				validationRules: map[string][]string{"Name": {"required", "kind:string"}, "Child.Name": {""}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 0,
@@ -228,7 +228,7 @@ func Test_ValidateStruct(t *testing.T) {
 			name: "validate struct with unsuitable data",
 			args: args{
 				structData:      Parent{Name: "Mina"},
-				validationRules: map[string][]string{"Name": {"required", "string"}, "Age": {"required"}},
+				validationRules: map[string][]string{"Name": {"required", "kind:string"}, "Age": {"required"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 1,
@@ -240,7 +240,7 @@ func Test_ValidateStruct(t *testing.T) {
 					Name:  "Ikhnaton",
 					Child: Child{Name: "Tut"},
 				},
-				validationRules: map[string][]string{"Name": {"required", "string"}, "Age": {""}, "Child.Name": {"required", "string"}},
+				validationRules: map[string][]string{"Name": {"required", "kind:string"}, "Age": {""}, "Child.Name": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 0,
@@ -251,7 +251,7 @@ func Test_ValidateStruct(t *testing.T) {
 				structData: Parent{
 					Name: "Ikhnaton",
 				},
-				validationRules: map[string][]string{"Name": {"required", "string"}, "Child.Name": {"required", "string"}},
+				validationRules: map[string][]string{"Name": {"required", "kind:string"}, "Child.Name": {"required", "kind:string"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 2,
