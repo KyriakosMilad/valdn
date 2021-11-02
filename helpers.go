@@ -8,7 +8,8 @@ import (
 
 func splitRuleNameAndRuleValue(rule string) (string, string) {
 	if strings.ContainsRune(rule, ':') {
-		return strings.Split(rule, ":")[0], strings.Split(rule, ":")[1]
+		ruleSpliced := strings.Split(rule, ":")
+		return ruleSpliced[0], ruleSpliced[1]
 	}
 	return rule, ""
 }
