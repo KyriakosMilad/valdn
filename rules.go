@@ -6,11 +6,7 @@ import (
 
 var rules = make(map[string]func(fieldName string, fieldValue interface{}, ruleValue string) (error, string))
 
-func AddRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
-	_, ruleExists := rules[ruleName]
-	if ruleExists {
-		panic("rule already registered")
-	}
+func CustomRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
 	rules[ruleName] = ruleFunc
 }
 
@@ -45,7 +41,7 @@ func typeRule(fieldName string, fieldValue interface{}, ruleValue string) (error
 }
 
 func init() {
-	AddRule("required", requiredRule)
-	AddRule("type", typeRule)
-	AddRule("kind", kindRule)
+	CustomRule("required", requiredRule)
+	CustomRule("type", typeRule)
+	CustomRule("kind", kindRule)
 }

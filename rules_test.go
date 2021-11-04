@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_AddRule(t *testing.T) {
+func Test_CustomRule(t *testing.T) {
 	type args struct {
 		ruleName string
 		ruleFunc func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string)
@@ -15,7 +15,7 @@ func Test_AddRule(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "test add rule",
+			name: "test add custom rule",
 			args: args{
 				ruleName: "test",
 				ruleFunc: func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string) {
@@ -32,20 +32,12 @@ func Test_AddRule(t *testing.T) {
 					return
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			defer func() {
-				if err := recover(); err != nil && !tt.wantErr {
-					t.Errorf("AddRule() error: failed to add rule, wantErr: %v, error: %v, args: %v", tt.wantErr, err, tt.args)
-				}
-			}()
-			AddRule(tt.args.ruleName, tt.args.ruleFunc)
-			if _, ok := rules["test"]; !ok {
-				t.Errorf("AddRule() error: failed to add rule, wantErr: %v, error: %v, args: %v", tt.wantErr, nil, tt.args)
-			}
+			CustomRule(tt.args.ruleName, tt.args.ruleFunc)
 		})
 	}
 }
