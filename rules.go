@@ -4,7 +4,9 @@ import (
 	"reflect"
 )
 
-var rules = make(map[string]func(fieldName string, fieldValue interface{}, ruleValue string) (error, string))
+type RuleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)
+
+var rules = make(map[string]RuleFunc)
 
 func CustomRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
 	rules[ruleName] = ruleFunc

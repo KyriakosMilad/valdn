@@ -286,7 +286,7 @@ func Test_getNestedRules(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want map[string][]string
+		want ValidationRules
 	}{
 		{
 			name: "test get nested rules",
@@ -294,13 +294,13 @@ func Test_getNestedRules(t *testing.T) {
 				validationRules: map[string][]string{"Parent.child.name": {"required"}},
 				structName:      "Parent",
 			},
-			want: map[string][]string{"Parent.child.name": {"required"}},
+			want: ValidationRules{"Parent.child.name": {"required"}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getNestedRules(tt.args.validationRules, tt.args.structName); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getStructRules() = %v, want %v", got, tt.want)
+				t.Errorf("getNestedRules() = %v, want %v", got, tt.want)
 			}
 		})
 	}
