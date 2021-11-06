@@ -17,8 +17,7 @@ func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string
 			continue
 		}
 
-		ruleName, ruleValue := splitRuleNameAndRuleValue(rule)
-		ruleFunc, ruleExists := rules[ruleName]
+		ruleName, ruleValue, ruleFunc, ruleExists := getRuleInfo(rule)
 		if !ruleExists {
 			err := errors.New("unknown validation rule: " + ruleName)
 			return err, ""

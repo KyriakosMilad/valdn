@@ -14,6 +14,12 @@ func splitRuleNameAndRuleValue(rule string) (string, string) {
 	return rule, ""
 }
 
+func getRuleInfo(rule string) (string, string, RuleFunc, bool) {
+	ruleName, ruleValue := splitRuleNameAndRuleValue(rule)
+	ruleFunc, ruleExists := rules[ruleName]
+	return ruleName, ruleValue, ruleFunc, ruleExists
+}
+
 func makeParentNameJoinable(parentName string) string {
 	if parentName != "" && parentName[len(parentName)-1] != '.' {
 		return parentName + "."
