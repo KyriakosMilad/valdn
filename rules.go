@@ -8,7 +8,15 @@ type RuleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (
 
 var rules = make(map[string]RuleFunc)
 
-func CustomRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
+func AddRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
+	_, ruleExists := rules[ruleName]
+	if ruleExists {
+		panic("rule already registered")
+	}
+	rules[ruleName] = ruleFunc
+}
+
+func OverwriteRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
 	rules[ruleName] = ruleFunc
 }
 
@@ -43,7 +51,7 @@ func typeRule(fieldName string, fieldValue interface{}, ruleValue string) (error
 }
 
 func init() {
-	CustomRule("required", requiredRule)
-	CustomRule("type", typeRule)
-	CustomRule("kind", kindRule)
+	AddRule("required", requiredRule)
+	AddRule("type", typeRule)
+	AddRule("kind", kindRule)
 }

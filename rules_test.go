@@ -4,10 +4,10 @@ import (
 	"testing"
 )
 
-func Test_CustomRule(t *testing.T) {
+func Test_AddRule(t *testing.T) {
 	type args struct {
 		ruleName string
-		ruleFunc func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string)
+		ruleFunc RuleFunc
 	}
 	tests := []struct {
 		name    string
@@ -15,7 +15,7 @@ func Test_CustomRule(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "test add custom rule",
+			name: "test add rule",
 			args: args{
 				ruleName: "test",
 				ruleFunc: func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string) {
@@ -32,12 +32,58 @@ func Test_CustomRule(t *testing.T) {
 					return
 				},
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			CustomRule(tt.args.ruleName, tt.args.ruleFunc)
+			defer func() {
+				if err := recover(); err != nil && !tt.wantErr {
+					t.Errorf("AddRule() error: failed to add rule, wantErr: %v, error: %v, args: %v", tt.wantErr, err, tt.args)
+				}
+			}()
+			AddRule(tt.args.ruleName, tt.args.ruleFunc)
+			if _, ok := rules["test"]; !ok {
+				t.Errorf("AddRule() error: failed to add rule, wantErr: %v, error: %v, args: %v", tt.wantErr, nil, tt.args)
+			}
+		})
+	}
+}
+
+func Test_OverwriteRule(t *testing.T) {
+	type args struct {
+		ruleName string
+		ruleFunc RuleFunc
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "test overwrite rule",
+			args: args{
+				ruleName: "test0",
+				ruleFunc: func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string) {
+					return
+				},
+			},
+		},
+		{
+			name: "test overwrite rule already exists",
+			args: args{
+				ruleName: "test0",
+				ruleFunc: func(field string, fieldValue interface{}, ruleValue string) (err error, validationError string) {
+					return
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			OverwriteRule(tt.args.ruleName, tt.args.ruleFunc)
+			if _, ok := rules["test0"]; !ok {
+				t.Errorf("OverwriteRule() error: failed to overwrite rule, args: %v", tt.args)
+			}
 		})
 	}
 }
