@@ -7,8 +7,8 @@ import (
 )
 
 type (
-	ValidationRules  map[string][]string
-	ValidationErrors map[string]string
+	Rules  map[string][]string
+	Errors map[string]string
 )
 
 func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string) (error, string) {
@@ -34,8 +34,8 @@ func ValidateField(fieldName string, fieldValue interface{}, fieldRules []string
 	return nil, ""
 }
 
-func ValidateStruct(structData interface{}, validationRules ValidationRules, parentName string) (error, ValidationErrors) {
-	validationErrors := make(ValidationErrors)
+func ValidateStruct(structData interface{}, validationRules Rules, parentName string) (error, Errors) {
+	validationErrors := make(Errors)
 
 	t := reflect.TypeOf(structData)
 	v := reflect.ValueOf(structData)
@@ -58,7 +58,7 @@ func ValidateStruct(structData interface{}, validationRules ValidationRules, par
 	return nil, validationErrors
 }
 
-func ValidateJson(jsonData string, validationRules ValidationRules) (error, ValidationErrors) {
+func ValidateJson(jsonData string, validationRules Rules) (error, Errors) {
 	var decodedJson map[string]interface{}
 
 	err := json.Unmarshal([]byte(jsonData), &decodedJson)
@@ -69,8 +69,8 @@ func ValidateJson(jsonData string, validationRules ValidationRules) (error, Vali
 	return ValidateMap(decodedJson, validationRules, "")
 }
 
-func ValidateMap(mapData map[string]interface{}, validationRules ValidationRules, parentName string) (error, ValidationErrors) {
-	validationErrors := make(ValidationErrors)
+func ValidateMap(mapData map[string]interface{}, validationRules Rules, parentName string) (error, Errors) {
+	validationErrors := make(Errors)
 
 	err := validateMapFields(mapData, parentName, validationRules, validationErrors)
 	if err != nil {

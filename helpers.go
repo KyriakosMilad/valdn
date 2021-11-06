@@ -38,7 +38,7 @@ func isRuleExists(rules []string, rule string) bool {
 	return false
 }
 
-func isParentRequired(fieldName string, validationRules ValidationRules) bool {
+func isParentRequired(fieldName string, validationRules Rules) bool {
 	parent := getParentName(fieldName)
 	if parent == "" {
 		return true
@@ -47,7 +47,7 @@ func isParentRequired(fieldName string, validationRules ValidationRules) bool {
 	return isRuleExists(parentRules, "required")
 }
 
-func addValidationTagRules(t reflect.Type, validationRules ValidationRules, parentName string) {
+func addValidationTagRules(t reflect.Type, validationRules Rules, parentName string) {
 	parentName = makeParentNameJoinable(parentName)
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
@@ -81,14 +81,14 @@ func getStructFieldInfo(fieldNumber int, parentType reflect.Type, parentValue re
 	return fieldName, fieldType, fieldValue
 }
 
-func addValidationErrors(validationErrors ValidationErrors, newValidationErrors ValidationErrors) {
+func addValidationErrors(validationErrors Errors, newValidationErrors Errors) {
 	for k, v := range newValidationErrors {
 		validationErrors[k] = v
 	}
 }
 
-func getNestedRules(validationRules ValidationRules, structName string) ValidationRules {
-	structRules := make(ValidationRules)
+func getNestedRules(validationRules Rules, structName string) Rules {
+	structRules := make(Rules)
 	for k, v := range validationRules {
 		if strings.Contains(k, makeParentNameJoinable(structName)) {
 			structRules[k] = v
@@ -97,8 +97,8 @@ func getNestedRules(validationRules ValidationRules, structName string) Validati
 	return structRules
 }
 
-func validateNestedStruct(fieldName string, fieldValue interface{}, validationRules ValidationRules) (error, ValidationErrors) {
-	fieldValidationErrors := make(ValidationErrors)
+func validateNestedStruct(fieldName string, fieldValue interface{}, validationRules Rules) (error, Errors) {
+	fieldValidationErrors := make(Errors)
 	fieldRules := validationRules[fieldName]
 
 	err, structFieldError := ValidateField(fieldName, fieldValue, fieldRules)
@@ -125,8 +125,8 @@ func convertInterfaceToMap(value interface{}) map[string]interface{} {
 	return newMap
 }
 
-func validateNestedMap(fieldName string, fieldValue interface{}, validationRules ValidationRules) (error, ValidationErrors) {
-	fieldValidationErrors := make(ValidationErrors)
+func validateNestedMap(fieldName string, fieldValue interface{}, validationRules Rules) (error, Errors) {
+	fieldValidationErrors := make(Errors)
 	fieldRules := validationRules[fieldName]
 
 	err, mapFieldError := ValidateField(fieldName, fieldValue, fieldRules)
@@ -144,9 +144,9 @@ func validateNestedMap(fieldName string, fieldValue interface{}, validationRules
 	return ValidateMap(mapData, mapRules, fieldName)
 }
 
-func validateByType(fieldName string, fieldType reflect.Type, fieldValue interface{}, validationRules ValidationRules) (error, ValidationErrors) {
+func validateByType(fieldName string, fieldType reflect.Type, fieldValue interface{}, validationRules Rules) (error, Errors) {
 	var err error
-	fieldValidationErrors := make(ValidationErrors)
+	fieldValidationErrors := make(Errors)
 
 	fieldRules, fieldHasRules := validationRules[fieldName]
 	if !fieldHasRules && fieldType.Kind() != reflect.Struct && fieldType != reflect.TypeOf(map[string]interface{}{}) {
@@ -172,7 +172,7 @@ func validateByType(fieldName string, fieldType reflect.Type, fieldValue interfa
 	return err, fieldValidationErrors
 }
 
-func validateStructFields(t reflect.Type, v reflect.Value, parentName string, validationRules ValidationRules, validationErrors ValidationErrors) error {
+func validateStructFields(t reflect.Type, v reflect.Value, parentName string, validationRules Rules, validationErrors Errors) error {
 	parentName = makeParentNameJoinable(parentName)
 	for i := 0; i < t.NumField(); i++ {
 		fieldName, fieldType, fieldValue := getStructFieldInfo(i, t, v, parentName)
@@ -185,7 +185,7 @@ func validateStructFields(t reflect.Type, v reflect.Value, parentName string, va
 	return nil
 }
 
-func validateMapFields(mapData map[string]interface{}, parentName string, validationRules ValidationRules, validationErrors ValidationErrors) error {
+func validateMapFields(mapData map[string]interface{}, parentName string, validationRules Rules, validationErrors Errors) error {
 	parentName = makeParentNameJoinable(parentName)
 	for fieldName, fieldValue := range mapData {
 		fieldName = parentName + fieldName
@@ -236,7 +236,7 @@ func registerNestedFieldsByType(fieldType reflect.Type, fieldValue interface{}, 
 	}
 }
 
-func validateNonExistRequiredFields(validationRules ValidationRules, fieldsExists map[string]bool, validationErrors ValidationErrors) {
+func validateNonExistRequiredFields(validationRules Rules, fieldsExists map[string]bool, validationErrors Errors) {
 	for k, v := range validationRules {
 		for _, val := range v {
 			if val == "required" {
