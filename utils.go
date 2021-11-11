@@ -5,8 +5,15 @@ import (
 	"reflect"
 )
 
-func IsZero(val interface{}) bool {
-	return reflect.ValueOf(val).IsZero()
+func IsEmpty(val interface{}) bool {
+	t := reflect.TypeOf(val)
+	v := reflect.ValueOf(val)
+	switch t.Kind() {
+	case reflect.Map, reflect.Slice, reflect.Array:
+		return v.Len() == 0
+	default:
+		return v.IsZero()
+	}
 }
 
 func IsString(val interface{}) bool {

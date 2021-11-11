@@ -21,7 +21,7 @@ func OverwriteRule(ruleName string, ruleFunc RuleFunc) {
 }
 
 func requiredRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
-	if IsZero(fieldValue) {
+	if IsEmpty(fieldValue) {
 		validationError := fieldName + " is required"
 		return nil, validationError
 	}

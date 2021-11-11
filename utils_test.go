@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test_IsZero(t *testing.T) {
+func Test_IsEmpty(t *testing.T) {
 	type args struct {
 		val interface{}
 	}
@@ -16,20 +16,20 @@ func Test_IsZero(t *testing.T) {
 		want bool
 	}{
 		{
-			name: "test check if zero value is zero",
+			name: "test check if empty value is empty",
 			args: args{val: ""},
 			want: true,
 		},
 		{
-			name: "test check if non-zero value is zero",
+			name: "test check if non-empty value is empty",
 			args: args{val: "t"},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsZero(tt.args.val); got != tt.want {
-				t.Errorf("IsZero() = %v, want %v", got, tt.want)
+			if got := IsEmpty(tt.args.val); got != tt.want {
+				t.Errorf("IsEmpty() = %v, want %v", got, tt.want)
 			}
 		})
 	}
