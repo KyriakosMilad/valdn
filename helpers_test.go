@@ -34,6 +34,58 @@ func Test_splitRuleNameAndRuleValue(t *testing.T) {
 	}
 }
 
+func Test_getRuleInfo(t *testing.T) {
+	type args struct {
+		rule string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		ruleName  string
+		ruleValue string
+		ruleFunc  RuleFunc
+		ruleExist bool
+	}{
+		{
+			name: "test get rule info",
+			args: args{
+				rule: "kind:string",
+			},
+			ruleName:  "kind",
+			ruleValue: "string",
+			ruleFunc:  rules["kind"],
+			ruleExist: true,
+		},
+		{
+			name: "test get info of rule does not exist",
+			args: args{
+				rule: "string",
+			},
+			ruleName:  "string",
+			ruleValue: "",
+			ruleFunc:  nil,
+			ruleExist: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ruleName, ruleValue, ruleFunc, ruleExist := getRuleInfo(tt.args.rule)
+			if ruleName != tt.ruleName {
+				t.Errorf("getRuleInfo() ruleName = %v, want %v", ruleName, tt.ruleName)
+			}
+			if ruleValue != tt.ruleValue {
+				t.Errorf("getRuleInfo() ruleValue = %v, want %v", ruleValue, tt.ruleValue)
+			}
+			if !reflect.DeepEqual(toString(ruleFunc), toString(tt.ruleFunc)) {
+				t.Errorf("getRuleInfo() ruleFunc = %v, want %v", toString(ruleFunc), toString(tt.ruleFunc))
+			}
+			if ruleExist != tt.ruleExist {
+				t.Errorf("getRuleInfo() ruleExist = %v, want %v", ruleExist, tt.ruleExist)
+			}
+		})
+	}
+}
+
 func Test_makeParentNameJoinable(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -60,102 +112,6 @@ func Test_makeParentNameJoinable(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := makeParentNameJoinable(tt.parentName); got != tt.want {
 				t.Errorf("makeParentNameJoinable() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_getParentName(t *testing.T) {
-	type args struct {
-		name string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "test get parent name",
-			args: args{name: "parent.child.grandchild"},
-			want: "parent.child",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getParentName(tt.args.name); got != tt.want {
-				t.Errorf("getParentName() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_isRuleExists(t *testing.T) {
-	type args struct {
-		rules []string
-		rule  string
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{
-			name: "test check if exist-rule exists",
-			args: args{
-				rules: []string{"rule2", "rule1"},
-				rule:  "rule1",
-			},
-			want: true,
-		},
-		{
-			name: "test check if non-exist-rule exists",
-			args: args{
-				rules: []string{"rule2", "rule1"},
-				rule:  "rule1",
-			},
-			want: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := isRuleExists(tt.args.rules, tt.args.rule); got != tt.want {
-				t.Errorf("isRuleExists() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_isParentRequired(t *testing.T) {
-	type args struct {
-		fieldName       string
-		validationRules map[string][]string
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{
-			name: "test check if required-parent required",
-			args: args{
-				fieldName:       "parent.child",
-				validationRules: map[string][]string{"parent": {"required"}},
-			},
-			want: true,
-		},
-		{
-			name: "test check if non-required-parent required",
-			args: args{
-				fieldName:       "parent.child",
-				validationRules: map[string][]string{},
-			},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := isParentRequired(tt.args.fieldName, tt.args.validationRules); got != tt.want {
-				t.Errorf("isParentRequired() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -188,8 +144,9 @@ func Test_addValidationTagRules(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			addValidationTagRules(tt.args.t, tt.args.validationRules, tt.args.parentName)
-			if len(tt.args.validationRules) != tt.lengthExpected {
+			initialize(tt.args.validationRules)
+			addValidationTagRules(tt.args.t, tt.args.parentName)
+			if len(validationRules) != tt.lengthExpected {
 				t.Errorf("addValidationTagRules() validationRules = %v len = %v, want %v", tt.args.validationRules, len(tt.args.validationRules), tt.lengthExpected)
 			}
 		})
@@ -249,112 +206,6 @@ func Test_getStructFieldInfo(t *testing.T) {
 	}
 }
 
-func Test_addValidationErrors(t *testing.T) {
-	type args struct {
-		validationErrors    map[string]string
-		newValidationErrors map[string]string
-	}
-	tests := []struct {
-		name           string
-		args           args
-		lengthExpected int
-	}{
-		{
-			name: "test add validation errors",
-			args: args{
-				validationErrors:    map[string]string{"1": "one"},
-				newValidationErrors: map[string]string{"2": "two"},
-			},
-			lengthExpected: 2,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			addValidationErrors(tt.args.validationErrors, tt.args.newValidationErrors)
-			if len(tt.args.validationErrors) != tt.lengthExpected {
-				t.Errorf("addValidationErrors() validationErrors = %v len = %v, want %v", tt.args.validationErrors, len(tt.args.validationErrors), tt.lengthExpected)
-			}
-		})
-	}
-}
-
-func Test_getNestedRules(t *testing.T) {
-	type args struct {
-		validationRules map[string][]string
-		structName      string
-	}
-	tests := []struct {
-		name string
-		args args
-		want Rules
-	}{
-		{
-			name: "test get nested rules",
-			args: args{
-				validationRules: map[string][]string{"Parent.child.name": {"required"}},
-				structName:      "Parent",
-			},
-			want: Rules{"Parent.child.name": {"required"}},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getNestedRules(tt.args.validationRules, tt.args.structName); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getNestedRules() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_validateNestedStruct(t *testing.T) {
-	type Parent struct {
-		Name string
-	}
-	type args struct {
-		fieldName       string
-		fieldValue      interface{}
-		validationRules map[string][]string
-	}
-	tests := []struct {
-		name                          string
-		args                          args
-		wantErr                       bool
-		expectedValidationErrorsCount int
-	}{
-		{
-			name: "test validate nested struct",
-			args: args{
-				fieldName:       "Parent",
-				fieldValue:      Parent{Name: "Beshoy"},
-				validationRules: map[string][]string{"Parent.Name": {"required"}},
-			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
-		},
-		{
-			name: "test validate nested struct with unsuitable data",
-			args: args{
-				fieldName:       "Parent",
-				fieldValue:      Parent{},
-				validationRules: map[string][]string{"Parent.Child": {"required"}},
-			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := validateNestedStruct(tt.args.fieldName, tt.args.fieldValue, tt.args.validationRules)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validateNestedStruct() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-			if len(validationErrors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateNestedStruct() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-		})
-	}
-}
-
 func Test_convertInterfaceToMap(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -374,52 +225,6 @@ func Test_convertInterfaceToMap(t *testing.T) {
 			}
 			if got := convertInterfaceToMap(tt.value); !reflect.DeepEqual(reflect.TypeOf(got), reflect.TypeOf(tt.value)) {
 				t.Errorf("convertInterfaceToMap() length = %v, lengthExpected %v", len(got), tt.lengthExpected)
-			}
-		})
-	}
-}
-
-func Test_validateNestedMap(t *testing.T) {
-	type args struct {
-		fieldName       string
-		fieldValue      interface{}
-		validationRules map[string][]string
-	}
-	tests := []struct {
-		name                          string
-		args                          args
-		wantErr                       bool
-		expectedValidationErrorsCount int
-	}{
-		{
-			name: "test validate nested map",
-			args: args{
-				fieldName:       "Parent",
-				fieldValue:      map[string]interface{}{"name": "Beshay"},
-				validationRules: map[string][]string{"Parent.name": {"kind:string"}},
-			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
-		},
-		{
-			name: "test validate nested map with unsuitable data",
-			args: args{
-				fieldName:       "Parent",
-				fieldValue:      map[string]interface{}{},
-				validationRules: map[string][]string{"Parent.child": {"required"}},
-			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := validateNestedMap(tt.args.fieldName, tt.args.fieldValue, tt.args.validationRules)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validateNestedMap() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-			if len(validationErrors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateNestedMap() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
 		})
 	}
@@ -483,8 +288,8 @@ func Test_validateByType(t *testing.T) {
 			args: args{
 				fieldName:       "Parent",
 				fieldType:       reflect.TypeOf(map[string]interface{}{}),
-				fieldValue:      map[string]interface{}{},
-				validationRules: map[string][]string{"Parent.Name": {"required"}},
+				fieldValue:      map[string]interface{}{"Name": 22},
+				validationRules: map[string][]string{"Parent.Name": {"kind:string"}},
 				fieldsExists:    map[string]bool{},
 			},
 			wantErr:                       false,
@@ -517,7 +322,8 @@ func Test_validateByType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := validateByType(tt.args.fieldName, tt.args.fieldType, tt.args.fieldValue, tt.args.validationRules)
+			initialize(tt.args.validationRules)
+			err := validateByType(tt.args.fieldName, tt.args.fieldType, tt.args.fieldValue)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("validateByType() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
@@ -572,12 +378,13 @@ func Test_validateStructFields(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateStructFields(tt.args.t, tt.args.v, tt.args.parentName, tt.args.validationRules, tt.args.validationErrors)
+			initialize(tt.args.validationRules)
+			err := validateStructFields(tt.args.t, tt.args.v, tt.args.parentName)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("validateStructFields() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, tt.args.validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+				t.Errorf("validateStructFields() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
-			if len(tt.args.validationErrors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateStructFields() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, tt.args.validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			if len(validationErrors) != tt.expectedValidationErrorsCount {
+				t.Errorf("validateStructFields() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
 		})
 	}
@@ -621,123 +428,13 @@ func Test_validateMapFields(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateMapFields(tt.args.mapData, tt.args.parentName, tt.args.validationRules, tt.args.validationErrors)
+			initialize(tt.args.validationRules)
+			err := validateMapFields(tt.args.mapData, tt.args.parentName)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("validateMapFields() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, tt.args.validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+				t.Errorf("validateMapFields() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
-			if len(tt.args.validationErrors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateMapFields() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, tt.args.validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-		})
-	}
-}
-
-func Test_registerStructFields(t *testing.T) {
-	type Parent struct {
-		Name string
-	}
-	type args struct {
-		structData   interface{}
-		parentName   string
-		fieldsExists map[string]bool
-	}
-	tests := []struct {
-		name                      string
-		args                      args
-		expectedExistsFieldsCount int
-	}{
-		{
-			name: "test register struct fields",
-			args: args{
-				structData:   Parent{Name: "Youlitta"},
-				parentName:   "Parent",
-				fieldsExists: map[string]bool{},
-			},
-			expectedExistsFieldsCount: 1,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			registerStructFields(tt.args.structData, tt.args.parentName, tt.args.fieldsExists)
-			if len(tt.args.fieldsExists) != tt.expectedExistsFieldsCount {
-				t.Errorf("registerStructFields(): fieldsExists %v, expectedValidationErrorsCount %v, args %v", tt.args.fieldsExists, tt.expectedExistsFieldsCount, tt.args)
-			}
-		})
-	}
-}
-
-func Test_registerMapFields(t *testing.T) {
-	type args struct {
-		mapData      interface{}
-		parentName   string
-		fieldsExists map[string]bool
-	}
-	tests := []struct {
-		name                      string
-		args                      args
-		expectedExistsFieldsCount int
-	}{
-		{
-			name: "test register map fields",
-			args: args{
-				mapData:      map[string]interface{}{"age": 4},
-				parentName:   "Parent",
-				fieldsExists: map[string]bool{},
-			},
-			expectedExistsFieldsCount: 1,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			registerMapFields(tt.args.mapData, tt.args.parentName, tt.args.fieldsExists)
-			if len(tt.args.fieldsExists) != tt.expectedExistsFieldsCount {
-				t.Errorf("registerMapFields(): fieldsExists %v, expectedValidationErrorsCount %v, args %v", tt.args.fieldsExists, tt.expectedExistsFieldsCount, tt.args)
-			}
-		})
-	}
-}
-
-func Test_registerNestedFieldsByType(t *testing.T) {
-	type Parent struct {
-		Name string
-	}
-	type args struct {
-		fieldType    reflect.Type
-		fieldValue   interface{}
-		fieldName    string
-		fieldsExists map[string]bool
-	}
-	tests := []struct {
-		name                      string
-		args                      args
-		expectedExistsFieldsCount int
-	}{
-		{
-			name: "test register nested fields by type - struct",
-			args: args{
-				fieldType:    reflect.TypeOf(Parent{Name: "Nefrtari"}),
-				fieldValue:   Parent{Name: "Nefrtari"},
-				fieldName:    "Parent",
-				fieldsExists: map[string]bool{},
-			},
-			expectedExistsFieldsCount: 1,
-		},
-		{
-			name: "test register nested fields by type - map",
-			args: args{
-				fieldType:    reflect.TypeOf(map[string]interface{}{"Age": 1}),
-				fieldValue:   map[string]interface{}{"Age": 1},
-				fieldName:    "Parent",
-				fieldsExists: map[string]bool{},
-			},
-			expectedExistsFieldsCount: 1,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			registerNestedFieldsByType(tt.args.fieldType, tt.args.fieldValue, tt.args.fieldName, tt.args.fieldsExists)
-			if len(tt.args.fieldsExists) != tt.expectedExistsFieldsCount {
-				t.Errorf("registerNestedFieldsByType(): fieldsExists %v, expectedValidationErrorsCount %v, args %v", tt.args.fieldsExists, tt.expectedExistsFieldsCount, tt.args)
+			if len(validationErrors) != tt.expectedValidationErrorsCount {
+				t.Errorf("validateMapFields() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
 		})
 	}
@@ -766,9 +463,11 @@ func Test_validateNonExistRequiredFields(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			validateNonExistRequiredFields(tt.args.validationRules, tt.args.fieldsExists, tt.args.validationErrors)
-			if len(tt.args.validationErrors) != tt.validationErrorsCountExpected {
-				t.Errorf("validateNonExistRequiredFields() validationErrors = %v len = %v, want %v", tt.args.validationErrors, len(tt.args.validationErrors), tt.validationErrorsCountExpected)
+			initialize(tt.args.validationRules)
+			fieldsExists = tt.args.fieldsExists
+			validateNonExistRequiredFields()
+			if len(validationErrors) != tt.validationErrorsCountExpected {
+				t.Errorf("validateNonExistRequiredFields() validationErrors = %v len = %v, want %v", validationErrors, len(validationErrors), tt.validationErrorsCountExpected)
 			}
 		})
 	}

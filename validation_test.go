@@ -1,8 +1,40 @@
 package validation
 
 import (
+	"reflect"
 	"testing"
 )
+
+func Test_initialize(t *testing.T) {
+	type args struct {
+		rules Rules
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "test initialize",
+			args: args{
+				rules: Rules{"test": {"required"}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			initialize(tt.args.rules)
+			if !reflect.DeepEqual(tt.args.rules, validationRules) {
+				t.Errorf("initialize(): error initialize not wroking")
+			}
+			if reflect.ValueOf(validationErrors).IsZero() {
+				t.Errorf("initialize(): validationErrors is nil")
+			}
+			if reflect.ValueOf(fieldsExists).IsZero() {
+				t.Errorf("initialize(): fieldsExists is nil")
+			}
+		})
+	}
+}
 
 func Test_ValidateField(t *testing.T) {
 	type args struct {
@@ -46,14 +78,24 @@ func Test_ValidateField(t *testing.T) {
 			wantErr:              true,
 			wantValidationErrors: false,
 		},
+		{
+			name: "test validate field with empty rule",
+			args: args{
+				fieldName:  "Name",
+				fieldValue: 55,
+				fieldRules: []string{},
+			},
+			wantErr:              false,
+			wantValidationErrors: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := ValidateField(tt.args.fieldName, tt.args.fieldValue, tt.args.fieldRules)
+			err, validationError := ValidateField(tt.args.fieldName, tt.args.fieldValue, tt.args.fieldRules)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateField() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
 			}
-			if (len(validationErrors) > 0) != tt.wantValidationErrors {
+			if (validationError != "") != tt.wantValidationErrors {
 				t.Errorf("ValidateField() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.wantValidationErrors, tt.args)
 			}
 		})
@@ -89,6 +131,15 @@ func Test_ValidateJson(t *testing.T) {
 			wantErr:                       false,
 			expectedValidationErrorsCount: 1,
 		},
+		{
+			name: `test validate json with non-json-string`,
+			args: args{
+				jsonData:        `{"name:"}`,
+				validationRules: map[string][]string{},
+			},
+			wantErr:                       true,
+			expectedValidationErrorsCount: 0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -103,7 +154,7 @@ func Test_ValidateJson(t *testing.T) {
 	}
 }
 
-func Test_ValidateMap(t *testing.T) {
+func Test_validateMap(t *testing.T) {
 	type User struct {
 		Name int
 	}
@@ -130,7 +181,7 @@ func Test_ValidateMap(t *testing.T) {
 			name: "test validate map with unsuitable data",
 			args: args{
 				mapData:         map[string]interface{}{"name": "Ramses", "age": 90},
-				validationRules: map[string][]string{"name": {"required", "kind:string"}, "city": {"required", "kind:string"}},
+				validationRules: map[string][]string{"name": {"required", "kind:int"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 1,
@@ -183,26 +234,26 @@ func Test_ValidateMap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := ValidateMap(tt.args.mapData, tt.args.validationRules, "")
+			initialize(tt.args.validationRules)
+			err := validateMap(tt.args.mapData, "")
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateMap() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+				t.Errorf("validateMap() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
 			if len(validationErrors) != tt.expectedValidationErrorsCount {
-				t.Errorf("ValidateMap() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+				t.Errorf("validateMap() error = %v, validationErrors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
 			}
 		})
 	}
 }
 
-func Test_ValidateStruct(t *testing.T) {
+func Test_validateStruct(t *testing.T) {
 	type Child struct {
 		Name string `validation:"required|kind:string"`
 	}
 	type Parent struct {
-		Name            string `validation:"required|kind:string"`
-		Age             int    `validation:"required"`
-		StringKeyMap    map[string]interface{}
-		NonStringKeyMap map[int]interface{}
+		Name         string `validation:"required|kind:string"`
+		Age          int    `validation:"required"`
+		StringKeyMap map[string]interface{}
 		Child
 	}
 	type args struct {
@@ -231,7 +282,7 @@ func Test_ValidateStruct(t *testing.T) {
 				validationRules: map[string][]string{"Name": {"required", "kind:string"}, "Age": {"required"}},
 			},
 			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedValidationErrorsCount: 2,
 		},
 		{
 			name: "validate nested struct",
@@ -278,7 +329,7 @@ func Test_ValidateStruct(t *testing.T) {
 				validationRules: map[string][]string{},
 			},
 			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedValidationErrorsCount: 2,
 		},
 		{
 			name: "validate struct includes string-key-map",
@@ -287,33 +338,96 @@ func Test_ValidateStruct(t *testing.T) {
 					Name: "Ikhnaton",
 					Age:  2,
 				},
-				validationRules: map[string][]string{"stringKeyMap": {"required"}, "stringKeyMap.val": {"required"}},
+				validationRules: map[string][]string{"StringKeyMap": {"required"}},
 			},
 			wantErr:                       false,
 			expectedValidationErrorsCount: 2,
 		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			initialize(tt.args.validationRules)
+			addValidationTagRules(reflect.TypeOf(tt.args.structData), "")
+			err := validateStruct(tt.args.structData, "")
+			if (err != nil) != tt.wantErr {
+				t.Errorf("validateStruct() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			}
+			if len(validationErrors) != tt.expectedValidationErrorsCount {
+				t.Errorf("validateStruct() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			}
+		})
+	}
+}
+
+func TestValidate(t *testing.T) {
+	type Child struct {
+		Name string `validation:"required|kind:string"`
+		Age  int
+	}
+	type args struct {
+		val   interface{}
+		rules Rules
+	}
+	tests := []struct {
+		name                  string
+		args                  args
+		wantErr               bool
+		validationErrorsCount int
+	}{
 		{
-			name: "validate struct includes non-string-key-map",
+			name: "test validate struct with unsuitable data",
 			args: args{
-				structData: Parent{
-					Name:            "Ikhnaton",
-					Age:             2,
-					NonStringKeyMap: map[int]interface{}{1: 2},
-				},
-				validationRules: map[string][]string{"NonStringKeyMap": {"required"}},
+				val:   Child{},
+				rules: Rules{"Age": {"required"}},
 			},
-			wantErr:                       true,
-			expectedValidationErrorsCount: 0,
+			wantErr:               false,
+			validationErrorsCount: 2,
+		},
+		{
+			name: "test validate struct with non exist rule",
+			args: args{
+				val:   Child{},
+				rules: Rules{"Age": {"bla"}},
+			},
+			wantErr:               true,
+			validationErrorsCount: 0,
+		},
+		{
+			name: "test validate map with unsuitable data",
+			args: args{
+				val:   map[string]interface{}{"Name": ""},
+				rules: Rules{"Name": {"required"}, "Age": {"required"}},
+			},
+			wantErr:               false,
+			validationErrorsCount: 2,
+		},
+		{
+			name: "test validate map with non exist rule",
+			args: args{
+				val:   map[string]interface{}{"Name": ""},
+				rules: Rules{"Name": {"bla"}},
+			},
+			wantErr:               true,
+			validationErrorsCount: 0,
+		},
+		{
+			name: "test validate with non-struct and non-map value",
+			args: args{
+				val:   "test",
+				rules: Rules{"Name": {"bla"}},
+			},
+			wantErr:               true,
+			validationErrorsCount: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErrors := ValidateStruct(tt.args.structData, tt.args.validationRules, "")
+			err, validationErrors := Validate(tt.args.val, tt.args.rules)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateStruct() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+				t.Errorf("Validate() err = %v, want %v", err, tt.wantErr)
 			}
-			if len(validationErrors) != tt.expectedValidationErrorsCount {
-				t.Errorf("ValidateStruct() error = %v, validationErrors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, validationErrors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			if !reflect.DeepEqual(len(validationErrors), tt.validationErrorsCount) {
+				t.Errorf("Validate() validationErrors = %v, want %v", validationErrors, tt.validationErrorsCount)
 			}
 		})
 	}
