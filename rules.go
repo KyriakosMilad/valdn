@@ -8,7 +8,7 @@ type RuleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (
 
 var rules = make(map[string]RuleFunc)
 
-func AddRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
+func AddRule(ruleName string, ruleFunc RuleFunc) {
 	_, ruleExists := rules[ruleName]
 	if ruleExists {
 		panic("rule already registered")
@@ -16,7 +16,7 @@ func AddRule(ruleName string, ruleFunc func(fieldName string, fieldValue interfa
 	rules[ruleName] = ruleFunc
 }
 
-func OverwriteRule(ruleName string, ruleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)) {
+func OverwriteRule(ruleName string, ruleFunc RuleFunc) {
 	rules[ruleName] = ruleFunc
 }
 
