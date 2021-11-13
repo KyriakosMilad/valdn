@@ -26,29 +26,6 @@ func makeParentNameJoinable(parentName string) string {
 	return parentName
 }
 
-func addValidationTagRules(t reflect.Type, parentName string) {
-	parentName = makeParentNameJoinable(parentName)
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		fieldType := field.Type
-		fieldName := parentName + field.Name
-		fieldValidationTag := field.Tag.Get("validation")
-
-		_, fieldHasRules := validationRules[fieldName]
-		if !fieldHasRules && fieldValidationTag != "" {
-			var fieldRules []string
-			for _, v := range strings.Split(fieldValidationTag, "|") {
-				fieldRules = append(fieldRules, v)
-			}
-			validationRules[fieldName] = fieldRules
-		}
-
-		if fieldType.Kind() == reflect.Struct {
-			addValidationTagRules(fieldType, fieldName)
-		}
-	}
-}
-
 func getStructFieldInfo(fieldNumber int, parentType reflect.Type, parentValue reflect.Value, parentName string) (string, reflect.Type, reflect.Value) {
 	field := parentType.Field(fieldNumber)
 	fieldName := parentName + field.Name
@@ -66,65 +43,6 @@ func convertInterfaceToMap(value interface{}) map[string]interface{} {
 		}
 	}
 	return newMap
-}
-
-func validateByType(fieldName string, fieldType reflect.Type, fieldValue interface{}) error {
-	var err error
-	fieldRules := validationRules[fieldName]
-
-	switch fieldType.Kind() {
-	case reflect.Struct:
-		err = validateStruct(fieldValue, fieldName)
-	case reflect.Map:
-		err = validateMap(fieldValue, fieldName)
-	default:
-		var fieldValidationError string
-		err, fieldValidationError = ValidateField(fieldName, fieldValue, fieldRules)
-		if fieldValidationError != "" {
-			validationErrors[fieldName] = fieldValidationError
-		}
-	}
-	return err
-}
-
-func validateStructFields(t reflect.Type, v reflect.Value, parentName string) error {
-	parentName = makeParentNameJoinable(parentName)
-	for i := 0; i < t.NumField(); i++ {
-		fieldName, fieldType, fieldValue := getStructFieldInfo(i, t, v, parentName)
-		fieldsExists[fieldName] = true
-		err := validateByType(fieldName, fieldType, fieldValue.Interface())
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func validateMapFields(mapData map[string]interface{}, parentName string) error {
-	parentName = makeParentNameJoinable(parentName)
-	for fieldName, fieldValue := range mapData {
-		fieldName = parentName + fieldName
-		fieldsExists[fieldName] = true
-		fieldType := reflect.TypeOf(fieldValue)
-		err := validateByType(fieldName, fieldType, fieldValue)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func validateNonExistRequiredFields() {
-	for k, v := range validationRules {
-		for _, val := range v {
-			if val == "required" {
-				_, ok := fieldsExists[k]
-				if !ok {
-					validationErrors[k] = k + " is required"
-				}
-			}
-		}
-	}
 }
 
 func copyRules(rules Rules) Rules {
