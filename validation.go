@@ -29,7 +29,7 @@ func createNewValidation(r Rules) *validation {
 	return &v
 }
 
-func Validate(name string, val interface{}, rlz []string) (error, string) {
+func Validate(name string, val interface{}, rlz []string) error {
 	for _, r := range rlz {
 		if r == "" {
 			continue
@@ -37,49 +37,42 @@ func Validate(name string, val interface{}, rlz []string) (error, string) {
 
 		rName, rVal, rFunc, rExist := getRuleInfo(r)
 		if !rExist {
-			err := errors.New("unknown validation rule: " + rName)
-			return err, ""
+			panic("unknown rule: " + rName)
 		}
-		err, vErr := rFunc(name, val, rVal)
+
+		err := rFunc(name, val, rVal)
 		if err != nil {
-			return err, ""
-		}
-		if vErr != "" {
-			return nil, vErr
+			return err
 		}
 	}
-	return nil, ""
+	return nil
 }
 
-func ValidateNested(val interface{}, r Rules) (error, Errors) {
-	var err error
+func ValidateNested(val interface{}, r Rules) Errors {
 	v := createNewValidation(r)
 
 	t := reflect.TypeOf(val)
 	switch t.Kind() {
 	case reflect.Struct:
 		v.addValidationTagRules(t, "")
-		err = v.validateStruct(val, "")
+		v.validateStruct(val, "")
 	case reflect.Map:
-		err = v.validateMap(convertInterfaceToMap(val), "")
+		v.validateMap(convertInterfaceToMap(val), "")
 	default:
-		err = errors.New("ValidateNested() can only validate struct and map ")
-	}
-	if err != nil {
-		return err, nil
+		panic("ValidateNested() can only validate struct and map ")
 	}
 
 	v.validateNonExistRequiredFields()
 
-	return nil, v.errors
+	return v.errors
 }
 
-func ValidateJson(val string, r Rules) (error, Errors) {
+func ValidateJson(val string, r Rules) Errors {
 	var decodedJson map[string]interface{}
 
 	err := json.Unmarshal([]byte(val), &decodedJson)
 	if err != nil {
-		return errors.New(toString(err)), nil
+		panic(err)
 	}
 
 	return ValidateNested(decodedJson, r)
@@ -89,8 +82,8 @@ func (v *validation) registerField(name string) {
 	v.fieldsExist[name] = true
 }
 
-func (v *validation) addError(name string, err string) {
-	v.errors[name] = err
+func (v *validation) addError(name string, err error) {
+	v.errors[name] = err.Error()
 }
 
 func (v *validation) getFieldRules(name string) []string {
@@ -120,81 +113,65 @@ func (v *validation) addValidationTagRules(t reflect.Type, parName string) {
 	}
 }
 
-func (v *validation) validateStruct(val interface{}, name string) error {
+func (v *validation) validateStruct(val interface{}, name string) {
 	rlz := v.getFieldRules(name)
-	err, structErr := Validate(name, val, rlz)
+
+	err := Validate(name, val, rlz)
 	if err != nil {
-		return err
-	}
-	if structErr != "" {
-		v.addError(name, structErr)
+		v.addError(name, err)
 	}
 
 	typ := reflect.TypeOf(val)
 	value := reflect.ValueOf(val)
-	return v.validateStructFields(typ, value, name)
+	v.validateStructFields(typ, value, name)
 }
 
-func (v *validation) validateMap(val interface{}, name string) error {
+func (v *validation) validateMap(val interface{}, name string) {
 	if !reflect.DeepEqual(reflect.TypeOf(val), reflect.TypeOf(map[string]interface{}{})) {
-		return fmt.Errorf("error validating %v: type %v is not supported", name, reflect.TypeOf(val))
+		panic(fmt.Errorf("error validating %v: type %v is not supported", name, reflect.TypeOf(val)))
 	}
 
 	r := v.getFieldRules(name)
-	err, mapErr := Validate(name, val, r)
+	err := Validate(name, val, r)
 	if err != nil {
-		return err
-	}
-	if mapErr != "" {
-		v.addError(name, mapErr)
+		v.addError(name, err)
 	}
 
-	return v.validateMapFields(convertInterfaceToMap(val), name)
+	v.validateMapFields(convertInterfaceToMap(val), name)
 }
 
-func (v *validation) validateByType(name string, t reflect.Type, val interface{}) error {
-	var err error
+func (v *validation) validateByType(name string, t reflect.Type, val interface{}) {
 	v.registerField(name)
 	r := v.getFieldRules(name)
 
 	switch t.Kind() {
 	case reflect.Struct:
-		err = v.validateStruct(val, name)
+		v.validateStruct(val, name)
 	case reflect.Map:
-		err = v.validateMap(val, name)
+		v.validateMap(val, name)
 	default:
-		var vErr string
-		err, vErr = Validate(name, val, r)
-		if vErr != "" {
-			v.addError(name, vErr)
+		err := Validate(name, val, r)
+		if err != nil {
+			v.addError(name, err)
 		}
 	}
-	return err
 }
 
-func (v *validation) validateStructFields(parTyp reflect.Type, parVal reflect.Value, parName string) error {
+func (v *validation) validateStructFields(parTyp reflect.Type, parVal reflect.Value, parName string) {
 	parName = makeParentNameJoinable(parName)
 	for i := 0; i < parTyp.NumField(); i++ {
-		name, typ, value := getStructFieldInfo(i, parTyp, parVal, parName)
-		err := v.validateByType(name, typ, value.Interface())
-		if err != nil {
-			return err
-		}
+		name, typ, val := getStructFieldInfo(i, parTyp, parVal, parName)
+		v.validateByType(name, typ, val.Interface())
 	}
-	return nil
 }
 
-func (v *validation) validateMapFields(val map[string]interface{}, parName string) error {
+func (v *validation) validateMapFields(val map[string]interface{}, parName string) {
 	parName = makeParentNameJoinable(parName)
 	for name, value := range val {
 		name = parName + name
 		typ := reflect.TypeOf(value)
-		err := v.validateByType(name, typ, value)
-		if err != nil {
-			return err
-		}
+		v.validateByType(name, typ, value)
 	}
-	return nil
 }
 
 func (v *validation) validateNonExistRequiredFields() {
@@ -203,7 +180,7 @@ func (v *validation) validateNonExistRequiredFields() {
 			if r == "required" {
 				_, ok := v.fieldsExist[name]
 				if !ok {
-					v.addError(name, name+" is required")
+					v.addError(name, errors.New(name+" is required"))
 				}
 			}
 		}

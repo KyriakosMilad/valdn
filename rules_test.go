@@ -19,8 +19,8 @@ func Test_AddRule(t *testing.T) {
 			name: "test add rule",
 			args: args{
 				name: "test",
-				f: func(name string, fVal interface{}, rVal string) (err error, validationError string) {
-					return
+				f: func(name string, fVal interface{}, rVal string) error {
+					return nil
 				},
 			},
 			wantErr: false,
@@ -29,8 +29,8 @@ func Test_AddRule(t *testing.T) {
 			name: "test add rule already exist",
 			args: args{
 				name: "test",
-				f: func(name string, fVal interface{}, rVal string) (err error, validationError string) {
-					return
+				f: func(name string, fVal interface{}, rVal string) error {
+					return nil
 				},
 			},
 			wantErr: true,
@@ -40,12 +40,12 @@ func Test_AddRule(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				if err := recover(); err != nil && !tt.wantErr {
-					t.Errorf("AddRule() error: failed to add rule, wantErr: %v, error: %v, args: %v", tt.wantErr, err, tt.args)
+					t.Errorf("AddRule() error: failed to add rule, wantPanic: %v, error: %v, args: %v", tt.wantErr, err, tt.args)
 				}
 			}()
 			AddRule(tt.args.name, tt.args.f)
 			if _, ok := registeredRules["test"]; !ok {
-				t.Errorf("AddRule() error: failed to add rule, wantErr: %v, error: %v, args: %v", tt.wantErr, nil, tt.args)
+				t.Errorf("AddRule() error: failed to add rule, wantPanic: %v, error: %v, args: %v", tt.wantErr, nil, tt.args)
 			}
 		})
 	}
@@ -64,8 +64,8 @@ func Test_OverwriteRule(t *testing.T) {
 			name: "test overwrite rule",
 			args: args{
 				name: "test0",
-				f: func(field string, fVal interface{}, rVal string) (err error, validationError string) {
-					return
+				f: func(field string, fVal interface{}, rVal string) error {
+					return nil
 				},
 			},
 		},
@@ -73,8 +73,8 @@ func Test_OverwriteRule(t *testing.T) {
 			name: "test overwrite rule already exist",
 			args: args{
 				name: "test0",
-				f: func(field string, fVal interface{}, rVal string) (err error, validationError string) {
-					return
+				f: func(field string, fVal interface{}, rVal string) error {
+					return nil
 				},
 			},
 		},
@@ -148,10 +148,9 @@ func Test_requiredRule(t *testing.T) {
 		rVal  string
 	}
 	tests := []struct {
-		name              string
-		args              args
-		wantErr           bool
-		wantValidationErr bool
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "test required rule",
@@ -160,8 +159,7 @@ func Test_requiredRule(t *testing.T) {
 				fVal:  "Kyriakos",
 				rVal:  "",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test required rule with zero value",
@@ -170,8 +168,7 @@ func Test_requiredRule(t *testing.T) {
 				fVal:  "",
 				rVal:  "",
 			},
-			wantErr:           false,
-			wantValidationErr: true,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -180,12 +177,9 @@ func Test_requiredRule(t *testing.T) {
 			if !requiredExist {
 				panic("required rule is not exist")
 			}
-			err, validationError := requiredFunc(tt.args.field, tt.args.fVal, tt.args.rVal)
+			err := requiredFunc(tt.args.field, tt.args.fVal, tt.args.rVal)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("required rule: err: %v, wantErr: %v, validationError: %v, wantValidationError: %v, args: %v", err, tt.wantErr, validationError, tt.wantValidationErr, tt.args)
-			}
-			if (validationError != "") != tt.wantValidationErr {
-				t.Errorf("required rule: err: %v, wantErr: %v, validationError: %v, wantValidationError: %v, args: %v", err, tt.wantErr, validationError, tt.wantValidationErr, tt.args)
+				t.Errorf("required rule: err: %v, wantErr: %v, args: %v", err, tt.wantErr, tt.args)
 			}
 		})
 	}
@@ -309,12 +303,9 @@ func Test_typeRule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErr := typeRule(tt.args.fieldName, tt.args.fVal, tt.args.rVal)
+			err := typeRule(tt.args.fieldName, tt.args.fVal, tt.args.rVal)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("typeRule() got = %v, want %v", err, tt.wantErr)
-			}
-			if (validationErr != "") != tt.wantValidationErr {
-				t.Errorf("typeRule() got = %v, want %v", validationErr, tt.wantValidationErr)
 			}
 		})
 	}
@@ -435,12 +426,9 @@ func Test_kindRule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationErr := kindRule(tt.args.fName, tt.args.fVal, tt.args.rVal)
+			err := kindRule(tt.args.fName, tt.args.fVal, tt.args.rVal)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("kindRule() err = %v, want %v", err, tt.wantErr)
-			}
-			if (validationErr != "") != tt.wantValidationErr {
-				t.Errorf("kindRule() validationErr = %v, want %v", validationErr, tt.wantValidationErr)
 			}
 		})
 	}

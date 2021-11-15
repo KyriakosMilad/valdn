@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -36,10 +37,10 @@ func Test_Validate(t *testing.T) {
 		fieldRules []string
 	}
 	tests := []struct {
-		name                string
-		args                args
-		wantErr             bool
-		wantValidationError bool
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
 	}{
 		{
 			name: "test validate field",
@@ -48,8 +49,8 @@ func Test_Validate(t *testing.T) {
 				fieldValue: "Kyria",
 				fieldRules: []string{"required", "kind:string"},
 			},
-			wantErr:             false,
-			wantValidationError: false,
+			wantErr:   false,
+			wantPanic: false,
 		},
 		{
 			name: "test validate field with unsuitable data",
@@ -58,18 +59,18 @@ func Test_Validate(t *testing.T) {
 				fieldValue: 55,
 				fieldRules: []string{"required", "kind:string"},
 			},
-			wantErr:             false,
-			wantValidationError: true,
+			wantErr:   true,
+			wantPanic: false,
 		},
 		{
-			name: "test validate field with not exist rule",
+			name: "test validate field with non exist rule",
 			args: args{
 				fieldName:  "Name",
 				fieldValue: 55,
 				fieldRules: []string{"bla:bla"},
 			},
-			wantErr:             true,
-			wantValidationError: false,
+			wantErr:   false,
+			wantPanic: true,
 		},
 		{
 			name: "test validate field with empty rule",
@@ -78,18 +79,20 @@ func Test_Validate(t *testing.T) {
 				fieldValue: 55,
 				fieldRules: []string{},
 			},
-			wantErr:             false,
-			wantValidationError: false,
+			wantErr:   false,
+			wantPanic: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, validationError := Validate(tt.args.fieldName, tt.args.fieldValue, tt.args.fieldRules)
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("Validate() error = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			err := Validate(tt.args.fieldName, tt.args.fieldValue, tt.args.fieldRules)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Validate() error = %v, errors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationError, tt.wantErr, tt.wantValidationError, tt.args)
-			}
-			if (validationError != "") != tt.wantValidationError {
-				t.Errorf("Validate() error = %v, errors = %v, wantErr %v, wantValidationErrors %v, args %v", err, validationError, tt.wantErr, tt.wantValidationError, tt.args)
+				t.Errorf("Validate() error = %v, wantErr %v, args %v", err, tt.wantErr, tt.args)
 			}
 		})
 	}
@@ -105,10 +108,10 @@ func Test_ValidateNested(t *testing.T) {
 		rules Rules
 	}
 	tests := []struct {
-		name        string
-		args        args
-		wantErr     bool
-		errorsCount int
+		name                string
+		args                args
+		wantPanic           bool
+		expectedErrorsCount int
 	}{
 		{
 			name: "test validate struct with unsuitable data",
@@ -116,8 +119,8 @@ func Test_ValidateNested(t *testing.T) {
 				val:   Child{},
 				rules: Rules{"Age": {"required"}},
 			},
-			wantErr:     false,
-			errorsCount: 2,
+			wantPanic:           false,
+			expectedErrorsCount: 2,
 		},
 		{
 			name: "test validate struct with non exist rule",
@@ -125,8 +128,8 @@ func Test_ValidateNested(t *testing.T) {
 				val:   Child{},
 				rules: Rules{"Age": {"bla"}},
 			},
-			wantErr:     true,
-			errorsCount: 0,
+			wantPanic:           true,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate map with unsuitable data",
@@ -134,8 +137,8 @@ func Test_ValidateNested(t *testing.T) {
 				val:   map[string]interface{}{"Name": ""},
 				rules: Rules{"Name": {"required"}, "Age": {"required"}},
 			},
-			wantErr:     false,
-			errorsCount: 2,
+			wantPanic:           false,
+			expectedErrorsCount: 2,
 		},
 		{
 			name: "test validate map with non exist rule",
@@ -143,8 +146,8 @@ func Test_ValidateNested(t *testing.T) {
 				val:   map[string]interface{}{"Name": ""},
 				rules: Rules{"Name": {"bla"}},
 			},
-			wantErr:     true,
-			errorsCount: 0,
+			wantPanic:           true,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate with non-struct and non-map value",
@@ -152,18 +155,20 @@ func Test_ValidateNested(t *testing.T) {
 				val:   "test",
 				rules: Rules{"Name": {"bla"}},
 			},
-			wantErr:     true,
-			errorsCount: 0,
+			wantPanic:           true,
+			expectedErrorsCount: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, errors := ValidateNested(tt.args.val, tt.args.rules)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateNested() err = %v, want %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(len(errors), tt.errorsCount) {
-				t.Errorf("ValidateNested() errors = %v, want %v", errors, tt.errorsCount)
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ValidateNested() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			vErrors := ValidateNested(tt.args.val, tt.args.rules)
+			if !reflect.DeepEqual(len(vErrors), tt.expectedErrorsCount) {
+				t.Errorf("ValidateNested() vErrors = %v, want %v", vErrors, tt.expectedErrorsCount)
 			}
 		})
 	}
@@ -175,10 +180,10 @@ func Test_ValidateJson(t *testing.T) {
 		rules    Rules
 	}
 	tests := []struct {
-		name                          string
-		args                          args
-		wantErr                       bool
-		expectedValidationErrorsCount int
+		name                string
+		args                args
+		wantPanic           bool
+		expectedErrorsCount int
 	}{
 		{
 			name: `test validate json`,
@@ -186,8 +191,8 @@ func Test_ValidateJson(t *testing.T) {
 				jsonData: `{"rName":"Ramses", "city":"Tiba"}`,
 				rules:    Rules{"rName": {"required", "kind:string"}, "city": {"required", "kind:string"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			wantPanic:           false,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: `test validate json with unsuitable data`,
@@ -195,8 +200,8 @@ func Test_ValidateJson(t *testing.T) {
 				jsonData: `{"rName":"Ramses", "age":90}`,
 				rules:    Rules{"rName": {"required", "kind:string"}, "city": {"required", "kind:string"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			wantPanic:           false,
+			expectedErrorsCount: 1,
 		},
 		{
 			name: `test validate json with non-json-string`,
@@ -204,18 +209,20 @@ func Test_ValidateJson(t *testing.T) {
 				jsonData: `{"rName:"}`,
 				rules:    Rules{},
 			},
-			wantErr:                       true,
-			expectedValidationErrorsCount: 0,
+			wantPanic:           true,
+			expectedErrorsCount: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, errors := ValidateJson(tt.args.jsonData, tt.args.rules)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateJson() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-			if len(errors) != tt.expectedValidationErrorsCount {
-				t.Errorf("ValidateJson() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ValidateJson() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			vErrors := ValidateJson(tt.args.jsonData, tt.args.rules)
+			if len(vErrors) != tt.expectedErrorsCount {
+				t.Errorf("ValidateJson() vErrors = %v, expectedErrorsCount %v, args %v", vErrors, tt.expectedErrorsCount, tt.args)
 			}
 		})
 	}
@@ -228,20 +235,20 @@ func Test_validation_registerField(t *testing.T) {
 	tests := []struct {
 		name                string
 		args                args
-		fieldsCountExpected int
+		expectedFieldsCount int
 	}{
 		{
 			name:                "test register field",
 			args:                args{fieldName: "test"},
-			fieldsCountExpected: 1,
+			expectedFieldsCount: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(Rules{})
 			v.registerField(tt.args.fieldName)
-			if len(v.fieldsExist) != tt.fieldsCountExpected {
-				t.Errorf("registerField(): can't register field, got %v, want %v", len(v.fieldsExist), tt.fieldsCountExpected)
+			if len(v.fieldsExist) != tt.expectedFieldsCount {
+				t.Errorf("registerField(): can't register field, got %v, want %v", len(v.fieldsExist), tt.expectedFieldsCount)
 			}
 		})
 	}
@@ -249,29 +256,29 @@ func Test_validation_registerField(t *testing.T) {
 
 func Test_validation_addError(t *testing.T) {
 	type args struct {
-		fieldName string
-		err       string
+		name string
+		err  error
 	}
 	tests := []struct {
 		name                string
 		args                args
-		errorsCountExpected int
+		expectedErrorsCount int
 	}{
 		{
 			name: "test add error",
 			args: args{
-				fieldName: "test",
-				err:       "just test err",
+				name: "test",
+				err:  errors.New("just test err"),
 			},
-			errorsCountExpected: 1,
+			expectedErrorsCount: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(Rules{})
-			v.addError(tt.args.fieldName, tt.args.err)
-			if len(v.errors) != tt.errorsCountExpected {
-				t.Errorf("registerField(): can't register field, got %v, want %v", len(v.fieldsExist), tt.errorsCountExpected)
+			v.addError(tt.args.name, tt.args.err)
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("registerField(): can't register field, got %v, want %v", len(v.fieldsExist), tt.expectedErrorsCount)
 			}
 		})
 	}
@@ -358,10 +365,9 @@ func Test_validation_validateStruct(t *testing.T) {
 		rules Rules
 	}
 	tests := []struct {
-		name                          string
-		args                          args
-		wantErr                       bool
-		expectedValidationErrorsCount int
+		name                string
+		args                args
+		expectedErrorsCount int
 	}{
 		{
 			name: "validate struct",
@@ -369,8 +375,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				val:   Parent{Name: "Mina", Age: 26},
 				rules: Rules{"Name": {"required", "kind:string"}, "Child.Name": {""}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "validate struct with unsuitable data",
@@ -378,8 +383,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				val:   Parent{Name: "Mina"},
 				rules: Rules{"Name": {"required", "kind:string"}, "Age": {"required"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 2,
+			expectedErrorsCount: 2,
 		},
 		{
 			name: "validate nested struct",
@@ -390,8 +394,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				},
 				rules: Rules{"Name": {"required", "kind:string"}, "Age": {""}, "Child.Name": {"required", "kind:string"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "validate nested struct with unsuitable data",
@@ -401,8 +404,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				},
 				rules: Rules{"Name": {"required", "kind:string"}, "Child.Name": {"required", "kind:string"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 2,
+			expectedErrorsCount: 2,
 		},
 		{
 			name: "validate nested struct (validation tag)",
@@ -414,8 +416,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				},
 				rules: Rules{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "validate nested struct with unsuitable data (validation tag)",
@@ -425,8 +426,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				},
 				rules: Rules{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 2,
+			expectedErrorsCount: 2,
 		},
 		{
 			name: "validate struct containing string-key-map",
@@ -437,20 +437,16 @@ func Test_validation_validateStruct(t *testing.T) {
 				},
 				rules: Rules{"StringKeyMap": {"required"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 2,
+			expectedErrorsCount: 2,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(tt.args.rules)
 			v.addValidationTagRules(reflect.TypeOf(tt.args.val), "")
-			err := v.validateStruct(tt.args.val, "")
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validateStruct() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-			if len(v.errors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateStruct() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			v.validateStruct(tt.args.val, "")
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("validateStruct() errors = %v expectedErrorsCount %v, args %v", v.errors, tt.expectedErrorsCount, tt.args)
 			}
 		})
 	}
@@ -465,10 +461,10 @@ func Test_validation_validateMap(t *testing.T) {
 		rules Rules
 	}
 	tests := []struct {
-		name                          string
-		args                          args
-		wantErr                       bool
-		expectedValidationErrorsCount int
+		name                string
+		args                args
+		expectedErrorsCount int
+		wantPanic           bool
 	}{
 		{
 			name: "test validate map",
@@ -476,8 +472,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"rName": "Ramses", "city": "Tiba"},
 				rules: Rules{"rName": {"required", "kind:string"}, "city": {"required", "kind:string"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate map with unsuitable data",
@@ -485,8 +480,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"rName": "Ramses", "age": 90},
 				rules: Rules{"rName": {"required", "kind:int"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedErrorsCount: 1,
 		},
 		{
 			name: "test validate nested map",
@@ -494,8 +488,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"user": map[string]interface{}{"rName": "Kyriakos M.", "country": "Egypt"}},
 				rules: Rules{"user": {"required"}, "user.rName": {"required", "kind:string"}, "user.country": {"required", "kind:string"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate nested map with unsuitable data",
@@ -503,8 +496,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"user": map[string]interface{}{"rName": 1, "country": "Egypt"}},
 				rules: Rules{"user": {"required"}, "user.rName": {"required", "kind:string"}, "user.country": {"required", "kind:string"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedErrorsCount: 1,
 		},
 		{
 			name: "test validate nested map with non-string key",
@@ -512,8 +504,8 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"user": map[int]interface{}{1: 2}},
 				rules: Rules{"user": {"required"}},
 			},
-			wantErr:                       true,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
+			wantPanic:           true,
 		},
 		{
 			name: "test validate map containing struct",
@@ -521,8 +513,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"user": User{Name: 5}},
 				rules: Rules{"user": {"required"}, "user.Name": {"required"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate map containing struct with unsuitable data",
@@ -530,19 +521,20 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"user": User{Name: 5}},
 				rules: Rules{"user": {"required"}, "user.Name": {"required", "kind:string"}},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedErrorsCount: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("validateMap() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
 			v := createNewValidation(tt.args.rules)
-			err := v.validateMap(tt.args.val, "")
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validateMap() error = %v, errors = %v, wantErr %v, wantValidationErrors %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-			if len(v.errors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateMap() error = %v, errors = %v, wantErr %v, wantValidationErrors %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			v.validateMap(tt.args.val, "")
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("validateMap() errors = %v, wantValidationErrors %v, args %v", v.errors, tt.expectedErrorsCount, tt.args)
 			}
 		})
 	}
@@ -560,10 +552,9 @@ func Test_validation_validateByType(t *testing.T) {
 		fieldsExist map[string]bool
 	}
 	tests := []struct {
-		name                          string
-		args                          args
-		wantErr                       bool
-		expectedValidationErrorsCount int
+		name                string
+		args                args
+		expectedErrorsCount int
 	}{
 		{
 			name: "test validate by type - struct",
@@ -574,8 +565,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"Parent.Name": {"required"}},
 				fieldsExist: map[string]bool{"Parent.Name": true},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate by type - struct with unsuitable data",
@@ -586,8 +576,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"Parent.Name": {"required"}},
 				fieldsExist: map[string]bool{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedErrorsCount: 1,
 		},
 		{
 			name: "test validate by type - map",
@@ -598,8 +587,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"Parent.Name": {"required"}},
 				fieldsExist: map[string]bool{"Parent.Name": true},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate by type - map with unsuitable data",
@@ -610,8 +598,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"Parent.Name": {"kind:string"}},
 				fieldsExist: map[string]bool{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedErrorsCount: 1,
 		},
 		{
 			name: "test validate by type - field",
@@ -622,8 +609,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"age": {"required"}},
 				fieldsExist: map[string]bool{"age": true},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate by type - field with unsuitable data",
@@ -634,19 +620,15 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"age": {"required"}},
 				fieldsExist: map[string]bool{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedErrorsCount: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(tt.args.rules)
-			err := v.validateByType(tt.args.name, tt.args.typ, tt.args.val)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validateByType() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-			if len(v.errors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateByType() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			v.validateByType(tt.args.name, tt.args.typ, tt.args.val)
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("validateByType()errors = %v, expectedErrorsCount %v, args %v", v.errors, tt.expectedErrorsCount, tt.args)
 			}
 		})
 	}
@@ -664,10 +646,9 @@ func Test_validation_validateStructFields(t *testing.T) {
 		errors  map[string]string
 	}
 	tests := []struct {
-		name                          string
-		args                          args
-		wantErr                       bool
-		expectedValidationErrorsCount int
+		name                string
+		args                args
+		expectedErrorsCount int
 	}{
 		{
 			name: "test validate struct fields",
@@ -678,8 +659,7 @@ func Test_validation_validateStructFields(t *testing.T) {
 				rules:   Rules{"Name": {"required"}},
 				errors:  map[string]string{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate struct fields with unsuitable data",
@@ -690,19 +670,15 @@ func Test_validation_validateStructFields(t *testing.T) {
 				rules:   Rules{"Name": {"required"}},
 				errors:  map[string]string{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedErrorsCount: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(tt.args.rules)
-			err := v.validateStructFields(tt.args.t, tt.args.v, tt.args.parName)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validateStructFields() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-			if len(v.errors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateStructFields() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			v.validateStructFields(tt.args.t, tt.args.v, tt.args.parName)
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("validateStructFields() errors = %v, expectedErrorsCount %v, args %v", v.errors, tt.expectedErrorsCount, tt.args)
 			}
 		})
 	}
@@ -716,10 +692,9 @@ func Test_validation_validateMapFields(t *testing.T) {
 		errors  map[string]string
 	}
 	tests := []struct {
-		name                          string
-		args                          args
-		wantErr                       bool
-		expectedValidationErrorsCount int
+		name                string
+		args                args
+		expectedErrorsCount int
 	}{
 		{
 			name: "test validate map fields",
@@ -729,8 +704,7 @@ func Test_validation_validateMapFields(t *testing.T) {
 				rules:   Rules{"Parent.Name": {"required"}},
 				errors:  map[string]string{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 0,
+			expectedErrorsCount: 0,
 		},
 		{
 			name: "test validate map fields with unsuitable data",
@@ -740,19 +714,15 @@ func Test_validation_validateMapFields(t *testing.T) {
 				rules:   Rules{"Parent.Name": {"required"}},
 				errors:  map[string]string{},
 			},
-			wantErr:                       false,
-			expectedValidationErrorsCount: 1,
+			expectedErrorsCount: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(tt.args.rules)
-			err := v.validateMapFields(tt.args.val, tt.args.parName)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validateMapFields() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
-			}
-			if len(v.errors) != tt.expectedValidationErrorsCount {
-				t.Errorf("validateMapFields() error = %v, errors = %v, wantErr %v, expectedValidationErrorsCount %v, args %v", err, v.errors, tt.wantErr, tt.expectedValidationErrorsCount, tt.args)
+			v.validateMapFields(tt.args.val, tt.args.parName)
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("validateMapFields() errors = %v, expectedErrorsCount %v, args %v", v.errors, tt.expectedErrorsCount, tt.args)
 			}
 		})
 	}
@@ -767,7 +737,7 @@ func Test_validation_validateNonExistRequiredFields(t *testing.T) {
 	tests := []struct {
 		name                string
 		args                args
-		errorsCountExpected int
+		expectedErrorsCount int
 	}{
 		{
 			name: "test validate non exist required fields",
@@ -776,7 +746,7 @@ func Test_validation_validateNonExistRequiredFields(t *testing.T) {
 				fieldsExist: map[string]bool{"field1": true, "field2": true},
 				errors:      map[string]string{},
 			},
-			errorsCountExpected: 1,
+			expectedErrorsCount: 1,
 		},
 	}
 	for _, tt := range tests {
@@ -784,8 +754,8 @@ func Test_validation_validateNonExistRequiredFields(t *testing.T) {
 			v := createNewValidation(tt.args.rules)
 			v.fieldsExist = tt.args.fieldsExist
 			v.validateNonExistRequiredFields()
-			if len(v.errors) != tt.errorsCountExpected {
-				t.Errorf("validateNonExistRequiredFields() errors = %v len = %v, want %v", v.errors, len(v.errors), tt.errorsCountExpected)
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("validateNonExistRequiredFields() errors = %v len = %v, want %v", v.errors, len(v.errors), tt.expectedErrorsCount)
 			}
 		})
 	}

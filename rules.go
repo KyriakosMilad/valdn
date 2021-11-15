@@ -1,10 +1,11 @@
 package validation
 
 import (
+	"errors"
 	"reflect"
 )
 
-type RuleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)
+type RuleFunc func(fieldName string, fieldValue interface{}, ruleValue string) error
 
 var registeredRules = make(map[string]RuleFunc)
 
@@ -26,23 +27,21 @@ func getRuleInfo(r string) (string, string, RuleFunc, bool) {
 	return rName, rValue, rFunc, rExist
 }
 
-func requiredRule(name string, val interface{}, ruleVal string) (error, string) {
+func requiredRule(name string, val interface{}, ruleVal string) error {
 	if IsEmpty(val) {
-		validationError := name + " is required"
-		return nil, validationError
+		return errors.New(name + " is required")
 	}
-	return nil, ""
+	return nil
 }
 
-func kindRule(name string, val interface{}, ruleVal string) (error, string) {
+func kindRule(name string, val interface{}, ruleVal string) error {
 	if k := reflect.TypeOf(val).Kind(); toString(k) != ruleVal {
-		validationError := name + " must be kind of " + ruleVal
-		return nil, validationError
+		return errors.New(name + " must be kind of " + ruleVal)
 	}
-	return nil, ""
+	return nil
 }
 
-func typeRule(name string, val interface{}, ruleVal string) (error, string) {
+func typeRule(name string, val interface{}, ruleVal string) error {
 	var typeInString string
 	if t := reflect.TypeOf(val); t.Kind() == reflect.Struct {
 		typeInString = t.Name()
@@ -50,10 +49,9 @@ func typeRule(name string, val interface{}, ruleVal string) (error, string) {
 		typeInString = toString(t)
 	}
 	if typeInString != ruleVal {
-		validationError := name + " must be type of " + ruleVal
-		return nil, validationError
+		return errors.New(name + " must be type of " + ruleVal)
 	}
-	return nil, ""
+	return nil
 }
 
 func init() {
