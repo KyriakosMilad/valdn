@@ -7,80 +7,28 @@ import (
 
 func Test_splitRuleNameAndRuleValue(t *testing.T) {
 	tests := []struct {
-		name              string
-		rule              string
-		ruleNameExpected  string
-		ruleValueExpected string
+		name          string
+		rule          string
+		nameExpected  string
+		valueExpected string
 	}{
 		{
-			name:              "test get rule value from rule does have value",
-			rule:              "val:test",
-			ruleNameExpected:  "val",
-			ruleValueExpected: "test",
+			name:          "test get rule value from rule does have value",
+			rule:          "val:test",
+			nameExpected:  "val",
+			valueExpected: "test",
 		},
 		{
-			name:              "test get rule value from rule does not have value",
-			rule:              "val",
-			ruleNameExpected:  "val",
-			ruleValueExpected: "",
+			name:          "test get rule value from rule does not have value",
+			rule:          "val",
+			nameExpected:  "val",
+			valueExpected: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if ruleName, ruleValue := splitRuleNameAndRuleValue(tt.rule); (ruleName != tt.ruleNameExpected) || ruleValue != tt.ruleValueExpected {
-				t.Errorf("getRuleValue(): ruleName = %v, ruleValue = %v, ruleNameExpected = %v, ruleValueExpected = %v", ruleName, ruleValue, tt.ruleNameExpected, tt.ruleValueExpected)
-			}
-		})
-	}
-}
-
-func Test_getRuleInfo(t *testing.T) {
-	type args struct {
-		rule string
-	}
-	tests := []struct {
-		name      string
-		args      args
-		ruleName  string
-		ruleValue string
-		ruleFunc  RuleFunc
-		ruleExist bool
-	}{
-		{
-			name: "test get rule info",
-			args: args{
-				rule: "kind:string",
-			},
-			ruleName:  "kind",
-			ruleValue: "string",
-			ruleFunc:  rules["kind"],
-			ruleExist: true,
-		},
-		{
-			name: "test get info of rule does not exist",
-			args: args{
-				rule: "string",
-			},
-			ruleName:  "string",
-			ruleValue: "",
-			ruleFunc:  nil,
-			ruleExist: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ruleName, ruleValue, ruleFunc, ruleExist := getRuleInfo(tt.args.rule)
-			if ruleName != tt.ruleName {
-				t.Errorf("getRuleInfo() ruleName = %v, want %v", ruleName, tt.ruleName)
-			}
-			if ruleValue != tt.ruleValue {
-				t.Errorf("getRuleInfo() ruleValue = %v, want %v", ruleValue, tt.ruleValue)
-			}
-			if !reflect.DeepEqual(toString(ruleFunc), toString(tt.ruleFunc)) {
-				t.Errorf("getRuleInfo() ruleFunc = %v, want %v", toString(ruleFunc), toString(tt.ruleFunc))
-			}
-			if ruleExist != tt.ruleExist {
-				t.Errorf("getRuleInfo() ruleExist = %v, want %v", ruleExist, tt.ruleExist)
+			if ruleName, ruleValue := splitRuleNameAndRuleValue(tt.rule); (ruleName != tt.nameExpected) || ruleValue != tt.valueExpected {
+				t.Errorf("getRuleValue(): rName = %v, ruleValue = %v, ruleNameExpected = %v, ruleValueExpected = %v", ruleName, ruleValue, tt.nameExpected, tt.valueExpected)
 			}
 		})
 	}
@@ -88,29 +36,29 @@ func Test_getRuleInfo(t *testing.T) {
 
 func Test_makeParentNameJoinable(t *testing.T) {
 	tests := []struct {
-		name       string
-		parentName string
-		want       string
+		name    string
+		parName string
+		want    string
 	}{
 		{
-			name:       "test make parent name joinable",
-			parentName: "Parent",
-			want:       "Parent.",
+			name:    "test make parent rName joinable",
+			parName: "Parent",
+			want:    "Parent.",
 		},
 		{
-			name:       "test make parent name joinable with . at the end",
-			parentName: "Parent.",
-			want:       "Parent.",
+			name:    "test make parent rName joinable with . at the end",
+			parName: "Parent.",
+			want:    "Parent.",
 		},
 		{
-			name:       "test make empty parent name joinable",
-			parentName: "",
-			want:       "",
+			name:    "test make empty parent rName joinable",
+			parName: "",
+			want:    "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := makeParentNameJoinable(tt.parentName); got != tt.want {
+			if got := makeParentNameJoinable(tt.parName); got != tt.want {
 				t.Errorf("makeParentNameJoinable() = %v, want %v", got, tt.want)
 			}
 		})
@@ -127,44 +75,44 @@ func Test_getStructFieldInfo(t *testing.T) {
 		Age:  1,
 	}
 	type args struct {
-		fieldNumber int
-		parentType  reflect.Type
-		parentValue reflect.Value
-		parentName  string
+		fNumber int
+		pType   reflect.Type
+		pValue  reflect.Value
+		parName string
 	}
 	tests := []struct {
 		name               string
 		args               args
-		fieldName          string
-		fieldType          reflect.Type
-		fieldValue         interface{}
+		fName              string
+		fType              reflect.Type
+		fValue             interface{}
 		fieldValidationTag string
 	}{
 		{
 			name: "test get struct field info",
 			args: args{
-				fieldNumber: 1,
-				parentType:  reflect.TypeOf(parentStruct),
-				parentValue: reflect.ValueOf(parentStruct),
-				parentName:  "",
+				fNumber: 1,
+				pType:   reflect.TypeOf(parentStruct),
+				pValue:  reflect.ValueOf(parentStruct),
+				parName: "",
 			},
-			fieldName:          "Age",
-			fieldType:          reflect.TypeOf(parentStruct.Age),
-			fieldValue:         1,
+			fName:              "Age",
+			fType:              reflect.TypeOf(parentStruct.Age),
+			fValue:             1,
 			fieldValidationTag: "required|int",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fieldName, fieldType, fieldValue := getStructFieldInfo(tt.args.fieldNumber, tt.args.parentType, tt.args.parentValue, tt.args.parentName)
-			if fieldName != tt.fieldName {
-				t.Errorf("getStructFieldInfo() got = %v, want %v", fieldName, tt.fieldName)
+			fieldName, fieldType, fieldValue := getStructFieldInfo(tt.args.fNumber, tt.args.pType, tt.args.pValue, tt.args.parName)
+			if fieldName != tt.fName {
+				t.Errorf("getStructFieldInfo() got = %v, want %v", fieldName, tt.fName)
 			}
-			if !reflect.DeepEqual(fieldType, tt.fieldType) {
-				t.Errorf("getStructFieldInfo() fieldType = %v, want %v", fieldType, tt.fieldType)
+			if !reflect.DeepEqual(fieldType, tt.fType) {
+				t.Errorf("getStructFieldInfo() fType = %v, want %v", fieldType, tt.fType)
 			}
-			if !reflect.DeepEqual(fieldValue.Interface(), tt.fieldValue) {
-				t.Errorf("getStructFieldInfo() fieldValue = %v, want %v", fieldValue.Interface(), tt.fieldValue)
+			if !reflect.DeepEqual(fieldValue.Interface(), tt.fValue) {
+				t.Errorf("getStructFieldInfo() fValue = %v, want %v", fieldValue.Interface(), tt.fValue)
 			}
 		})
 	}

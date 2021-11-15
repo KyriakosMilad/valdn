@@ -6,45 +6,51 @@ import (
 
 type RuleFunc func(fieldName string, fieldValue interface{}, ruleValue string) (error, string)
 
-var rules = make(map[string]RuleFunc)
+var registeredRules = make(map[string]RuleFunc)
 
-func AddRule(ruleName string, ruleFunc RuleFunc) {
-	_, ruleExists := rules[ruleName]
-	if ruleExists {
+func AddRule(name string, f RuleFunc) {
+	_, ruleExist := registeredRules[name]
+	if ruleExist {
 		panic("rule already registered")
 	}
-	rules[ruleName] = ruleFunc
+	registeredRules[name] = f
 }
 
-func OverwriteRule(ruleName string, ruleFunc RuleFunc) {
-	rules[ruleName] = ruleFunc
+func OverwriteRule(name string, f RuleFunc) {
+	registeredRules[name] = f
 }
 
-func requiredRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
-	if IsEmpty(fieldValue) {
-		validationError := fieldName + " is required"
+func getRuleInfo(r string) (string, string, RuleFunc, bool) {
+	rName, rValue := splitRuleNameAndRuleValue(r)
+	rFunc, rExist := registeredRules[rName]
+	return rName, rValue, rFunc, rExist
+}
+
+func requiredRule(name string, val interface{}, ruleVal string) (error, string) {
+	if IsEmpty(val) {
+		validationError := name + " is required"
 		return nil, validationError
 	}
 	return nil, ""
 }
 
-func kindRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
-	if k := reflect.TypeOf(fieldValue).Kind(); toString(k) != ruleValue {
-		validationError := fieldName + " must be kind of " + ruleValue
+func kindRule(name string, val interface{}, ruleVal string) (error, string) {
+	if k := reflect.TypeOf(val).Kind(); toString(k) != ruleVal {
+		validationError := name + " must be kind of " + ruleVal
 		return nil, validationError
 	}
 	return nil, ""
 }
 
-func typeRule(fieldName string, fieldValue interface{}, ruleValue string) (error, string) {
+func typeRule(name string, val interface{}, ruleVal string) (error, string) {
 	var typeInString string
-	if t := reflect.TypeOf(fieldValue); t.Kind() == reflect.Struct {
+	if t := reflect.TypeOf(val); t.Kind() == reflect.Struct {
 		typeInString = t.Name()
 	} else {
 		typeInString = toString(t)
 	}
-	if typeInString != ruleValue {
-		validationError := fieldName + " must be type of " + ruleValue
+	if typeInString != ruleVal {
+		validationError := name + " must be type of " + ruleVal
 		return nil, validationError
 	}
 	return nil, ""

@@ -13,26 +13,20 @@ func splitRuleNameAndRuleValue(rule string) (string, string) {
 	return rule, ""
 }
 
-func getRuleInfo(rule string) (string, string, RuleFunc, bool) {
-	ruleName, ruleValue := splitRuleNameAndRuleValue(rule)
-	ruleFunc, ruleExists := rules[ruleName]
-	return ruleName, ruleValue, ruleFunc, ruleExists
-}
-
-func makeParentNameJoinable(parentName string) string {
-	if parentName != "" && parentName[len(parentName)-1] != '.' {
-		return parentName + "."
+func makeParentNameJoinable(name string) string {
+	if name != "" && name[len(name)-1] != '.' {
+		return name + "."
 	}
-	return parentName
+	return name
 }
 
-func getStructFieldInfo(fieldNumber int, parentType reflect.Type, parentValue reflect.Value, parentName string) (string, reflect.Type, reflect.Value) {
-	field := parentType.Field(fieldNumber)
-	fieldName := parentName + field.Name
-	fieldType := field.Type
-	fieldValue := parentValue.Field(fieldNumber)
+func getStructFieldInfo(number int, parTyp reflect.Type, parVal reflect.Value, parName string) (string, reflect.Type, reflect.Value) {
+	field := parTyp.Field(number)
+	name := parName + field.Name
+	typ := field.Type
+	val := parVal.Field(number)
 
-	return fieldName, fieldType, fieldValue
+	return name, typ, val
 }
 
 func convertInterfaceToMap(value interface{}) map[string]interface{} {
@@ -45,9 +39,9 @@ func convertInterfaceToMap(value interface{}) map[string]interface{} {
 	return newMap
 }
 
-func copyRules(rules Rules) Rules {
+func copyRules(r Rules) Rules {
 	newMap := make(Rules)
-	for k, v := range rules {
+	for k, v := range r {
 		newMap[k] = v
 	}
 	return newMap
