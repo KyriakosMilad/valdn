@@ -14,6 +14,11 @@ type (
 	fieldsExist map[string]bool
 )
 
+var (
+	TagName                = "validation"
+	RulesInStringSeparator = "|"
+)
+
 type validation struct {
 	rules       Rules
 	errors      Errors
@@ -68,14 +73,14 @@ func ValidateNested(val interface{}, r Rules) Errors {
 }
 
 func ValidateJson(val string, r Rules) Errors {
-	var decodedJson map[string]interface{}
+	var jsonMap map[string]interface{}
 
-	err := json.Unmarshal([]byte(val), &decodedJson)
+	err := json.Unmarshal([]byte(val), &jsonMap)
 	if err != nil {
 		panic(err)
 	}
 
-	return ValidateNested(decodedJson, r)
+	return ValidateNested(jsonMap, r)
 }
 
 func (v *validation) registerField(name string) {
@@ -96,12 +101,12 @@ func (v *validation) addValidationTagRules(t reflect.Type, parName string) {
 		f := t.Field(i)
 		typ := f.Type
 		name := parName + f.Name
-		tRules := f.Tag.Get("validation")
+		tRules := f.Tag.Get(TagName)
 
 		_, ok := v.rules[name]
 		if !ok && tRules != "" {
 			var rlz []string
-			for _, r := range strings.Split(tRules, "|") {
+			for _, r := range strings.Split(tRules, RulesInStringSeparator) {
 				rlz = append(rlz, r)
 			}
 			v.rules[name] = rlz
