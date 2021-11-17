@@ -142,6 +142,7 @@ func (v *validation) validateStruct(val interface{}, name string) {
 	err := Validate(name, val, rules)
 	if err != nil {
 		v.addError(name, err)
+		return
 	}
 
 	typ := reflect.TypeOf(val)
@@ -158,6 +159,7 @@ func (v *validation) validateMap(val interface{}, name string) {
 	err := Validate(name, val, r)
 	if err != nil {
 		v.addError(name, err)
+		return
 	}
 
 	v.validateMapFields(convertInterfaceToMap(val), name)
