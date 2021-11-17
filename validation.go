@@ -25,17 +25,22 @@ type validation struct {
 	fieldsExist fieldsExist
 }
 
-func createNewValidation(r Rules) *validation {
+// createNewValidation copies rules and initialise new validation with it.
+// rules are copied in case they will be manipulated later it doesn't affect the original rules.
+func createNewValidation(rules Rules) *validation {
 	v := validation{
-		rules:       copyRules(r),
+		rules:       copyRules(rules),
 		errors:      make(Errors),
 		fieldsExist: make(fieldsExist),
 	}
 	return &v
 }
 
-func Validate(name string, val interface{}, rlz []string) error {
-	for _, r := range rlz {
+// Validate validates val with rules.
+// If error found it will not check the rest of the rules and return the error.
+// It panics if one of the rules is not registered.
+func Validate(name string, val interface{}, rules []string) error {
+	for _, r := range rules {
 		if r == "" {
 			continue
 		}
@@ -53,8 +58,14 @@ func Validate(name string, val interface{}, rlz []string) error {
 	return nil
 }
 
-func ValidateNested(val interface{}, r Rules) Errors {
-	v := createNewValidation(r)
+// ValidateNested validates val and it's nested fields with rules and returns Errors.
+// If error found it will not check the rest of field rules and move to the next field.
+// If struct or map has error it's nested fields will not be validated.
+// It panics if val's kind is not map or struct.
+// It panics if one of the rules is not registered.
+// It panics if one of the fields is a map and it's type is not map[string]interface{}.
+func ValidateNested(val interface{}, rules Rules) Errors {
+	v := createNewValidation(rules)
 
 	t := reflect.TypeOf(val)
 	switch t.Kind() {
@@ -72,7 +83,12 @@ func ValidateNested(val interface{}, r Rules) Errors {
 	return v.errors
 }
 
-func ValidateJson(val string, r Rules) Errors {
+// ValidateJson transforms json string to a map and validates it with rules and returns Errors.
+// If error found it will not check the rest of field rules and move to the next field.
+// If map has error it's nested fields will not be validated.
+// It panics if val is not json.
+// It panics if one of the rules is not registered.
+func ValidateJson(val string, rules Rules) Errors {
 	var jsonMap map[string]interface{}
 
 	err := json.Unmarshal([]byte(val), &jsonMap)
@@ -80,7 +96,7 @@ func ValidateJson(val string, r Rules) Errors {
 		panic(err)
 	}
 
-	return ValidateNested(jsonMap, r)
+	return ValidateNested(jsonMap, rules)
 }
 
 func (v *validation) registerField(name string) {
@@ -95,6 +111,7 @@ func (v *validation) getFieldRules(name string) []string {
 	return v.rules[name]
 }
 
+// addValidationTagRules gets rules from struct tag for every field and adds them to field rules if field has no rules.
 func (v *validation) addValidationTagRules(t reflect.Type, parName string) {
 	parName = makeParentNameJoinable(parName)
 	for i := 0; i < t.NumField(); i++ {
@@ -103,13 +120,14 @@ func (v *validation) addValidationTagRules(t reflect.Type, parName string) {
 		name := parName + f.Name
 		tRules := f.Tag.Get(TagName)
 
+		// add tag rules only if field has no rules
 		_, ok := v.rules[name]
 		if !ok && tRules != "" {
-			var rlz []string
+			var rules []string
 			for _, r := range strings.Split(tRules, RulesInStringSeparator) {
-				rlz = append(rlz, r)
+				rules = append(rules, r)
 			}
-			v.rules[name] = rlz
+			v.rules[name] = rules
 		}
 
 		if typ.Kind() == reflect.Struct {
@@ -119,9 +137,9 @@ func (v *validation) addValidationTagRules(t reflect.Type, parName string) {
 }
 
 func (v *validation) validateStruct(val interface{}, name string) {
-	rlz := v.getFieldRules(name)
+	rules := v.getFieldRules(name)
 
-	err := Validate(name, val, rlz)
+	err := Validate(name, val, rules)
 	if err != nil {
 		v.addError(name, err)
 	}
@@ -147,7 +165,7 @@ func (v *validation) validateMap(val interface{}, name string) {
 
 func (v *validation) validateByType(name string, t reflect.Type, val interface{}) {
 	v.registerField(name)
-	r := v.getFieldRules(name)
+	rules := v.getFieldRules(name)
 
 	switch t.Kind() {
 	case reflect.Struct:
@@ -155,7 +173,7 @@ func (v *validation) validateByType(name string, t reflect.Type, val interface{}
 	case reflect.Map:
 		v.validateMap(val, name)
 	default:
-		err := Validate(name, val, r)
+		err := Validate(name, val, rules)
 		if err != nil {
 			v.addError(name, err)
 		}
@@ -180,8 +198,8 @@ func (v *validation) validateMapFields(val map[string]interface{}, parName strin
 }
 
 func (v *validation) validateNonExistRequiredFields() {
-	for name, rlz := range v.rules {
-		for _, r := range rlz {
+	for name, rules := range v.rules {
+		for _, r := range rules {
 			if r == "required" {
 				_, ok := v.fieldsExist[name]
 				if !ok {

@@ -9,6 +9,8 @@ type RuleFunc func(fieldName string, fieldValue interface{}, ruleValue string) e
 
 var registeredRules = make(map[string]RuleFunc)
 
+// AddRule registers a new rule.
+// It panics if the rule is already registered.
 func AddRule(name string, f RuleFunc) {
 	_, ruleExist := registeredRules[name]
 	if ruleExist {
@@ -17,6 +19,8 @@ func AddRule(name string, f RuleFunc) {
 	registeredRules[name] = f
 }
 
+// OverwriteRule registers a new rule.
+// If there is a rule already registered with that name it will be overwritten by the new rule.
 func OverwriteRule(name string, f RuleFunc) {
 	registeredRules[name] = f
 }
@@ -27,6 +31,8 @@ func getRuleInfo(r string) (string, string, RuleFunc, bool) {
 	return rName, rValue, rFunc, rExist
 }
 
+// requiredRule checks if val is empty.
+// It returns error if val IsEmpty().
 func requiredRule(name string, val interface{}, ruleVal string) error {
 	if IsEmpty(val) {
 		return errors.New(name + " is required")
@@ -34,6 +40,8 @@ func requiredRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// kindRule checks if val's kind equals ruleVal
+// It returns error if val's kind does not equal ruleVal.
 func kindRule(name string, val interface{}, ruleVal string) error {
 	if k := reflect.TypeOf(val).Kind(); toString(k) != ruleVal {
 		return errors.New(name + " must be kind of " + ruleVal)
@@ -41,6 +49,8 @@ func kindRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// typeRule checks if val's type equals ruleVal
+// It returns error if val's type does not equal ruleVal.
 func typeRule(name string, val interface{}, ruleVal string) error {
 	var typeInString string
 	if t := reflect.TypeOf(val); t.Kind() == reflect.Struct {
