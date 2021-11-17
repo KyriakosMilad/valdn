@@ -117,7 +117,7 @@ func IsMap(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Map
 }
 
-// toString converts any kind or type to string
+// toString converts any kind to string
 func toString(val interface{}) string {
 	return fmt.Sprintf("%v", val)
 }
