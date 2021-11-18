@@ -36,8 +36,8 @@ func createNewValidation(rules Rules) *validation {
 	return &v
 }
 
-// Validate validates val with rules.
-// If error found it will not check the rest of the rules and return the error.
+// Validate validates val by rules.
+// If an error is found it will not check the rest of the rules and return the error.
 // It panics if one of the rules is not registered.
 func Validate(name string, val interface{}, rules []string) error {
 	for _, r := range rules {
@@ -58,9 +58,9 @@ func Validate(name string, val interface{}, rules []string) error {
 	return nil
 }
 
-// ValidateNested validates val and it's nested fields with rules and returns Errors.
-// If error found it will not check the rest of field rules and move to the next field.
-// If struct or map has error it's nested fields will not be validated.
+// ValidateNested validates val and it's nested fields by rules and returns Errors.
+// If an error is found it will not check the rest of the field's rules and continue to the next field.
+// If a struct or map has error it's nested fields will not be validated.
 // It panics if val's kind is not map or struct.
 // It panics if one of the rules is not registered.
 // It panics if one of the fields is a map and it's type is not map[string]interface{}.
@@ -83,9 +83,9 @@ func ValidateNested(val interface{}, rules Rules) Errors {
 	return v.errors
 }
 
-// ValidateJson transforms json string to a map and validates it with rules and returns Errors.
-// If error found it will not check the rest of field rules and move to the next field.
-// If map has error it's nested fields will not be validated.
+// ValidateJson transforms json string to a map and validates it by rules and returns Errors.
+// If an error is found it will not check the rest of the field's rules and continue to the next field.
+// If a map has error it's nested fields will not be validated.
 // It panics if val is not json.
 // It panics if one of the rules is not registered.
 func ValidateJson(val string, rules Rules) Errors {
