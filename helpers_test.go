@@ -5,6 +5,32 @@ import (
 	"testing"
 )
 
+func Test_copyRules(t *testing.T) {
+	type args struct {
+		r Rules
+	}
+	tests := []struct {
+		name               string
+		args               args
+		expectedRulesCount int
+	}{
+		{
+			name: "test copy rules",
+			args: args{
+				r: Rules{"test": {"required", "kind:string"}},
+			},
+			expectedRulesCount: 2,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := copyRules(tt.args.r); len(got) != tt.expectedRulesCount {
+				t.Errorf("copyRules() = %v, expectedRulesCount %v", got, tt.expectedRulesCount)
+			}
+		})
+	}
+}
+
 func Test_splitRuleNameAndRuleValue(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -59,7 +85,7 @@ func Test_makeParentNameJoinable(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := makeParentNameJoinable(tt.parName); got != tt.want {
-				t.Errorf("makeParentNameJoinable() = %v, want %v", got, tt.want)
+				t.Errorf("makeParentNameJoinable() = %v, expectedRulesCount %v", got, tt.want)
 			}
 		})
 	}
@@ -106,13 +132,13 @@ func Test_getStructFieldInfo(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			fieldName, fieldType, fieldValue := getStructFieldInfo(tt.args.fNumber, tt.args.pType, tt.args.pValue, tt.args.parName)
 			if fieldName != tt.fName {
-				t.Errorf("getStructFieldInfo() got = %v, want %v", fieldName, tt.fName)
+				t.Errorf("getStructFieldInfo() got = %v, expectedRulesCount %v", fieldName, tt.fName)
 			}
 			if !reflect.DeepEqual(fieldType, tt.fType) {
-				t.Errorf("getStructFieldInfo() fType = %v, want %v", fieldType, tt.fType)
+				t.Errorf("getStructFieldInfo() fType = %v, expectedRulesCount %v", fieldType, tt.fType)
 			}
 			if !reflect.DeepEqual(fieldValue.Interface(), tt.fValue) {
-				t.Errorf("getStructFieldInfo() fValue = %v, want %v", fieldValue.Interface(), tt.fValue)
+				t.Errorf("getStructFieldInfo() fValue = %v, expectedRulesCount %v", fieldValue.Interface(), tt.fValue)
 			}
 		})
 	}
@@ -133,7 +159,7 @@ func Test_convertInterfaceToMap(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := convertInterfaceToMap(tt.value); !reflect.DeepEqual(reflect.TypeOf(got), reflect.TypeOf(tt.value)) {
-				t.Errorf("convertInterfaceToMap() type = %v, want %v", reflect.TypeOf(got), reflect.TypeOf(tt.value))
+				t.Errorf("convertInterfaceToMap() type = %v, expectedRulesCount %v", reflect.TypeOf(got), reflect.TypeOf(tt.value))
 			}
 			if got := convertInterfaceToMap(tt.value); !reflect.DeepEqual(reflect.TypeOf(got), reflect.TypeOf(tt.value)) {
 				t.Errorf("convertInterfaceToMap() length = %v, lengthExpected %v", len(got), tt.lengthExpected)

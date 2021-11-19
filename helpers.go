@@ -5,6 +5,14 @@ import (
 	"strings"
 )
 
+func copyRules(r Rules) Rules {
+	newMap := make(Rules)
+	for k, v := range r {
+		newMap[k] = v
+	}
+	return newMap
+}
+
 func splitRuleNameAndRuleValue(rule string) (string, string) {
 	if strings.ContainsRune(rule, ':') {
 		ruleSpliced := strings.Split(rule, ":")
@@ -35,14 +43,6 @@ func convertInterfaceToMap(value interface{}) map[string]interface{} {
 		for k, v := range val {
 			newMap[k] = v
 		}
-	}
-	return newMap
-}
-
-func copyRules(r Rules) Rules {
-	newMap := make(Rules)
-	for k, v := range r {
-		newMap[k] = v
 	}
 	return newMap
 }
