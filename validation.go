@@ -15,8 +15,8 @@ type (
 )
 
 var (
-	TagName                = "validation"
-	RulesInStringSeparator = "|"
+	TagName      = "validation"
+	TagSeparator = "|"
 )
 
 type validation struct {
@@ -124,7 +124,7 @@ func (v *validation) addTagRules(t reflect.Type, parName string) {
 		_, ok := v.rules[name]
 		if !ok && tRules != "" {
 			var rules []string
-			for _, r := range strings.Split(tRules, RulesInStringSeparator) {
+			for _, r := range strings.Split(tRules, TagSeparator) {
 				rules = append(rules, r)
 			}
 			v.rules[name] = rules
