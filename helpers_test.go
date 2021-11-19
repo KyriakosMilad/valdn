@@ -20,7 +20,7 @@ func Test_copyRules(t *testing.T) {
 			args: args{
 				r: Rules{"test": {"required", "kind:string"}},
 			},
-			expectedRulesCount: 2,
+			expectedRulesCount: 1,
 		},
 	}
 	for _, tt := range tests {
