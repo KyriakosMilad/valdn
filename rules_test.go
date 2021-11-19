@@ -7,8 +7,9 @@ import (
 
 func Test_AddRule(t *testing.T) {
 	type args struct {
-		name string
-		f    RuleFunc
+		name   string
+		f      RuleFunc
+		errMsg string
 	}
 	tests := []struct {
 		name    string
@@ -43,7 +44,7 @@ func Test_AddRule(t *testing.T) {
 					t.Errorf("AddRule() error: failed to add rule, wantPanic: %v, error: %v, args: %v", tt.wantErr, err, tt.args)
 				}
 			}()
-			AddRule(tt.args.name, tt.args.f)
+			AddRule(tt.args.name, tt.args.f, tt.args.errMsg)
 			if _, ok := registeredRules["test"]; !ok {
 				t.Errorf("AddRule() error: failed to add rule, wantPanic: %v, error: %v, args: %v", tt.wantErr, nil, tt.args)
 			}
@@ -53,8 +54,9 @@ func Test_AddRule(t *testing.T) {
 
 func Test_OverwriteRule(t *testing.T) {
 	type args struct {
-		name string
-		f    RuleFunc
+		name   string
+		f      RuleFunc
+		errMsg string
 	}
 	tests := []struct {
 		name string
@@ -81,7 +83,7 @@ func Test_OverwriteRule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			OverwriteRule(tt.args.name, tt.args.f)
+			OverwriteRule(tt.args.name, tt.args.f, tt.args.errMsg)
 			if _, ok := registeredRules["test0"]; !ok {
 				t.Errorf("OverwriteRule() error: failed to overwrite rule, args: %v", tt.args)
 			}
@@ -108,7 +110,7 @@ func Test_getRuleInfo(t *testing.T) {
 			},
 			rName:     "kind",
 			rVal:      "string",
-			f:         registeredRules["kind"],
+			f:         registeredRules["kind"].fn,
 			ruleExist: true,
 		},
 		{
@@ -173,11 +175,7 @@ func Test_requiredRule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			requiredFunc, requiredExist := registeredRules["required"]
-			if !requiredExist {
-				panic("required rule is not exist")
-			}
-			err := requiredFunc(tt.args.field, tt.args.fVal, tt.args.rVal)
+			err := requiredRule(tt.args.field, tt.args.fVal, tt.args.rVal)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("required rule: err: %v, wantErr: %v, args: %v", err, tt.wantErr, tt.args)
 			}
@@ -429,6 +427,69 @@ func Test_kindRule(t *testing.T) {
 			err := kindRule(tt.args.fName, tt.args.fVal, tt.args.rVal)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("kindRule() err = %v, want %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestSetErrMsg(t *testing.T) {
+	type args struct {
+		ruleName string
+		errMsg   string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "test set error message",
+			args: args{
+				ruleName: "test_add_err_msg",
+				errMsg:   "test",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rFunc := func(fieldName string, fieldValue interface{}, ruleValue string) error {
+				return nil
+			}
+			AddRule(tt.args.ruleName, rFunc, tt.args.errMsg)
+			SetErrMsg(tt.args.ruleName, tt.args.errMsg)
+			if registeredRules[tt.args.ruleName].errMsg != tt.args.errMsg {
+				t.Errorf("SetErrMsg() can't set err msg, ruleName= %v, errMsg %v", tt.args.ruleName, tt.args.errMsg)
+			}
+		})
+	}
+}
+
+func Test_getErrMsg(t *testing.T) {
+	type args struct {
+		ruleName string
+		ruleVal  string
+		name     string
+		val      interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test get error message",
+			args: args{
+				ruleName: "kind",
+				ruleVal:  "map",
+				name:     "title",
+				val:      44,
+			},
+			want: "title must be kind of map",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getErrMsg(tt.args.ruleName, tt.args.ruleVal, tt.args.name, tt.args.val); got != tt.want {
+				t.Errorf("getErrMsg() = %v, want: %v", got, tt.want)
 			}
 		})
 	}
