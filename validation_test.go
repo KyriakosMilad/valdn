@@ -314,7 +314,7 @@ func Test_validation_getFieldRules(t *testing.T) {
 	}
 }
 
-func Test_validation_addValidationTagRules(t *testing.T) {
+func Test_validation_addTagRules(t *testing.T) {
 	type Parent struct {
 		Name string `validation:"required|string"`
 		Age  int    `validation:"required|string"`
@@ -330,7 +330,7 @@ func Test_validation_addValidationTagRules(t *testing.T) {
 		lengthExpected int
 	}{
 		{
-			name: "test add validation tag rules",
+			name: "test add tag rules",
 			args: args{
 				t:       reflect.TypeOf(Parent{}),
 				rules:   Rules{"test": {"required"}},
@@ -342,9 +342,9 @@ func Test_validation_addValidationTagRules(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(tt.args.rules)
-			v.addValidationTagRules(tt.args.t, tt.args.parName)
+			v.addTagRules(tt.args.t, tt.args.parName)
 			if len(v.rules) != tt.lengthExpected {
-				t.Errorf("addValidationTagRules() rules = %v len = %v, want %v", tt.args.rules, len(tt.args.rules), tt.lengthExpected)
+				t.Errorf("addTagRules() rules = %v len = %v, want %v", tt.args.rules, len(tt.args.rules), tt.lengthExpected)
 			}
 		})
 	}
@@ -443,7 +443,7 @@ func Test_validation_validateStruct(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(tt.args.rules)
-			v.addValidationTagRules(reflect.TypeOf(tt.args.val), "")
+			v.addTagRules(reflect.TypeOf(tt.args.val), "")
 			v.validateStruct(tt.args.val, "")
 			if len(v.errors) != tt.expectedErrorsCount {
 				t.Errorf("validateStruct() errors = %v expectedErrorsCount %v, args %v", v.errors, tt.expectedErrorsCount, tt.args)

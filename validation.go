@@ -70,7 +70,7 @@ func ValidateNested(val interface{}, rules Rules) Errors {
 	t := reflect.TypeOf(val)
 	switch t.Kind() {
 	case reflect.Struct:
-		v.addValidationTagRules(t, "")
+		v.addTagRules(t, "")
 		v.validateStruct(val, "")
 	case reflect.Map:
 		v.validateMap(convertInterfaceToMap(val), "")
@@ -111,8 +111,8 @@ func (v *validation) getFieldRules(name string) []string {
 	return v.rules[name]
 }
 
-// addValidationTagRules gets rules from struct tag for every field and adds them to field rules if field has no rules.
-func (v *validation) addValidationTagRules(t reflect.Type, parName string) {
+// addTagRules gets rules from struct tag for every field and adds them to field rules if field has no rules.
+func (v *validation) addTagRules(t reflect.Type, parName string) {
 	parName = makeParentNameJoinable(parName)
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
@@ -131,7 +131,7 @@ func (v *validation) addValidationTagRules(t reflect.Type, parName string) {
 		}
 
 		if typ.Kind() == reflect.Struct {
-			v.addValidationTagRules(typ, name)
+			v.addTagRules(typ, name)
 		}
 	}
 }
