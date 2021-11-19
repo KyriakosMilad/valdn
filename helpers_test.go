@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -26,6 +27,89 @@ func Test_copyRules(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := copyRules(tt.args.r); len(got) != tt.expectedRulesCount {
 				t.Errorf("copyRules() = %v, expectedRulesCount %v", got, tt.expectedRulesCount)
+			}
+		})
+	}
+}
+
+func Test_toString(t *testing.T) {
+	type user struct {
+		name string
+	}
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test to string with string value",
+			args: args{val: "string"},
+			want: "string",
+		},
+		{
+			name: "test to string with uint value",
+			args: args{val: 44},
+			want: "44",
+		},
+		{
+			name: "test to string with int value",
+			args: args{val: -44},
+			want: "-44",
+		},
+		{
+			name: "test to string with float value",
+			args: args{val: 44.44},
+			want: "44.44",
+		},
+		{
+			name: "test to string with complex number value",
+			args: args{val: 44 + 22i},
+			want: "(44+22i)",
+		},
+		{
+			name: "test to string with bool value",
+			args: args{val: true},
+			want: "true",
+		},
+		{
+			name: "test to string with map value",
+			args: args{val: map[string]interface{}{"key": 55}},
+			want: "map[key:55]",
+		},
+		{
+			name: "test to string with struct value",
+			args: args{val: user{name: "test"}},
+			want: "{test}",
+		},
+		{
+			name: "test to string with array value",
+			args: args{val: [2]int{1, 2}},
+			want: "[1 2]",
+		},
+		{
+			name: "test to string with slice value",
+			args: args{val: []int{1, 2}},
+			want: "[1 2]",
+		},
+		{
+			name: "test to string with Type value",
+			args: args{val: reflect.TypeOf(map[string]interface{}{"key": 5})},
+			want: "map[string]interface {}",
+		},
+		{
+			name: "test to string with Kind value",
+			args: args{val: reflect.String},
+			want: "string",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fmt.Println(tt.want)
+			if got := toString(tt.args.val); got != tt.want {
+				t.Errorf("toString() = %v, expectedRulesCount %v", got, tt.want)
 			}
 		})
 	}

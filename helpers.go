@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -11,6 +12,10 @@ func copyRules(r Rules) Rules {
 		newMap[k] = v
 	}
 	return newMap
+}
+
+func toString(val interface{}) string {
+	return fmt.Sprintf("%v", val)
 }
 
 func splitRuleNameAndRuleValue(rule string) (string, string) {

@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -115,9 +114,4 @@ func IsStruct(val interface{}) bool {
 // IsMap reports weather val's kind is map or not
 func IsMap(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Map
-}
-
-// toString converts any kind to string
-func toString(val interface{}) string {
-	return fmt.Sprintf("%v", val)
 }
