@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-// IsEmpty reports weather val is empty or not
+// IsEmpty reports weather val is empty or not.
 func IsEmpty(val interface{}) bool {
 	t := reflect.TypeOf(val)
 	v := reflect.ValueOf(val)
@@ -16,107 +16,107 @@ func IsEmpty(val interface{}) bool {
 	}
 }
 
-// IsString reports weather val's kind is string or not
+// IsString reports weather val's kind is string or not.
 func IsString(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.String
 }
 
-// IsInt reports weather val's kind is int or not
+// IsInt reports weather val's kind is int or not.
 func IsInt(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Int
 }
 
-// IsInt8 reports weather val's kind is int8 or not
+// IsInt8 reports weather val's kind is int8 or not.
 func IsInt8(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Int8
 }
 
-// IsInt16 reports weather val's kind is int16 or not
+// IsInt16 reports weather val's kind is int16 or not.
 func IsInt16(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Int16
 }
 
-// IsInt32 reports weather val's kind is int32 or not
+// IsInt32 reports weather val's kind is int32 or not.
 func IsInt32(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Int32
 }
 
-// IsInt64 reports weather val's kind is int64 or not
+// IsInt64 reports weather val's kind is int64 or not.
 func IsInt64(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Int64
 }
 
-// IsUint reports weather val's kind is uint or not
+// IsUint reports weather val's kind is uint or not.
 func IsUint(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Uint
 }
 
-// IsUint8 reports weather val's kind is uint8 or not
+// IsUint8 reports weather val's kind is uint8 or not.
 func IsUint8(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Uint8
 }
 
-// IsUint16 reports weather val's kind is uint16 or not
+// IsUint16 reports weather val's kind is uint16 or not.
 func IsUint16(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Uint16
 }
 
-// IsUint32 reports weather val's kind is uint32 or not
+// IsUint32 reports weather val's kind is uint32 or not.
 func IsUint32(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Uint32
 }
 
-// IsUint64 reports weather val's kind is uint64 or not
+// IsUint64 reports weather val's kind is uint64 or not.
 func IsUint64(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Uint64
 }
 
-// IsFloat32 reports weather val's kind is float32 or not
+// IsFloat32 reports weather val's kind is float32 or not.
 func IsFloat32(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Float32
 }
 
-// IsFloat64 reports weather val's kind is float64 or not
+// IsFloat64 reports weather val's kind is float64 or not.
 func IsFloat64(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Float64
 }
 
-// IsComplex64 reports weather val's kind is complex64 or not
+// IsComplex64 reports weather val's kind is complex64 or not.
 func IsComplex64(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Complex64
 }
 
-// IsComplex128 reports weather val's kind is complex128 or not
+// IsComplex128 reports weather val's kind is complex128 or not.
 func IsComplex128(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Complex128
 }
 
-// IsBool reports weather val's kind is bool or not
+// IsBool reports weather val's kind is bool or not.
 func IsBool(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Bool
 }
 
-// IsSlice reports weather val's kind is slice or not
+// IsSlice reports weather val's kind is slice or not.
 func IsSlice(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Slice
 }
 
-// IsArray reports weather val's kind is array or not
+// IsArray reports weather val's kind is array or not.
 func IsArray(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Array
 }
 
-// IsStruct reports weather val's kind is struct or not
+// IsStruct reports weather val's kind is struct or not.
 func IsStruct(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Struct
 }
 
-// IsMap reports weather val's kind is map or not
+// IsMap reports weather val's kind is map or not.
 func IsMap(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Map
 }
 
-// IsInteger reports weather val is integer or not
+// IsInteger reports weather val is integer or not.
 func IsInteger(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Uint, reflect.Int, reflect.Uint8, reflect.Int8, reflect.Uint16, reflect.Int16, reflect.Uint32, reflect.Int32, reflect.Uint64, reflect.Int64:
@@ -126,7 +126,7 @@ func IsInteger(val interface{}) bool {
 	}
 }
 
-// IsUnsignedInteger reports weather val is unsigned integer or not
+// IsUnsignedInteger reports weather val is unsigned integer or not.
 func IsUnsignedInteger(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -136,7 +136,7 @@ func IsUnsignedInteger(val interface{}) bool {
 	}
 }
 
-// IsFloat reports weather val is float or not
+// IsFloat reports weather val is float or not.
 func IsFloat(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Float32, reflect.Float64:
@@ -146,7 +146,7 @@ func IsFloat(val interface{}) bool {
 	}
 }
 
-// IsComplex reports weather val is complex number or not
+// IsComplex reports weather val is complex number or not.
 func IsComplex(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Complex64, reflect.Complex128:
@@ -156,7 +156,7 @@ func IsComplex(val interface{}) bool {
 	}
 }
 
-// IsNumeric reports weather val is numeric or not
+// IsNumeric reports weather val is numeric or not.
 func IsNumeric(val interface{}) bool {
 	if !IsInteger(val) && !IsFloat(val) && !IsComplex(val) {
 		return false

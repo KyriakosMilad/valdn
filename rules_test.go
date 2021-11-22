@@ -91,7 +91,7 @@ func Test_OverwriteRule(t *testing.T) {
 	}
 }
 
-func TestSetErrMsg(t *testing.T) {
+func Test_SetErrMsg(t *testing.T) {
 	type args struct {
 		ruleName string
 		errMsg   string
