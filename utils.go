@@ -135,3 +135,13 @@ func IsUnsignedInteger(val interface{}) bool {
 		return false
 	}
 }
+
+// IsFloat reports weather val is float or not
+func IsFloat(val interface{}) bool {
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Float32, reflect.Float64:
+		return true
+	default:
+		return false
+	}
+}
