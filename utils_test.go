@@ -854,3 +854,50 @@ func Test_IsComplex(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsNumeric(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsNumeric with integer",
+			args: args{
+				val: 1,
+			},
+			want: true,
+		},
+		{
+			name: "test IsNumeric with float",
+			args: args{
+				val: 1.1,
+			},
+			want: true,
+		},
+		{
+			name: "test IsNumeric with complex",
+			args: args{
+				val: 1 + 2i,
+			},
+			want: true,
+		},
+		{
+			name: "test IsNumeric with string",
+			args: args{
+				val: "ss",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsNumeric(tt.args.val); got != tt.want {
+				t.Errorf("IsNumeric() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
