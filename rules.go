@@ -15,24 +15,6 @@ type rule struct {
 
 var registeredRules = make(map[string]*rule)
 
-// SetErrMsg sets errMsg to ruleName.
-// It panics if rule does not exist.
-func SetErrMsg(ruleName string, errMsg string) {
-	r, ok := registeredRules[ruleName]
-	if !ok {
-		panic("cannot set error message to rule does not exist: " + ruleName)
-	}
-	r.errMsg = errMsg
-}
-
-func getErrMsg(ruleName string, ruleVal string, name string, val interface{}) string {
-	errMsg := registeredRules[ruleName].errMsg
-	errMsg = strings.ReplaceAll(errMsg, "[name]", name)
-	errMsg = strings.ReplaceAll(errMsg, "[val]", toString(val))
-	errMsg = strings.ReplaceAll(errMsg, "[ruleVal]", ruleVal)
-	return errMsg
-}
-
 // AddRule registers a new rule.
 // It panics if the rule is already registered.
 func AddRule(name string, fn RuleFunc, errMsg string) {
@@ -55,6 +37,24 @@ func OverwriteRule(name string, fn RuleFunc, errMsg string) {
 		errMsg: errMsg,
 	}
 	registeredRules[name] = r
+}
+
+// SetErrMsg sets errMsg to ruleName.
+// It panics if rule does not exist.
+func SetErrMsg(ruleName string, errMsg string) {
+	r, ok := registeredRules[ruleName]
+	if !ok {
+		panic("cannot set error message to rule does not exist: " + ruleName)
+	}
+	r.errMsg = errMsg
+}
+
+func getErrMsg(ruleName string, ruleVal string, name string, val interface{}) string {
+	errMsg := registeredRules[ruleName].errMsg
+	errMsg = strings.ReplaceAll(errMsg, "[name]", name)
+	errMsg = strings.ReplaceAll(errMsg, "[val]", toString(val))
+	errMsg = strings.ReplaceAll(errMsg, "[ruleVal]", ruleVal)
+	return errMsg
 }
 
 func getRuleInfo(r string) (string, string, RuleFunc, bool) {
@@ -100,8 +100,18 @@ func typeRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// equalRule checks if val equals ruleVal
+// It returns error if val does not equal ruleVal.
+func equalRule(name string, val interface{}, ruleVal string) error {
+	if toString(val) != ruleVal {
+		return errors.New(getErrMsg("equal", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
 	AddRule("kind", kindRule, "[name] must be kind of [ruleVal]")
+	AddRule("equal", equalRule, "[name] does not equal [ruleVal]")
 }

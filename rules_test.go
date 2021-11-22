@@ -490,3 +490,42 @@ func Test_kindRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_equalRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test equal rule",
+			args: args{
+				name:    "age",
+				val:     22,
+				ruleVal: "22",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test equal rule with unsuitable value",
+			args: args{
+				name:    "age",
+				val:     22,
+				ruleVal: "23",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := equalRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("equalRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
