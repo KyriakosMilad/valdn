@@ -713,3 +713,64 @@ func Test_IsInteger(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsUnsignedInteger(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsUnsignedInteger with uint",
+			args: args{
+				val: uint(1),
+			},
+			want: true,
+		},
+		{
+			name: "test IsUnsignedInteger with uint8",
+			args: args{
+				val: uint8(1),
+			},
+			want: true,
+		},
+		{
+			name: "test IsUnsignedInteger with uint16",
+			args: args{
+				val: uint16(1),
+			},
+			want: true,
+		},
+		{
+			name: "test IsUnsignedInteger with uint32",
+			args: args{
+				val: uint32(1),
+			},
+			want: true,
+		},
+		{
+			name: "test IsUnsignedInteger with uint64",
+			args: args{
+				val: uint64(1),
+			},
+			want: true,
+		},
+		{
+			name: "test IsUnsignedInteger with int",
+			args: args{
+				val: 1,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsUnsignedInteger(tt.args.val); got != tt.want {
+				t.Errorf("IsUnsignedInteger() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

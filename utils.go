@@ -125,3 +125,13 @@ func IsInteger(val interface{}) bool {
 		return false
 	}
 }
+
+// IsUnsignedInteger reports weather val is unsigned integer or not
+func IsUnsignedInteger(val interface{}) bool {
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return true
+	default:
+		return false
+	}
+}
