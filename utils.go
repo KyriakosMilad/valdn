@@ -115,3 +115,13 @@ func IsStruct(val interface{}) bool {
 func IsMap(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.Map
 }
+
+// IsInteger reports weather val is integer or not
+func IsInteger(val interface{}) bool {
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Uint, reflect.Int, reflect.Uint8, reflect.Int8, reflect.Uint16, reflect.Int16, reflect.Uint32, reflect.Int32, reflect.Uint64, reflect.Int64:
+		return true
+	default:
+		return false
+	}
+}
