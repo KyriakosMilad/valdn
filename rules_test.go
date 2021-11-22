@@ -529,3 +529,42 @@ func Test_equalRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_numericRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test numeric rule",
+			args: args{
+				name:    "age",
+				val:     15,
+				ruleVal: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test numeric rule with unsuitable data",
+			args: args{
+				name:    "age",
+				val:     "t",
+				ruleVal: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := numericRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("numericRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

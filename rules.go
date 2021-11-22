@@ -109,9 +109,19 @@ func equalRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// numericRule checks if val is numeric.
+// It returns error if val is not numeric.
+func numericRule(name string, val interface{}, ruleVal string) error {
+	if !IsNumeric(val) {
+		return errors.New(getErrMsg("numeric", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
 	AddRule("kind", kindRule, "[name] must be kind of [ruleVal]")
 	AddRule("equal", equalRule, "[name] does not equal [ruleVal]")
+	AddRule("numeric", numericRule, "[name] must be numeric")
 }
