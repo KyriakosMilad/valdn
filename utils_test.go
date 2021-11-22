@@ -814,3 +814,43 @@ func Test_IsFloat(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsComplex(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsComplex with complex64",
+			args: args{
+				val: complex64(456456 + 456456i),
+			},
+			want: true,
+		},
+		{
+			name: "test IsComplex with complex128",
+			args: args{
+				val: 456456 + 456456i,
+			},
+			want: true,
+		},
+		{
+			name: "test IsComplex with int",
+			args: args{
+				val: 1,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsComplex(tt.args.val); got != tt.want {
+				t.Errorf("IsComplex() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

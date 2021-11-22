@@ -145,3 +145,13 @@ func IsFloat(val interface{}) bool {
 		return false
 	}
 }
+
+// IsComplex reports weather val is complex number or not
+func IsComplex(val interface{}) bool {
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Complex64, reflect.Complex128:
+		return true
+	default:
+		return false
+	}
+}
