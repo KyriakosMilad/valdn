@@ -91,6 +91,69 @@ func Test_OverwriteRule(t *testing.T) {
 	}
 }
 
+func TestSetErrMsg(t *testing.T) {
+	type args struct {
+		ruleName string
+		errMsg   string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "test set error message",
+			args: args{
+				ruleName: "test_add_err_msg",
+				errMsg:   "test",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rFunc := func(fieldName string, fieldValue interface{}, ruleValue string) error {
+				return nil
+			}
+			AddRule(tt.args.ruleName, rFunc, tt.args.errMsg)
+			SetErrMsg(tt.args.ruleName, tt.args.errMsg)
+			if registeredRules[tt.args.ruleName].errMsg != tt.args.errMsg {
+				t.Errorf("SetErrMsg() can't set err msg, ruleName= %v, errMsg %v", tt.args.ruleName, tt.args.errMsg)
+			}
+		})
+	}
+}
+
+func Test_getErrMsg(t *testing.T) {
+	type args struct {
+		ruleName string
+		ruleVal  string
+		name     string
+		val      interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test get error message",
+			args: args{
+				ruleName: "kind",
+				ruleVal:  "map",
+				name:     "title",
+				val:      44,
+			},
+			want: "title must be kind of map",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getErrMsg(tt.args.ruleName, tt.args.ruleVal, tt.args.name, tt.args.val); got != tt.want {
+				t.Errorf("getErrMsg() = %v, want: %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_getRuleInfo(t *testing.T) {
 	type args struct {
 		rule string
@@ -193,10 +256,9 @@ func Test_typeRule(t *testing.T) {
 		rVal      string
 	}
 	tests := []struct {
-		name              string
-		args              args
-		wantErr           bool
-		wantValidationErr bool
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "test type rule with string",
@@ -205,8 +267,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      "string",
 				rVal:      "string",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with uint",
@@ -215,8 +276,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      uint(44),
 				rVal:      "uint",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with int",
@@ -225,8 +285,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      -44,
 				rVal:      "int",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with float",
@@ -235,8 +294,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      44.44,
 				rVal:      "float64",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with complex number",
@@ -245,8 +303,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      44 + 22i,
 				rVal:      "complex128",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with bool",
@@ -255,8 +312,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      true,
 				rVal:      "bool",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with map",
@@ -265,8 +321,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      map[string]interface{}{"key": 55},
 				rVal:      "map[string]interface {}",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with struct",
@@ -275,8 +330,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      user{name: "test"},
 				rVal:      "user",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with array",
@@ -285,8 +339,7 @@ func Test_typeRule(t *testing.T) {
 				fVal:      [2]int{1, 2},
 				rVal:      "[2]int",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with slice",
@@ -295,8 +348,16 @@ func Test_typeRule(t *testing.T) {
 				fVal:      []int{1, 2},
 				rVal:      "[]int",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
+		},
+		{
+			name: "test type rule with unsuitable data",
+			args: args{
+				fieldName: "typeField",
+				fVal:      []int{1, 2},
+				rVal:      "[2]int",
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -316,10 +377,9 @@ func Test_kindRule(t *testing.T) {
 		rVal  string
 	}
 	tests := []struct {
-		name              string
-		args              args
-		wantErr           bool
-		wantValidationErr bool
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "test type rule with string",
@@ -328,8 +388,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  "string",
 				rVal:  "string",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with uint",
@@ -338,8 +397,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  uint(44),
 				rVal:  "uint",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with int",
@@ -348,8 +406,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  -44,
 				rVal:  "int",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with float",
@@ -358,8 +415,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  44.44,
 				rVal:  "float64",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with complex number",
@@ -368,8 +424,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  44 + 22i,
 				rVal:  "complex128",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with bool",
@@ -378,8 +433,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  true,
 				rVal:  "bool",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with map",
@@ -388,8 +442,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  map[string]interface{}{"key": 55},
 				rVal:  "map",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with struct",
@@ -398,8 +451,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  struct{}{},
 				rVal:  "struct",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with array",
@@ -408,8 +460,7 @@ func Test_kindRule(t *testing.T) {
 				fVal:  [2]int{1, 2},
 				rVal:  "array",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
 		},
 		{
 			name: "test type rule with slice",
@@ -418,8 +469,16 @@ func Test_kindRule(t *testing.T) {
 				fVal:  []int{1, 2},
 				rVal:  "slice",
 			},
-			wantErr:           false,
-			wantValidationErr: false,
+			wantErr: false,
+		},
+		{
+			name: "test type rule with unsuitable data",
+			args: args{
+				fName: "kindField",
+				fVal:  []int{1, 2},
+				rVal:  "array",
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -427,69 +486,6 @@ func Test_kindRule(t *testing.T) {
 			err := kindRule(tt.args.fName, tt.args.fVal, tt.args.rVal)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("kindRule() err = %v, want %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestSetErrMsg(t *testing.T) {
-	type args struct {
-		ruleName string
-		errMsg   string
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "test set error message",
-			args: args{
-				ruleName: "test_add_err_msg",
-				errMsg:   "test",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			rFunc := func(fieldName string, fieldValue interface{}, ruleValue string) error {
-				return nil
-			}
-			AddRule(tt.args.ruleName, rFunc, tt.args.errMsg)
-			SetErrMsg(tt.args.ruleName, tt.args.errMsg)
-			if registeredRules[tt.args.ruleName].errMsg != tt.args.errMsg {
-				t.Errorf("SetErrMsg() can't set err msg, ruleName= %v, errMsg %v", tt.args.ruleName, tt.args.errMsg)
-			}
-		})
-	}
-}
-
-func Test_getErrMsg(t *testing.T) {
-	type args struct {
-		ruleName string
-		ruleVal  string
-		name     string
-		val      interface{}
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			name: "test get error message",
-			args: args{
-				ruleName: "kind",
-				ruleVal:  "map",
-				name:     "title",
-				val:      44,
-			},
-			want: "title must be kind of map",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getErrMsg(tt.args.ruleName, tt.args.ruleVal, tt.args.name, tt.args.val); got != tt.want {
-				t.Errorf("getErrMsg() = %v, want: %v", got, tt.want)
 			}
 		})
 	}
