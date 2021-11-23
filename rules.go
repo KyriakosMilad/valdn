@@ -127,6 +127,15 @@ func uintRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// complexRule checks if val is unsigned integer.
+// It returns error if val is not an unsigned integer.
+func complexRule(name string, val interface{}, ruleVal string) error {
+	if !IsComplex(val) {
+		return errors.New(getErrMsg("complex", ruleVal, name, val))
+	}
+	return nil
+}
+
 // numericRule checks if val is numeric.
 // It returns error if val is not numeric.
 func numericRule(name string, val interface{}, ruleVal string) error {
@@ -143,5 +152,6 @@ func init() {
 	AddRule("equal", equalRule, "[name] does not equal [ruleVal]")
 	AddRule("int", intRule, "[name] must be an integer")
 	AddRule("uint", uintRule, "[name] must be an unsigned integer")
+	AddRule("complex", complexRule, "[name] must be a complex number")
 	AddRule("numeric", numericRule, "[name] must be a numeric")
 }

@@ -608,6 +608,45 @@ func Test_uintRule(t *testing.T) {
 	}
 }
 
+func Test_complexRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test complex rule",
+			args: args{
+				name:    "complex",
+				val:     2 + 2i,
+				ruleVal: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test complex rule with unsuitable data",
+			args: args{
+				name:    "age",
+				val:     -1,
+				ruleVal: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := complexRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("complexRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_numericRule(t *testing.T) {
 	type args struct {
 		name    string
