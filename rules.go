@@ -20,7 +20,7 @@ var registeredRules = make(map[string]*rule)
 func AddRule(name string, fn RuleFunc, errMsg string) {
 	_, ruleExist := registeredRules[name]
 	if ruleExist {
-		panic("rule already registered")
+		panic("rule is already registered")
 	}
 	r := &rule{
 		fn:     fn,
@@ -127,8 +127,8 @@ func uintRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
-// complexRule checks if val is unsigned integer.
-// It returns error if val is not an unsigned integer.
+// complexRule checks if val is complex number.
+// It returns error if val is not a complex number.
 func complexRule(name string, val interface{}, ruleVal string) error {
 	if !IsComplex(val) {
 		return errors.New(getErrMsg("complex", ruleVal, name, val))
@@ -137,7 +137,7 @@ func complexRule(name string, val interface{}, ruleVal string) error {
 }
 
 // numericRule checks if val is numeric.
-// It returns error if val is not numeric.
+// It returns error if val is not a numeric.
 func numericRule(name string, val interface{}, ruleVal string) error {
 	if !IsNumeric(val) {
 		return errors.New(getErrMsg("numeric", ruleVal, name, val))
