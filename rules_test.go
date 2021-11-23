@@ -569,6 +569,45 @@ func Test_intRule(t *testing.T) {
 	}
 }
 
+func Test_uintRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test uint rule",
+			args: args{
+				name:    "age",
+				val:     uint(1),
+				ruleVal: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test uint rule with unsuitable data",
+			args: args{
+				name:    "age",
+				val:     -1,
+				ruleVal: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := uintRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("uintRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_numericRule(t *testing.T) {
 	type args struct {
 		name    string
