@@ -647,7 +647,7 @@ func Test_complexRule(t *testing.T) {
 	}
 }
 
-func Test_decimalRule(t *testing.T) {
+func Test_decRule(t *testing.T) {
 	type args struct {
 		name    string
 		val     interface{}
@@ -679,8 +679,8 @@ func Test_decimalRule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := decimalRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
-				t.Errorf("decimalRule() error = %v, wantErr %v", err, tt.wantErr)
+			if err := decRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("decRule() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
