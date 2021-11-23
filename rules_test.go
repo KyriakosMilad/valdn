@@ -647,6 +647,45 @@ func Test_complexRule(t *testing.T) {
 	}
 }
 
+func Test_decimalRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test decimal rule",
+			args: args{
+				name:    "decimal",
+				val:     2.2,
+				ruleVal: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test decimal rule with unsuitable data",
+			args: args{
+				name:    "age",
+				val:     5,
+				ruleVal: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := decimalRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("decimalRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_numericRule(t *testing.T) {
 	type args struct {
 		name    string

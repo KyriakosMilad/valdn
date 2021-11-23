@@ -136,6 +136,15 @@ func complexRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// decimalRule checks if val is decimal.
+// It returns error if val is not a decimal.
+func decimalRule(name string, val interface{}, ruleVal string) error {
+	if !IsDecimal(val) {
+		return errors.New(getErrMsg("decimal", ruleVal, name, val))
+	}
+	return nil
+}
+
 // numericRule checks if val is numeric.
 // It returns error if val is not a numeric.
 func numericRule(name string, val interface{}, ruleVal string) error {
@@ -153,5 +162,6 @@ func init() {
 	AddRule("int", intRule, "[name] must be an integer")
 	AddRule("uint", uintRule, "[name] must be an unsigned integer")
 	AddRule("complex", complexRule, "[name] must be a complex number")
+	AddRule("decimal", decimalRule, "[name] must be a decimal")
 	AddRule("numeric", numericRule, "[name] must be a numeric")
 }

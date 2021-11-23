@@ -155,8 +155,8 @@ func IsUnsignedInteger(val interface{}) bool {
 	return false
 }
 
-// IsFloat reports weather val is float or not.
-func IsFloat(val interface{}) bool {
+// IsDecimal reports weather val is decimal or not.
+func IsDecimal(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Float32, reflect.Float64:
 		return true
@@ -177,7 +177,7 @@ func IsComplex(val interface{}) bool {
 
 // IsNumeric reports weather val is numeric or not.
 func IsNumeric(val interface{}) bool {
-	if !IsInteger(val) && !IsFloat(val) && !IsComplex(val) {
+	if !IsInteger(val) && !IsDecimal(val) && !IsComplex(val) {
 		return false
 	}
 	return true
