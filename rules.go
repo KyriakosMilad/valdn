@@ -109,6 +109,15 @@ func equalRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// intRule checks if val is integer.
+// It returns error if val is not an integer.
+func intRule(name string, val interface{}, ruleVal string) error {
+	if !IsInteger(val) {
+		return errors.New(getErrMsg("int", ruleVal, name, val))
+	}
+	return nil
+}
+
 // numericRule checks if val is numeric.
 // It returns error if val is not numeric.
 func numericRule(name string, val interface{}, ruleVal string) error {
@@ -123,5 +132,6 @@ func init() {
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
 	AddRule("kind", kindRule, "[name] must be kind of [ruleVal]")
 	AddRule("equal", equalRule, "[name] does not equal [ruleVal]")
-	AddRule("numeric", numericRule, "[name] must be numeric")
+	AddRule("int", intRule, "[name] must be an integer")
+	AddRule("numeric", numericRule, "[name] must be a numeric")
 }
