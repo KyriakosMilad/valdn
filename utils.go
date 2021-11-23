@@ -131,9 +131,28 @@ func IsUnsignedInteger(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return true
-	default:
-		return false
+	case reflect.Int:
+		if val.(int) > 0 {
+			return true
+		}
+	case reflect.Int8:
+		if val.(int8) > 0 {
+			return true
+		}
+	case reflect.Int16:
+		if val.(int16) > 0 {
+			return true
+		}
+	case reflect.Int32:
+		if val.(int32) > 0 {
+			return true
+		}
+	case reflect.Int64:
+		if val.(int64) > 0 {
+			return true
+		}
 	}
+	return false
 }
 
 // IsFloat reports weather val is float or not.

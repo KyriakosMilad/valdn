@@ -759,9 +759,9 @@ func Test_IsUnsignedInteger(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "test IsUnsignedInteger with int",
+			name: "test IsUnsignedInteger with singed int",
 			args: args{
-				val: 1,
+				val: -1,
 			},
 			want: false,
 		},
