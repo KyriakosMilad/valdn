@@ -219,7 +219,7 @@ func maxRule(name string, val interface{}, ruleVal string) error {
 	}
 	err, max := stringToFloat(ruleVal)
 	if err != nil {
-		panic(fmt.Errorf("minRule: max must be an integer or a float, got: %v", ruleVal))
+		panic(fmt.Errorf("maxRule: max must be an integer or a float, got: %v", ruleVal))
 	}
 
 	if vFloat > max {
