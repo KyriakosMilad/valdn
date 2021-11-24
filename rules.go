@@ -103,6 +103,24 @@ func kindInRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// kindNotInRule checks if val's kind is not one of ruleVal[].
+// It returns error if val's kind is one of ruleVal[].
+func kindNotInRule(name string, val interface{}, ruleVal string) error {
+	k := toString(reflect.TypeOf(val).Kind())
+	fmt.Println(k)
+	in := false
+	for _, v := range strings.Split(ruleVal, ",") {
+		if v == k {
+			in = true
+			break
+		}
+	}
+	if in {
+		return errors.New(getErrMsg("kindNotIn", ruleVal, name, val))
+	}
+	return nil
+}
+
 // typeRule checks if val's type equals ruleVal
 // It returns error if val's type does not equal ruleVal.
 func typeRule(name string, val interface{}, ruleVal string) error {
@@ -283,6 +301,7 @@ func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
 	AddRule("kind", kindRule, "[name] must be kind of [ruleVal]")
+	AddRule("kindNotIn", kindNotInRule, "[name] must not be kind of [ruleVal]")
 	AddRule("kindIn", kindInRule, "[name]'s kind must be one of [ruleVal]")
 	AddRule("equal", equalRule, "[name] does not equal [ruleVal]")
 	AddRule("int", intRule, "[name] must be an integer")

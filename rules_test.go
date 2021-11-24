@@ -406,6 +406,45 @@ func Test_kindInRule(t *testing.T) {
 	}
 }
 
+func Test_kindNotInRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test kindNotInRule",
+			args: args{
+				name:    "test",
+				val:     8,
+				ruleVal: "string,slice,array",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test kindNotInRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     8,
+				ruleVal: "int,uint,int8",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := kindNotInRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("kindNotInRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_typeRule(t *testing.T) {
 	type user struct {
 		name string
