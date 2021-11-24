@@ -491,6 +491,45 @@ func Test_kindRule(t *testing.T) {
 	}
 }
 
+func Test_kindInRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test kindInRule",
+			args: args{
+				name:    "test",
+				val:     8,
+				ruleVal: "int,uint,int8",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test kindInRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     8,
+				ruleVal: "string,slice,array",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := kindInRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("kindInRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_equalRule(t *testing.T) {
 	type args struct {
 		name    string
