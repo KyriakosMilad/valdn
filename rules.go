@@ -136,6 +136,28 @@ func typeRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// typeInRule checks if val's type is one of ruleVal[].
+// It returns error if val's type is not one of ruleVal[].
+func typeInRule(name string, val interface{}, ruleVal string) error {
+	var typeInString string
+	if t := reflect.TypeOf(val); t.Kind() == reflect.Struct {
+		typeInString = t.Name()
+	} else {
+		typeInString = toString(t)
+	}
+	in := false
+	for _, v := range strings.Split(ruleVal, ",") {
+		if v == typeInString {
+			in = true
+			break
+		}
+	}
+	if !in {
+		return errors.New(getErrMsg("typeIn", ruleVal, name, val))
+	}
+	return nil
+}
+
 // equalRule checks if val equals ruleVal.
 // It returns error if val does not equal ruleVal.
 func equalRule(name string, val interface{}, ruleVal string) error {
@@ -300,9 +322,10 @@ func notInRule(name string, val interface{}, ruleVal string) error {
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
+	AddRule("typeIn", typeInRule, "[name]'s type must be one of [ruleVal]")
 	AddRule("kind", kindRule, "[name] must be kind of [ruleVal]")
-	AddRule("kindNotIn", kindNotInRule, "[name] must not be kind of [ruleVal]")
 	AddRule("kindIn", kindInRule, "[name]'s kind must be one of [ruleVal]")
+	AddRule("kindNotIn", kindNotInRule, "[name] must not be kind of [ruleVal]")
 	AddRule("equal", equalRule, "[name] does not equal [ruleVal]")
 	AddRule("int", intRule, "[name] must be an integer")
 	AddRule("uint", uintRule, "[name] must be an unsigned integer")
