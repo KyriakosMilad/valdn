@@ -244,6 +244,23 @@ func inRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// notInRule checks if val doesn't equal any item in ruleVal[].
+// It returns error if val equals one of ruleVal[] items.
+func notInRule(name string, val interface{}, ruleVal string) error {
+	ruleValSpliced := strings.Split(ruleVal, ",")
+	var in bool
+	for _, v := range ruleValSpliced {
+		if v == toString(val) {
+			in = true
+			break
+		}
+	}
+	if in {
+		return errors.New(getErrMsg("notIn", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -258,4 +275,5 @@ func init() {
 	AddRule("min", minRule, "[name] must be greater than or equal [ruleVal]")
 	AddRule("max", maxRule, "[name] must be lower than or equal [ruleVal]")
 	AddRule("in", inRule, "[name] must be in these values: [ruleVal]")
+	AddRule("notIn", notInRule, "[name] must not be in these values: [ruleVal]")
 }

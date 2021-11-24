@@ -1034,3 +1034,42 @@ func Test_inRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_notInRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test notInRule",
+			args: args{
+				name:    "country",
+				val:     "EGYPTtttt",
+				ruleVal: "GREECE,EGYPT,CYPRUS",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test notInRule with unsuitable data",
+			args: args{
+				name:    "country",
+				val:     "EGYPT",
+				ruleVal: "GREECE,EGYPT,CYPRUS",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := notInRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("notInRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
