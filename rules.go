@@ -236,6 +236,7 @@ func inRule(name string, val interface{}, ruleVal string) error {
 	for _, v := range ruleValSpliced {
 		if v == toString(val) {
 			in = true
+			break
 		}
 	}
 	if !in {
