@@ -251,3 +251,131 @@ func Test_convertInterfaceToMap(t *testing.T) {
 		})
 	}
 }
+
+func Test_interfaceToFloat(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		want    float64
+	}{
+		{
+			name: "test interfaceToFloat with string",
+			args: args{
+				val: "s",
+			},
+			wantErr: true,
+			want:    0.0,
+		},
+		{
+			name: "test interfaceToFloat with float64",
+			args: args{
+				val: 3.14,
+			},
+			wantErr: false,
+			want:    3.14,
+		},
+		{
+			name: "test interfaceToFloat with float32",
+			args: args{
+				val: float32(3.14),
+			},
+			wantErr: false,
+			want:    3.140000104904175,
+		},
+		{
+			name: "test interfaceToFloat with int",
+			args: args{
+				val: 3,
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with uint",
+			args: args{
+				val: uint(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with int8",
+			args: args{
+				val: int8(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with uint8",
+			args: args{
+				val: uint8(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with int16",
+			args: args{
+				val: int16(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with uint16",
+			args: args{
+				val: uint16(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with int32",
+			args: args{
+				val: int32(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with uint32",
+			args: args{
+				val: uint32(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with int64",
+			args: args{
+				val: int64(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test interfaceToFloat with uint64()",
+			args: args{
+				val: uint64(3),
+			},
+			wantErr: false,
+			want:    3,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, got := interfaceToFloat(tt.args.val)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("interfaceToFloat() err = %v, wantErr %v", err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Errorf("interfaceToFloat() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

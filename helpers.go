@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -50,4 +51,50 @@ func convertInterfaceToMap(value interface{}) map[string]interface{} {
 		}
 	}
 	return newMap
+}
+
+// stringToFloat converts val to float64.
+// It returns error if val is not a float or an integer.
+func interfaceToFloat(val interface{}) (error, float64) {
+	var f64 float64
+	if !IsInteger(val) && !IsDecimal(val) {
+		return errors.New("val must be an integer or a float"), f64
+	}
+	if v, ok := val.(float64); ok {
+		f64 = v
+	}
+	if v, ok := val.(float32); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(int); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(uint); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(int8); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(uint8); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(int16); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(uint16); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(int32); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(uint32); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(int64); ok {
+		f64 = float64(v)
+	}
+	if v, ok := val.(uint64); ok {
+		f64 = float64(v)
+	}
+	return nil, f64
 }
