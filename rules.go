@@ -228,6 +228,20 @@ func maxRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+func inRule(name string, val interface{}, ruleVal string) error {
+	ruleValSpliced := strings.Split(ruleVal, ",")
+	var in bool
+	for _, v := range ruleValSpliced {
+		if v == toString(val) {
+			in = true
+		}
+	}
+	if !in {
+		return errors.New(getErrMsg("in", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -241,4 +255,5 @@ func init() {
 	AddRule("between", betweenRule, "[name] must be between [ruleVal]")
 	AddRule("min", minRule, "[name] must be greater than or equal [ruleVal]")
 	AddRule("max", maxRule, "[name] must be lower than or equal [ruleVal]")
+	AddRule("in", inRule, "[name] must be in these values: [ruleVal]")
 }
