@@ -189,7 +189,7 @@ func betweenRule(name string, val interface{}, ruleVal string) error {
 // minRule checks if val is lower than ruleVal.
 // It panics if val is not an integer or a float.
 // It panics if ruleVal is empty.
-// It panics if min is not an integer or a float.
+// It panics if ruleVal is not an integer or a float.
 // It returns error if val is lower than ruleVal.
 func minRule(name string, val interface{}, ruleVal string) error {
 	err, vFloat := interfaceToFloat(val)
