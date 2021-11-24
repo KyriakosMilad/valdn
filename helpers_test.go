@@ -379,3 +379,51 @@ func Test_interfaceToFloat(t *testing.T) {
 		})
 	}
 }
+
+func Test_stringToFloat(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		want    float64
+	}{
+		{
+			name: "test stringToFloat with string contains float",
+			args: args{
+				s: "3.14",
+			},
+			wantErr: false,
+			want:    3.14,
+		},
+		{
+			name: "test stringToFloat with string contains integer",
+			args: args{
+				s: "3",
+			},
+			wantErr: false,
+			want:    3.0,
+		},
+		{
+			name: "test stringToFloat with string",
+			args: args{
+				s: "string",
+			},
+			wantErr: true,
+			want:    0.0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, got := stringToFloat(tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("stringToFloat() err = %v, wantErr %v", err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Errorf("stringToFloat() got1 = %v, wantErr %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -95,6 +96,22 @@ func interfaceToFloat(val interface{}) (error, float64) {
 	}
 	if v, ok := val.(uint64); ok {
 		f64 = float64(v)
+	}
+	return nil, f64
+}
+
+// stringToFloat converts s's to float64.
+// It returns error if s's value is not a float or an integer.
+func stringToFloat(s string) (error, float64) {
+	var f64 float64
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		f64, err = strconv.ParseFloat(s, 64)
+		if err != nil {
+			return errors.New("string must contain an integer or a float"), f64
+		}
+	} else {
+		f64 = float64(i)
 	}
 	return nil, f64
 }
