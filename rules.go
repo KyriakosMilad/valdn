@@ -186,6 +186,27 @@ func betweenRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// minRule checks if val is lower than ruleVal.
+// It panics if val is not an integer or a float.
+// It panics if ruleVal is empty.
+// It panics if min is not an integer or a float.
+// It returns error if val is lower than ruleVal.
+func minRule(name string, val interface{}, ruleVal string) error {
+	err, vFloat := interfaceToFloat(val)
+	if err != nil {
+		panic(name + " must be an integer or a float to be validated by minRule")
+	}
+	err, min := stringToFloat(ruleVal)
+	if err != nil {
+		panic(fmt.Errorf("minRule: min must be an integer or a float, got: %v", ruleVal))
+	}
+
+	if vFloat < min {
+		return errors.New(getErrMsg("min", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -197,4 +218,5 @@ func init() {
 	AddRule("float", floatRule, "[name] must be a float")
 	AddRule("numeric", numericRule, "[name] must be a numeric")
 	AddRule("between", betweenRule, "[name] must be between [ruleVal]")
+	AddRule("min", minRule, "[name] must be greater than or equal [ruleVal]")
 }

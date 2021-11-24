@@ -821,3 +821,90 @@ func Test_betweenRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_minRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test min rule with float val and integer rule val",
+			args: args{
+				name:    "price",
+				val:     5.5,
+				ruleVal: "3",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test min rule with integer val and integer rule val",
+			args: args{
+				name:    "price",
+				val:     5,
+				ruleVal: "3.6",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test min rule with string",
+			args: args{
+				name:    "price",
+				val:     "55",
+				ruleVal: "3",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test min rule with empty rule val",
+			args: args{
+				name:    "price",
+				val:     4,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test min rule with non-numeric rule val",
+			args: args{
+				name:    "price",
+				val:     4,
+				ruleVal: "bla",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test min rule with unsuitable data",
+			args: args{
+				name:    "price",
+				val:     4,
+				ruleVal: "5",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("minRule() error = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			if err := minRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("minRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
