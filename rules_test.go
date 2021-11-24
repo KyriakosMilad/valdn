@@ -608,6 +608,45 @@ func Test_typeInRule(t *testing.T) {
 	}
 }
 
+func Test_typeNotInRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test typeNotInRule",
+			args: args{
+				name:    "test",
+				val:     [2]int{1, 2},
+				ruleVal: "[3]int,[]int,[1]int",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test typeNotInRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     [2]int{1, 2},
+				ruleVal: "[2]int,[]int,[1]int",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := typeNotInRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("typeNotInRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_equalRule(t *testing.T) {
 	type args struct {
 		name    string
