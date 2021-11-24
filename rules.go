@@ -228,6 +228,8 @@ func maxRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// inRule checks if val equals one of ruleVal[] items.
+// It returns error if val doesn't equal any item in ruleVal[].
 func inRule(name string, val interface{}, ruleVal string) error {
 	ruleValSpliced := strings.Split(ruleVal, ",")
 	var in bool
