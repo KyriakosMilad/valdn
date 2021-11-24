@@ -58,7 +58,7 @@ func convertInterfaceToMap(value interface{}) map[string]interface{} {
 // It returns error if val is not a float or an integer.
 func interfaceToFloat(val interface{}) (error, float64) {
 	var f64 float64
-	if !IsInteger(val) && !IsDecimal(val) {
+	if !IsInteger(val) && !IsFloat(val) {
 		return errors.New("val must be an integer or a float"), f64
 	}
 	if v, ok := val.(float64); ok {

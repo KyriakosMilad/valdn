@@ -137,11 +137,11 @@ func complexRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
-// decRule checks if val is decimal.
-// It returns error if val is not a decimal.
-func decRule(name string, val interface{}, ruleVal string) error {
-	if !IsDecimal(val) {
-		return errors.New(getErrMsg("dec", ruleVal, name, val))
+// floatRule checks if val is float.
+// It returns error if val is not a float.
+func floatRule(name string, val interface{}, ruleVal string) error {
+	if !IsFloat(val) {
+		return errors.New(getErrMsg("float", ruleVal, name, val))
 	}
 	return nil
 }
@@ -194,7 +194,7 @@ func init() {
 	AddRule("int", intRule, "[name] must be an integer")
 	AddRule("uint", uintRule, "[name] must be an unsigned integer")
 	AddRule("complex", complexRule, "[name] must be a complex number")
-	AddRule("dec", decRule, "[name] must be a decimal")
+	AddRule("float", floatRule, "[name] must be a float")
 	AddRule("numeric", numericRule, "[name] must be a numeric")
 	AddRule("between", betweenRule, "[name] must be between [ruleVal]")
 }

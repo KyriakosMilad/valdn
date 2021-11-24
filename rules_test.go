@@ -647,7 +647,7 @@ func Test_complexRule(t *testing.T) {
 	}
 }
 
-func Test_decRule(t *testing.T) {
+func Test_floatRule(t *testing.T) {
 	type args struct {
 		name    string
 		val     interface{}
@@ -659,16 +659,16 @@ func Test_decRule(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "test decimal rule",
+			name: "test float rule",
 			args: args{
-				name:    "decimal",
+				name:    "float",
 				val:     2.2,
 				ruleVal: "",
 			},
 			wantErr: false,
 		},
 		{
-			name: "test decimal rule with unsuitable data",
+			name: "test float rule with unsuitable data",
 			args: args{
 				name:    "age",
 				val:     5,
@@ -679,8 +679,8 @@ func Test_decRule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := decRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
-				t.Errorf("decRule() error = %v, wantErr %v", err, tt.wantErr)
+			if err := floatRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("floatRule() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
