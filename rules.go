@@ -2,6 +2,7 @@ package validation
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -154,6 +155,37 @@ func numericRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// betweenRule checks if val is between min (ruleVal[0]) and max (ruleVal[1]).
+// It panics if val is not an integer or a float.
+// It panics if min or max is not set.
+// It panics if min is not an integer or a float.
+// It panics if max is not an integer or a float.
+// It returns error if val is not between min and max.
+func betweenRule(name string, val interface{}, ruleVal string) error {
+	err, vFloat := interfaceToFloat(val)
+	if err != nil {
+		panic(name + " must be an integer or a float to be validated by betweenRule")
+	}
+
+	ruleValSpliced := strings.Split(ruleVal, ",")
+	if len(ruleValSpliced) != 2 {
+		panic(fmt.Errorf("betweenRule expects two numeric values as min and max, got: %v", len(ruleValSpliced)))
+	}
+	err, min := stringToFloat(ruleValSpliced[0])
+	if err != nil {
+		panic(fmt.Errorf("betweenRule: min must be an integer or a float, got: %v", ruleValSpliced[0]))
+	}
+	err, max := stringToFloat(ruleValSpliced[1])
+	if err != nil {
+		panic(fmt.Errorf("betweenRule: max must be an integer or a float, got: %v", ruleValSpliced[1]))
+	}
+
+	if vFloat < min || vFloat > max {
+		return errors.New(getErrMsg("between", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -164,4 +196,5 @@ func init() {
 	AddRule("complex", complexRule, "[name] must be a complex number")
 	AddRule("dec", decRule, "[name] must be a decimal")
 	AddRule("numeric", numericRule, "[name] must be a numeric")
+	AddRule("between", betweenRule, "[name] must be between [ruleVal]")
 }

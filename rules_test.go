@@ -364,7 +364,7 @@ func Test_typeRule(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := typeRule(tt.args.fieldName, tt.args.fVal, tt.args.rVal)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("typeRule() got = %v, want %v", err, tt.wantErr)
+				t.Errorf("typeRule() err = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -485,7 +485,7 @@ func Test_kindRule(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := kindRule(tt.args.fName, tt.args.fVal, tt.args.rVal)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("kindRule() err = %v, want %v", err, tt.wantErr)
+				t.Errorf("kindRule() err = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -720,6 +720,103 @@ func Test_numericRule(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := numericRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
 				t.Errorf("numericRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_betweenRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test between rule with float val and integer rule val",
+			args: args{
+				name:    "price",
+				val:     5.5,
+				ruleVal: "3,6",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test between rule with integer val and integer rule val",
+			args: args{
+				name:    "price",
+				val:     5,
+				ruleVal: "3,6",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test between rule with float val and float rule val",
+			args: args{
+				name:    "price",
+				val:     5.5,
+				ruleVal: "3,6.5",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test between rule with string",
+			args: args{
+				name:    "price",
+				val:     "55",
+				ruleVal: "3,6",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test between rule with empty rule val",
+			args: args{
+				name:    "price",
+				val:     4,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test between rule with non-numeric rule val",
+			args: args{
+				name:    "price",
+				val:     4,
+				ruleVal: "bla,bb",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test between rule with unsuitable data",
+			args: args{
+				name:    "price",
+				val:     4,
+				ruleVal: "5,6",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("betweenRule() error = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			if err := betweenRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("betweenRule() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
