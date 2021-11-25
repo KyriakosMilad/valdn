@@ -901,3 +901,50 @@ func Test_IsNumeric(t *testing.T) {
 		})
 	}
 }
+
+func TestIsCollection(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsCollection with slice",
+			args: args{
+				val: []int{1, 2, 3},
+			},
+			want: true,
+		},
+		{
+			name: "test IsCollection with array",
+			args: args{
+				val: [3]int{1, 2, 3},
+			},
+			want: true,
+		},
+		{
+			name: "test IsCollection with map",
+			args: args{
+				val: map[string]int{"one": 1},
+			},
+			want: true,
+		},
+		{
+			name: "test IsCollection with string",
+			args: args{
+				val: "test",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsCollection(tt.args.val); got != tt.want {
+				t.Errorf("IsCollection() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
