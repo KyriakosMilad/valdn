@@ -378,6 +378,24 @@ func minLenRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// maxLenRule checks if val's length is lower than or equal ruleVal or not.
+// It panics if val is not array, slice, map, string, integer or float.
+// It returns error if val's length is greater than ruleVal.
+func maxLenRule(name string, val interface{}, ruleVal string) error {
+	l, err := strconv.ParseInt(ruleVal, 10, 64)
+	if err != nil {
+		panic("length must be an integer")
+	}
+	err, vLen := getLen(val)
+	if err != nil {
+		panic(err.Error())
+	}
+	if vLen > int(l) {
+		return errors.New(getErrMsg("maxLen", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -399,4 +417,5 @@ func init() {
 	AddRule("notIn", notInRule, "[name] must not be in these values: [ruleVal]")
 	AddRule("len", lenRule, "[name]'s length must equal: [ruleVal]")
 	AddRule("minLen", minLenRule, "[name]'s length must be greater than or equal: [ruleVal]")
+	AddRule("maxLen", minLenRule, "[name]'s length must be lower than or equal: [ruleVal]")
 }
