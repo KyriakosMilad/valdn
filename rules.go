@@ -396,6 +396,35 @@ func maxLenRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// lenBetweenRule checks if val's length is between ruleVal[0] and ruleVal[1] or not.
+// It panics if val is not array, slice, map, string, integer or float.
+// It panics if min or max is not set.
+// It panics if min is not an integer.
+// It panics if max is not an integer.
+// It returns error if val's length is not between ruleVal[0] and ruleVal[1].
+func lenBetweenRule(name string, val interface{}, ruleVal string) error {
+	err, l := getLen(val)
+	if err != nil {
+		panic(err.Error())
+	}
+	ruleValSpliced := strings.Split(ruleVal, ",")
+	if len(ruleValSpliced) != 2 {
+		panic(fmt.Errorf("lenBetweenRule expects two integer values as min and max, got: %v", len(ruleValSpliced)))
+	}
+	min, err := strconv.ParseInt(ruleValSpliced[0], 10, 64)
+	if err != nil {
+		panic(fmt.Errorf("lenBetweenRule: min must be an integer, got: %v", ruleValSpliced[0]))
+	}
+	max, err := strconv.ParseInt(ruleValSpliced[1], 10, 64)
+	if err != nil {
+		panic(fmt.Errorf("lenBetweenRule: max must be an integer, got: %v", ruleValSpliced[1]))
+	}
+	if l < int(min) || l > int(max) {
+		return errors.New(getErrMsg("lenBetween", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -418,4 +447,5 @@ func init() {
 	AddRule("len", lenRule, "[name]'s length must equal: [ruleVal]")
 	AddRule("minLen", minLenRule, "[name]'s length must be greater than or equal: [ruleVal]")
 	AddRule("maxLen", maxLenRule, "[name]'s length must be lower than or equal: [ruleVal]")
+	AddRule("lenBetween", lenBetweenRule, "[name]'s length must be between: [ruleVal]")
 }
