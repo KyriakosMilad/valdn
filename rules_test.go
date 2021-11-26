@@ -1229,3 +1229,140 @@ func Test_notInRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_lenRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test lenRule with slice",
+			args: args{
+				name:    "test",
+				ruleVal: "3",
+				val:     []int{1, 2, 3},
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test lenRule with array",
+			args: args{
+				name:    "test",
+				ruleVal: "3",
+				val:     [3]int{1, 2, 3},
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test lenRule with array",
+			args: args{
+				name:    "test",
+				ruleVal: "1",
+				val:     map[int]string{1: "test"},
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test lenRule with string",
+			args: args{
+				name:    "test",
+				ruleVal: "4",
+				val:     "test",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test lenRule with integer",
+			args: args{
+				name:    "test",
+				ruleVal: "5",
+				val:     -55555,
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test lenRule with unsigned integer",
+			args: args{
+				name:    "test",
+				ruleVal: "5",
+				val:     55555,
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test lenRule with float",
+			args: args{
+				name:    "test",
+				ruleVal: "5",
+				val:     -555.55,
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test lenRule with unsigned float",
+			args: args{
+				name:    "test",
+				ruleVal: "5",
+				val:     555.55,
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test lenRule with unsuitable ruleVal",
+			args: args{
+				name:    "test",
+				ruleVal: "bla",
+				val:     44,
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test lenRule with struct",
+			args: args{
+				name:    "test",
+				ruleVal: "0",
+				val:     struct{}{},
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test lenRule with unsuitable data",
+			args: args{
+				name:    "test",
+				ruleVal: "2",
+				val:     333,
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("lenRule() error = %v, wantPanic %v", e, tt.wantErr)
+				}
+			}()
+			if err := lenRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("lenRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

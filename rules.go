@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -341,6 +342,24 @@ func notInRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// lenRule checks if val's length equals ruleVal.
+// It panics if val is not array, slice, map, string, integer or float.
+// It returns error if val doesn't equal ruleVal[].
+func lenRule(name string, val interface{}, ruleVal string) error {
+	l, err := strconv.ParseInt(ruleVal, 10, 64)
+	if err != nil {
+		panic("length must be an integer")
+	}
+	err, vLen := getLen(val)
+	if err != nil {
+		panic(err.Error())
+	}
+	if vLen != int(l) {
+		return errors.New(getErrMsg("len", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -360,4 +379,5 @@ func init() {
 	AddRule("max", maxRule, "[name] must be lower than or equal [ruleVal]")
 	AddRule("in", inRule, "[name] must be in these values: [ruleVal]")
 	AddRule("notIn", notInRule, "[name] must not be in these values: [ruleVal]")
+	AddRule("len", lenRule, "[name]'s length must equal: [ruleVal]")
 }
