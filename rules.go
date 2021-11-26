@@ -344,7 +344,7 @@ func notInRule(name string, val interface{}, ruleVal string) error {
 
 // lenRule checks if val's length equals ruleVal.
 // It panics if val is not array, slice, map, string, integer or float.
-// It returns error if val doesn't equal ruleVal[].
+// It returns error if val's length doesn't equal ruleVal.
 func lenRule(name string, val interface{}, ruleVal string) error {
 	l, err := strconv.ParseInt(ruleVal, 10, 64)
 	if err != nil {
