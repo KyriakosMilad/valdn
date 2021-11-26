@@ -115,3 +115,25 @@ func stringToFloat(s string) (error, float64) {
 	}
 	return nil, f64
 }
+
+// getLen gets v's length.
+// It returns error if v is not array, slice, map, string, integer or float.
+func getLen(v interface{}) (error, int) {
+	switch {
+	case IsCollection(v) || IsString(v):
+		return nil, reflect.ValueOf(v).Len()
+	case IsInteger(v) || IsFloat(v):
+		l := 0
+		stringVal := toString(v)
+		if stringVal[0] == '-' {
+			l -= 1
+		}
+		if IsFloat(v) {
+			l -= 1
+		}
+		l += len(stringVal)
+		return nil, l
+	default:
+		return fmt.Errorf("can't get length of kind %v", reflect.TypeOf(v).Kind()), 0
+	}
+}

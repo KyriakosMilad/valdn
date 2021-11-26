@@ -427,3 +427,99 @@ func Test_stringToFloat(t *testing.T) {
 		})
 	}
 }
+
+func Test_getLen(t *testing.T) {
+	type args struct {
+		v interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		want    int
+	}{
+		{
+			name: "test getLen with slice",
+			args: args{
+				v: []int{1, 2, 3},
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test getLen with array",
+			args: args{
+				v: [3]int{1, 2, 3},
+			},
+			wantErr: false,
+			want:    3,
+		},
+		{
+			name: "test getLen with array",
+			args: args{
+				v: map[int]string{1: "test"},
+			},
+			wantErr: false,
+			want:    1,
+		},
+		{
+			name: "test getLen with string",
+			args: args{
+				v: "test",
+			},
+			wantErr: false,
+			want:    4,
+		},
+		{
+			name: "test getLen with integer",
+			args: args{
+				v: -55555,
+			},
+			wantErr: false,
+			want:    5,
+		},
+		{
+			name: "test getLen with unsigned integer",
+			args: args{
+				v: 55555,
+			},
+			wantErr: false,
+			want:    5,
+		},
+		{
+			name: "test getLen with float",
+			args: args{
+				v: -555.55,
+			},
+			wantErr: false,
+			want:    5,
+		},
+		{
+			name: "test getLen with unsigned float",
+			args: args{
+				v: 555.55,
+			},
+			wantErr: false,
+			want:    5,
+		},
+		{
+			name: "test getLen with struct",
+			args: args{
+				v: struct{}{},
+			},
+			wantErr: true,
+			want:    0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, got := getLen(tt.args.v)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getLen() err = %v, wantErr %v", err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Errorf("getLen() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
