@@ -417,5 +417,5 @@ func init() {
 	AddRule("notIn", notInRule, "[name] must not be in these values: [ruleVal]")
 	AddRule("len", lenRule, "[name]'s length must equal: [ruleVal]")
 	AddRule("minLen", minLenRule, "[name]'s length must be greater than or equal: [ruleVal]")
-	AddRule("maxLen", minLenRule, "[name]'s length must be lower than or equal: [ruleVal]")
+	AddRule("maxLen", maxLenRule, "[name]'s length must be lower than or equal: [ruleVal]")
 }
