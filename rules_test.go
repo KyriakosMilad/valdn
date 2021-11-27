@@ -2452,3 +2452,60 @@ func Test_ipv6Rule(t *testing.T) {
 		})
 	}
 }
+
+func Test_ipRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test ipRule",
+			args: args{
+				name:    "test",
+				val:     "2001:db8:3333:4444:5555:6666:1.2.3.4",
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test ipRule with non-string value",
+			args: args{
+				name:    "test",
+				val:     1973,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test ipRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     "bla",
+				ruleVal: "",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ipRule() error = %v, wantPanic %v", e, tt.wantErr)
+				}
+			}()
+			if err := ipRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("ipRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

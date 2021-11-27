@@ -583,6 +583,20 @@ func ipv6Rule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// ipRule checks if val is a valid IP address.
+// It panics if val is not a string.
+// It returns error if val is not a valid IP address.
+func ipRule(name string, val interface{}, ruleVal string) error {
+	if !IsString(val) {
+		panic(fmt.Errorf("%v must be a string to be valdiated with ipRule", name))
+	}
+	ok := IsIP(toString(val))
+	if !ok {
+		return errors.New(getErrMsg("ip", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -615,4 +629,5 @@ func init() {
 	AddRule("json", jsonRule, "[name] must be a valid json")
 	AddRule("ipv4", ipv4Rule, "[name] must be a valid ipv4")
 	AddRule("ipv6", ipv6Rule, "[name] must be a valid ipv6")
+	AddRule("ip", ipRule, "[name] must be a valid ip address")
 }
