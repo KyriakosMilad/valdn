@@ -1087,3 +1087,37 @@ func Test_IsIPv4(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsIPv6(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      bool
+		wantPanic bool
+	}{
+		{
+			name: "test IsIPv6",
+			args: args{
+				s: "2001:db8:3333:4444:5555:6666:1.2.3.4",
+			},
+			want: true,
+		},
+		{
+			name: "test IsIPv6 with unsuitable data",
+			args: args{
+				s: "1.1.1.1.",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsIPv6(tt.args.s); got != tt.want {
+				t.Errorf("IsIPv6() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

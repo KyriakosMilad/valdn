@@ -2,6 +2,7 @@ package validation
 
 import (
 	"encoding/json"
+	"net"
 	"reflect"
 	"regexp"
 )
@@ -235,6 +236,20 @@ func IsIPv4(s string) bool {
 	match := r.MatchString(s)
 	if match {
 		return true
+	}
+	return false
+}
+
+// IsIPv6 reports weather s is a valid IPv6 or not.
+func IsIPv6(s string) bool {
+	if net.ParseIP(s) == nil {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
+		case ':':
+			return true
+		}
 	}
 	return false
 }
