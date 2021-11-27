@@ -2509,3 +2509,60 @@ func Test_ipRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_macRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test macRule",
+			args: args{
+				name:    "test",
+				val:     "3D:F2:C9:A6:B3:4F",
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test macRule with non-string value",
+			args: args{
+				name:    "test",
+				val:     1973,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test macRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     "bla",
+				ruleVal: "",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("macRule() error = %v, wantPanic %v", e, tt.wantErr)
+				}
+			}()
+			if err := macRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("macRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
