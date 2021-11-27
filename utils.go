@@ -257,3 +257,11 @@ func IsIPv6(s string) bool {
 	}
 	return false
 }
+
+// IsIP reports weather s is a valid IP or not.
+func IsIP(s string) bool {
+	if net.ParseIP(s) == nil {
+		return false
+	}
+	return true
+}
