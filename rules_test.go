@@ -2051,3 +2051,70 @@ func Test_lenNotInRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_regexRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test regexRule",
+			args: args{
+				name:    "test",
+				val:     "email@email.com",
+				ruleVal: "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test regexRule with non-string value",
+			args: args{
+				name:    "test",
+				val:     55,
+				ruleVal: "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test regexRule with invalid regex",
+			args: args{
+				name:    "test",
+				val:     55,
+				ruleVal: "[",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test regexRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     "emailemail.com",
+				ruleVal: "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("regexRule() error = %v, wantPanic %v", e, tt.wantErr)
+				}
+			}()
+			if err := regexRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("regexRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

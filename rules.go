@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -479,6 +480,25 @@ func lenNotInRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// regexRule checks if val matches ruleVal regular expression.
+// It panics if val is not a string.
+// It panics if ruleVal is not a valid regular expression.
+// It returns error if val doesn't match ruleVal regular expression.
+func regexRule(name string, val interface{}, ruleVal string) error {
+	if !IsString(val) {
+		panic(fmt.Errorf("%v must be a string to be valdiated with regex", name))
+	}
+	r, err := regexp.Compile(ruleVal)
+	if err != nil {
+		panic(fmt.Errorf("%v is not a valid regex", ruleVal))
+	}
+	match := r.MatchString(toString(val))
+	if !match {
+		return errors.New(getErrMsg("regex", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -504,4 +524,5 @@ func init() {
 	AddRule("lenBetween", lenBetweenRule, "[name]'s length must be between: [ruleVal]")
 	AddRule("lenIn", lenInRule, "[name]'s length must be in these values: [ruleVal]")
 	AddRule("lenNotIn", lenNotInRule, "[name]'s length must not be in these values: [ruleVal]")
+	AddRule("regex", regexRule, "[name]'s format is not valid")
 }
