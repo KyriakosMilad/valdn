@@ -2088,7 +2088,7 @@ func Test_regexRule(t *testing.T) {
 			name: "test regexRule with invalid regex",
 			args: args{
 				name:    "test",
-				val:     55,
+				val:     "55",
 				ruleVal: "[",
 			},
 			wantErr:   false,
