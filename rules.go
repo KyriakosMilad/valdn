@@ -518,6 +518,20 @@ func notRegexRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// emailRule checks if val is not a valid email address.
+// It panics if val is not a string.
+// It returns error if val is not a valid email address.
+func emailRule(name string, val interface{}, ruleVal string) error {
+	if !IsString(val) {
+		panic(fmt.Errorf("%v must be a string to be valdiated with emailRule", name))
+	}
+	ok := IsEmail(toString(val))
+	if !ok {
+		return errors.New(getErrMsg("email", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -545,4 +559,5 @@ func init() {
 	AddRule("lenNotIn", lenNotInRule, "[name]'s length must not be in these values: [ruleVal]")
 	AddRule("regex", regexRule, "[name]'s format is not valid")
 	AddRule("notRegex", notRegexRule, "[name]'s format is not valid")
+	AddRule("email", emailRule, "[name] must be a valid email address")
 }

@@ -2185,3 +2185,60 @@ func Test_notRegexRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_emailRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test emailRule",
+			args: args{
+				name:    "test",
+				val:     "email@email.com",
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test emailRule with non-string value",
+			args: args{
+				name:    "test",
+				val:     55,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test emailRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     "emailemail.com",
+				ruleVal: "",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("emailRule() error = %v, wantPanic %v", e, tt.wantErr)
+				}
+			}()
+			if err := emailRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("emailRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
