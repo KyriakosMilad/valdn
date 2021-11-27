@@ -613,6 +613,6 @@ func init() {
 	AddRule("notRegex", notRegexRule, "[name]'s format is not valid")
 	AddRule("email", emailRule, "[name] must be a valid email address")
 	AddRule("json", jsonRule, "[name] must be a valid json")
-	AddRule("ipv4", jsonRule, "[name] must be a valid ipv4")
-	AddRule("ipv6", jsonRule, "[name] must be a valid ipv6")
+	AddRule("ipv4", ipv4Rule, "[name] must be a valid ipv4")
+	AddRule("ipv6", ipv6Rule, "[name] must be a valid ipv6")
 }
