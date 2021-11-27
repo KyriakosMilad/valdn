@@ -948,3 +948,36 @@ func TestIsCollection(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsEmail(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsEmail",
+			args: args{
+				s: "email@email.com",
+			},
+			want: true,
+		},
+		{
+			name: "test IsEmail with invalid email",
+			args: args{
+				s: "emailemail.com",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsEmail(tt.args.s); got != tt.want {
+				t.Errorf("IsEmail() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
