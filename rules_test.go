@@ -2338,3 +2338,60 @@ func Test_jsonRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_ipv4Rule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test ipv4Rule",
+			args: args{
+				name:    "test",
+				val:     "255.255.255.255",
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test ipv4Rule with non-string value",
+			args: args{
+				name:    "test",
+				val:     1973,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test ipv4Rule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     "1.1.1.1.",
+				ruleVal: "",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ipv4Rule() error = %v, wantPanic %v", e, tt.wantErr)
+				}
+			}()
+			if err := ipv4Rule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("ipv4Rule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
