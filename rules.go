@@ -518,7 +518,7 @@ func notRegexRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
-// emailRule checks if val is not a valid email address.
+// emailRule checks if val is a valid email address.
 // It panics if val is not a string.
 // It returns error if val is not a valid email address.
 func emailRule(name string, val interface{}, ruleVal string) error {
