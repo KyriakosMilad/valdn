@@ -486,7 +486,7 @@ func lenNotInRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val doesn't match ruleVal regular expression.
 func regexRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with regex", name))
+		panic(fmt.Errorf("%v must be a string to be valdiated with regexRule", name))
 	}
 	r, err := regexp.Compile(ruleVal)
 	if err != nil {
@@ -505,7 +505,7 @@ func regexRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val matches ruleVal regular expression.
 func notRegexRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with regex", name))
+		panic(fmt.Errorf("%v must be a string to be valdiated with notRegexRule", name))
 	}
 	r, err := regexp.Compile(ruleVal)
 	if err != nil {
