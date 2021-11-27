@@ -981,3 +981,36 @@ func Test_IsEmail(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsJSON(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsJSON",
+			args: args{
+				s: `{"name":"Ramses", "city":"Tiba"}`,
+			},
+			want: true,
+		},
+		{
+			name: "test IsJSON with unsuitable data",
+			args: args{
+				s: `name:"Ramses`,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsJSON(tt.args.s); got != tt.want {
+				t.Errorf("IsJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
