@@ -227,6 +227,15 @@ func floatRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// ufloatRule checks if val is unsigned float.
+// It returns error if val is not an unsigned float.
+func ufloatRule(name string, val interface{}, ruleVal string) error {
+	if !IsUnsignedFloat(val) {
+		return errors.New(getErrMsg("ufloat", ruleVal, name, val))
+	}
+	return nil
+}
+
 // numericRule checks if val is numeric.
 // It returns error if val is not a numeric.
 func numericRule(name string, val interface{}, ruleVal string) error {
@@ -559,6 +568,7 @@ func init() {
 	AddRule("uint", uintRule, "[name] must be an unsigned integer")
 	AddRule("complex", complexRule, "[name] must be a complex number")
 	AddRule("float", floatRule, "[name] must be a float")
+	AddRule("ufloat", ufloatRule, "[name] must be an unsigned json")
 	AddRule("numeric", numericRule, "[name] must be a numeric")
 	AddRule("between", betweenRule, "[name] must be between [ruleVal]")
 	AddRule("min", minRule, "[name] must be greater than or equal [ruleVal]")

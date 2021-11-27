@@ -842,6 +842,45 @@ func Test_floatRule(t *testing.T) {
 	}
 }
 
+func Test_ufloatRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test ufloat rule",
+			args: args{
+				name:    "price",
+				val:     2.5,
+				ruleVal: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test ufloat rule with unsuitable data",
+			args: args{
+				name:    "price",
+				val:     -1.1,
+				ruleVal: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := ufloatRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("ufloatRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_numericRule(t *testing.T) {
 	type args struct {
 		name    string
