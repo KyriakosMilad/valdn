@@ -1154,3 +1154,36 @@ func Test_IsIP(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsMacAddress(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsMacAddress",
+			args: args{
+				s: "3D:F2:C9:A6:B3:4F",
+			},
+			want: true,
+		},
+		{
+			name: "test IsMacAddress with unsuitable data",
+			args: args{
+				s: "asfgasg.asgas.asg456",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsMacAddress(tt.args.s); got != tt.want {
+				t.Errorf("IsMacAddress() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

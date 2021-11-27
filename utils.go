@@ -265,3 +265,13 @@ func IsIP(s string) bool {
 	}
 	return true
 }
+
+// IsMacAddress reports weather s is a valid MacAddress or not.
+func IsMacAddress(s string) bool {
+	r, _ := regexp.Compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
+	match := r.MatchString(s)
+	if match {
+		return true
+	}
+	return false
+}
