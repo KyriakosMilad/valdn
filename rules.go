@@ -499,6 +499,25 @@ func regexRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// notRegexRule checks if val doesn't match ruleVal regular expression.
+// It panics if val is not a string.
+// It panics if ruleVal is not a valid regular expression.
+// It returns error if val matches ruleVal regular expression.
+func notRegexRule(name string, val interface{}, ruleVal string) error {
+	if !IsString(val) {
+		panic(fmt.Errorf("%v must be a string to be valdiated with regex", name))
+	}
+	r, err := regexp.Compile(ruleVal)
+	if err != nil {
+		panic(fmt.Errorf("%v is not a valid regex", ruleVal))
+	}
+	match := r.MatchString(toString(val))
+	if match {
+		return errors.New(getErrMsg("notRegex", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -525,4 +544,5 @@ func init() {
 	AddRule("lenIn", lenInRule, "[name]'s length must be in these values: [ruleVal]")
 	AddRule("lenNotIn", lenNotInRule, "[name]'s length must not be in these values: [ruleVal]")
 	AddRule("regex", regexRule, "[name]'s format is not valid")
+	AddRule("notRegex", notRegexRule, "[name]'s format is not valid")
 }
