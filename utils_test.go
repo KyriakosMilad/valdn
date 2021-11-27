@@ -1055,7 +1055,7 @@ func Test_IsJSON(t *testing.T) {
 	}
 }
 
-func Test_IsIPV4(t *testing.T) {
+func Test_IsIPv4(t *testing.T) {
 	type args struct {
 		s string
 	}
@@ -1065,14 +1065,14 @@ func Test_IsIPV4(t *testing.T) {
 		want bool
 	}{
 		{
-			name: "test IsIPV4",
+			name: "test IsIPv4",
 			args: args{
 				s: "255.255.255.255",
 			},
 			want: true,
 		},
 		{
-			name: "test IsIPV4 with unsuitable data",
+			name: "test IsIPv4 with unsuitable data",
 			args: args{
 				s: "1.1.1.1.",
 			},
@@ -1081,8 +1081,8 @@ func Test_IsIPV4(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsIPV4(tt.args.s); got != tt.want {
-				t.Errorf("IsIPV4() = %v, want %v", got, tt.want)
+			if got := IsIPv4(tt.args.s); got != tt.want {
+				t.Errorf("IsIPv4() = %v, want %v", got, tt.want)
 			}
 		})
 	}
