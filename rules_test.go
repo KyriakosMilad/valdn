@@ -2242,3 +2242,60 @@ func Test_emailRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_jsonRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test jsonRule",
+			args: args{
+				name:    "test",
+				val:     `{"name":"Ramses", "city":"Tiba"}`,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test jsonRule with non-string value",
+			args: args{
+				name:    "test",
+				val:     1973,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test jsonRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     `name:"Ramses`,
+				ruleVal: "",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("jsonRule() error = %v, wantPanic %v", e, tt.wantErr)
+				}
+			}()
+			if err := jsonRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("jsonRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
