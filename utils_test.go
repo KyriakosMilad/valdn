@@ -815,6 +815,46 @@ func Test_IsFloat(t *testing.T) {
 	}
 }
 
+func Test_IsUnsignedFloat(t *testing.T) {
+	type args struct {
+		val interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsUnsignedFloat",
+			args: args{
+				val: 4.4,
+			},
+			want: true,
+		},
+		{
+			name: "test IsUnsignedFloat with unsuitable data",
+			args: args{
+				val: -1.2,
+			},
+			want: false,
+		},
+		{
+			name: "test IsUnsignedFloat with non-float value",
+			args: args{
+				val: 55,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsUnsignedFloat(tt.args.val); got != tt.want {
+				t.Errorf("IsUnsignedFloat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_IsComplex(t *testing.T) {
 	type args struct {
 		val interface{}

@@ -167,6 +167,20 @@ func IsFloat(val interface{}) bool {
 	}
 }
 
+// IsUnsignedFloat reports weather val is unsigned float or not.
+func IsUnsignedFloat(val interface{}) bool {
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Float32, reflect.Float64:
+		vString := toString(val)
+		if vString[0] != '-' {
+			return true
+		}
+		return false
+	default:
+		return false
+	}
+}
+
 // IsComplex reports weather val is complex number or not.
 func IsComplex(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
