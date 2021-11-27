@@ -452,6 +452,33 @@ func lenInRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// lenNotInRule checks if val's length doesn't equal any item in ruleVal[].
+// It panics if val is not array, slice, map, string, integer or float.
+// It panics if one of ruleVal items is not an integer.
+// It returns error if val's length equals any item in ruleVal[].
+func lenNotInRule(name string, val interface{}, ruleVal string) error {
+	err, vLen := getLen(val)
+	if err != nil {
+		panic(err.Error())
+	}
+	ruleValSpliced := strings.Split(ruleVal, ",")
+	var in bool
+	for _, v := range ruleValSpliced {
+		l, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			panic("length must be an integer")
+		}
+		if vLen == int(l) {
+			in = true
+			break
+		}
+	}
+	if in {
+		return errors.New(getErrMsg("lenNotIn", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -476,4 +503,5 @@ func init() {
 	AddRule("maxLen", maxLenRule, "[name]'s length must be lower than or equal: [ruleVal]")
 	AddRule("lenBetween", lenBetweenRule, "[name]'s length must be between: [ruleVal]")
 	AddRule("lenIn", lenInRule, "[name]'s length must be in these values: [ruleVal]")
+	AddRule("lenNotIn", lenNotInRule, "[name]'s length must not be in these values: [ruleVal]")
 }
