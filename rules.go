@@ -557,7 +557,7 @@ func jsonRule(name string, val interface{}, ruleVal string) error {
 
 // ipv4Rule checks if val is a valid IPv4.
 // It panics if val is not a string.
-// It returns error if val is not a valid json.
+// It returns error if val is not a valid IPv4.
 func ipv4Rule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
 		panic(fmt.Errorf("%v must be a string to be valdiated with ipv4Rule", name))
