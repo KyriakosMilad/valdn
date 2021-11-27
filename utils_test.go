@@ -902,7 +902,7 @@ func Test_IsNumeric(t *testing.T) {
 	}
 }
 
-func TestIsCollection(t *testing.T) {
+func Test_IsCollection(t *testing.T) {
 	type args struct {
 		val interface{}
 	}
