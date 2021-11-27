@@ -232,10 +232,14 @@ func IsJSON(s string) bool {
 
 // IsIPv4 reports weather s is a valid IPv4 or not.
 func IsIPv4(s string) bool {
-	r, _ := regexp.Compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
-	match := r.MatchString(s)
-	if match {
-		return true
+	if net.ParseIP(s) == nil {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
+		case '.':
+			return true
+		}
 	}
 	return false
 }
