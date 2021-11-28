@@ -611,6 +611,20 @@ func macRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// urlRule checks if val is a valid URL.
+// It panics if val is not a string.
+// It returns error if val is not a valid URL.
+func urlRule(name string, val interface{}, ruleVal string) error {
+	if !IsString(val) {
+		panic(fmt.Errorf("%v must be a string to be valdiated with macRule", name))
+	}
+	ok := IsURL(toString(val))
+	if !ok {
+		return errors.New(getErrMsg("url", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -645,4 +659,5 @@ func init() {
 	AddRule("ipv6", ipv6Rule, "[name] must be a valid ipv6")
 	AddRule("ip", ipRule, "[name] must be a valid ip address")
 	AddRule("mac", macRule, "[name] must be a valid mac address")
+	AddRule("url", urlRule, "[name] must be a valid url")
 }
