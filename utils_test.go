@@ -1187,3 +1187,36 @@ func Test_IsMAC(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsURL(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsURL",
+			args: args{
+				s: "presidency.eg",
+			},
+			want: true,
+		},
+		{
+			name: "test IsURL with unsuitable ata",
+			args: args{
+				s: "presidency_eg",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsURL(tt.args.s); got != tt.want {
+				t.Errorf("IsURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

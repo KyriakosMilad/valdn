@@ -275,3 +275,13 @@ func IsMAC(s string) bool {
 	}
 	return false
 }
+
+// IsURL reports weather s is a valid URL or not.
+func IsURL(s string) bool {
+	r, _ := regexp.Compile("[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)")
+	match := r.MatchString(s)
+	if match {
+		return true
+	}
+	return false
+}
