@@ -3,6 +3,7 @@ package validation
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_AddRule(t *testing.T) {
@@ -2619,6 +2620,45 @@ func Test_urlRule(t *testing.T) {
 			}()
 			if err := urlRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
 				t.Errorf("urlRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_timeRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test timeRule",
+			args: args{
+				name:    "createdAt",
+				val:     time.Now(),
+				ruleVal: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test timeRule with unsuitable data",
+			args: args{
+				name:    "createdAt",
+				val:     "6/10/1973",
+				ruleVal: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := timeRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("timeRule() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

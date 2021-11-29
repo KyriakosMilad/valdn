@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type RuleFunc func(fieldName string, fieldValue interface{}, ruleValue string) error
@@ -625,6 +626,15 @@ func urlRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// timeRule checks if val is type of time.Time.
+// It returns error if val is not type of time.Time.
+func timeRule(name string, val interface{}, ruleVal string) error {
+	if _, ok := val.(time.Time); !ok {
+		return errors.New(getErrMsg("time", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -660,4 +670,5 @@ func init() {
 	AddRule("ip", ipRule, "[name] must be a valid ip address")
 	AddRule("mac", macRule, "[name] must be a valid mac address")
 	AddRule("url", urlRule, "[name] must be a valid url")
+	AddRule("time", timeRule, "[name] must be type of time.Time")
 }
