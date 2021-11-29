@@ -645,6 +645,25 @@ func timeFormatRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// timeFormatInRule checks if val's format matches one of ruleVal[].
+// It returns error if val's format doesn't match any of ruleVal[].
+func timeFormatInRule(name string, val interface{}, ruleVal string) error {
+	stringVal := toString(val)
+	ruleValSpliced := strings.Split(ruleVal, ",")
+	in := false
+	for _, v := range ruleValSpliced {
+		_, err := time.Parse(v, stringVal)
+		if err == nil {
+			in = true
+			break
+		}
+	}
+	if !in {
+		return errors.New(getErrMsg("timeFormatIn", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -682,4 +701,5 @@ func init() {
 	AddRule("url", urlRule, "[name] must be a valid url")
 	AddRule("time", timeRule, "[name] must be type of time.Time")
 	AddRule("timeFormat", timeRule, "[name]'s format must match [ruleVal]")
+	AddRule("timeFormatIn", timeRule, "[name]'s format must match on of [ruleVal]")
 }
