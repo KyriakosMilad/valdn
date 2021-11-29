@@ -2663,3 +2663,42 @@ func Test_timeRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_timeFormatRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test timeFormatRule",
+			args: args{
+				name:    "updatedAt",
+				val:     "06/10/1973",
+				ruleVal: "02/01/2006",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test timeFormatRule with unsuitable data",
+			args: args{
+				name:    "updatedAt",
+				val:     "06/13/1973",
+				ruleVal: "02/01/2006",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := timeFormatRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("timeFormatRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
