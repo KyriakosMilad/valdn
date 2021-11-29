@@ -70,8 +70,8 @@ func getRuleInfo(r string) (string, string, RuleFunc, bool) {
 	return rName, rValue, rFunc, rExist
 }
 
-// requiredRule checks if val is empty.
-// It returns error if val IsEmpty().
+// requiredRule checks if val exists, and it's not empty.
+// It returns error if val is not exist or empty.
 func requiredRule(name string, val interface{}, ruleVal string) error {
 	if IsEmpty(val) {
 		return errors.New(getErrMsg("required", ruleVal, name, val))
