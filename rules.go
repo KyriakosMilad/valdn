@@ -696,7 +696,7 @@ func init() {
 	AddRule("uint", uintRule, "[name] must be an unsigned integer")
 	AddRule("complex", complexRule, "[name] must be a complex number")
 	AddRule("float", floatRule, "[name] must be a float")
-	AddRule("ufloat", ufloatRule, "[name] must be an unsigned json")
+	AddRule("ufloat", ufloatRule, "[name] must be an unsigned float")
 	AddRule("numeric", numericRule, "[name] must be a numeric")
 	AddRule("between", betweenRule, "[name] must be between [ruleVal]")
 	AddRule("min", minRule, "[name] must be greater than or equal [ruleVal]")
