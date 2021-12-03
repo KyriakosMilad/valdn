@@ -1,12 +1,17 @@
 package validation
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
 )
+
+const defaultMaxMemory = 32 << 20 // 32 MB
 
 func copyRules(r Rules) Rules {
 	newMap := make(Rules)
@@ -136,4 +141,44 @@ func getLen(v interface{}) (error, int) {
 	default:
 		return fmt.Errorf("can't get length of kind %v", reflect.TypeOf(v).Kind()), 0
 	}
+}
+
+func requestToMap(r *http.Request, rules Rules) map[string]interface{} {
+	reqMap := make(map[string]interface{})
+
+	// parse request by content type
+	contentType := r.Header.Get("Content-Type")
+	switch {
+	case contentType == "application/json":
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
+		err = json.Unmarshal(b, &reqMap)
+		if err != nil {
+			panic(err)
+		}
+	case strings.Contains(contentType, "multipart/form-data"):
+		err := r.ParseMultipartForm(defaultMaxMemory)
+		if err != nil {
+			panic(err)
+		}
+		for k := range rules {
+			// check if field is a file
+			if _, fhs, err := r.FormFile(k); err == nil {
+				reqMap[k] = fhs
+			} else {
+				reqMap[k] = r.Form.Get(k)
+			}
+		}
+	default:
+		err := r.ParseForm()
+		if err != nil {
+			panic(err)
+		}
+		for k := range rules {
+			reqMap[k] = r.Form.Get(k)
+		}
+	}
+	return reqMap
 }
