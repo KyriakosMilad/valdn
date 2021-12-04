@@ -51,6 +51,13 @@ func jsonRequest() *http.Request {
 	return r
 }
 
+func emptyJSONRequest() *http.Request {
+	jsonData := ``
+	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(jsonData))
+	r.Header.Set("Content-Type", "application/json")
+	return r
+}
+
 func paramsRequest() *http.Request {
 	r := httptest.NewRequest(http.MethodGet, "http://example.com?lang=go", strings.NewReader(""))
 	return r
@@ -582,6 +589,7 @@ func Test_requestToMap(t *testing.T) {
 	tests := []struct {
 		name           string
 		args           args
+		wantPanic      bool
 		expectedMapLen int
 	}{
 		{
@@ -590,6 +598,7 @@ func Test_requestToMap(t *testing.T) {
 				r:     formDataRequest(),
 				rules: Rules{"field1": {"required"}, "field2": {"required"}, "file": {"required"}},
 			},
+			wantPanic:      false,
 			expectedMapLen: 3,
 		},
 		{
@@ -598,6 +607,7 @@ func Test_requestToMap(t *testing.T) {
 				r:     urlencodedRequest(),
 				rules: Rules{"lang": {"required"}},
 			},
+			wantPanic:      false,
 			expectedMapLen: 1,
 		},
 		{
@@ -606,6 +616,7 @@ func Test_requestToMap(t *testing.T) {
 				r:     jsonRequest(),
 				rules: Rules{"lang": {"required"}},
 			},
+			wantPanic:      false,
 			expectedMapLen: 1,
 		},
 		{
@@ -614,11 +625,26 @@ func Test_requestToMap(t *testing.T) {
 				r:     paramsRequest(),
 				rules: Rules{"lang": {"required"}},
 			},
+			wantPanic:      false,
 			expectedMapLen: 1,
+		},
+		{
+			name: "test requestToMap with empty json",
+			args: args{
+				r:     emptyJSONRequest(),
+				rules: Rules{"lang": {"required"}},
+			},
+			wantPanic:      true,
+			expectedMapLen: 0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("requestToMap() panic = %v, wantPanic %v", e, tt.wantPanic)
+				}
+			}()
 			got := requestToMap(tt.args.r, tt.args.rules)
 			if len(got) != tt.expectedMapLen {
 				t.Errorf("requestToMap() = %v, length expected %v", got, tt.expectedMapLen)
