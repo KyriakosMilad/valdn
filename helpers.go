@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -200,4 +201,17 @@ func getFileSize(v interface{}) (error, int64) {
 		return nil, f.Size
 	}
 	return fmt.Errorf("%v is not type of *os.File or *multipart.FileHeader", v), 0
+}
+
+func getFileExt(v interface{}) (error, string) {
+	if f, ok := v.(*os.File); ok {
+		if (os.File{}) == *f {
+			return errors.New("can't get extension from empty os.File"), ""
+		}
+		return nil, filepath.Ext(f.Name())
+	}
+	if f, ok := v.(*multipart.FileHeader); ok {
+		return nil, filepath.Ext(f.Filename)
+	}
+	return fmt.Errorf("%v is not type of *os.File or *multipart.FileHeader", v), ""
 }

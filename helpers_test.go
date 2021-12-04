@@ -715,3 +715,55 @@ func Test_getFileSize(t *testing.T) {
 		})
 	}
 }
+
+func Test_getFileExt(t *testing.T) {
+	f, err := os.Open("example.json")
+	if err != nil {
+		panic(err)
+	}
+	type args struct {
+		v interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		wantExt string
+	}{
+		{
+			name: "test getFileExt with multipart.FileHeader",
+			args: args{
+				&multipart.FileHeader{Filename: "example.json"},
+			},
+			wantErr: false,
+			wantExt: ".json",
+		},
+		{
+			name: "test getFileExt with os.File",
+			args: args{
+				f,
+			},
+			wantErr: false,
+			wantExt: ".json",
+		},
+		{
+			name: "test getFileExt with empty os.File",
+			args: args{
+				&os.File{},
+			},
+			wantErr: true,
+			wantExt: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, ext := getFileExt(tt.args.v)
+			if !reflect.DeepEqual(ext, tt.wantExt) {
+				t.Errorf("getFileExt() got = %v, want %v", ext, tt.wantExt)
+			}
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getFileExt() err = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
