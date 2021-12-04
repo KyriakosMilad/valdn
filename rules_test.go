@@ -2868,7 +2868,7 @@ func Test_sizeRule(t *testing.T) {
 			wantPanic: false,
 		},
 		{
-			name: "test sizeRule non-integer ruleVal",
+			name: "test sizeRule with non-integer ruleVal",
 			args: args{
 				name:    "file",
 				val:     multipart.FileHeader{Size: 44},
@@ -2878,11 +2878,11 @@ func Test_sizeRule(t *testing.T) {
 			wantPanic: true,
 		},
 		{
-			name: "test sizeRule non-file val",
+			name: "test sizeRule with non-file val",
 			args: args{
 				name:    "file",
 				val:     "bla bla",
-				ruleVal: "forty",
+				ruleVal: "40",
 			},
 			wantErr:   false,
 			wantPanic: true,
@@ -2935,7 +2935,7 @@ func Test_sizeMinRule(t *testing.T) {
 			wantPanic: false,
 		},
 		{
-			name: "test sizeMinRule non-integer ruleVal",
+			name: "test sizeMinRule with non-integer ruleVal",
 			args: args{
 				name:    "file",
 				val:     multipart.FileHeader{Size: 44},
@@ -2945,11 +2945,11 @@ func Test_sizeMinRule(t *testing.T) {
 			wantPanic: true,
 		},
 		{
-			name: "test sizeMinRule non-file val",
+			name: "test sizeMinRule with non-file val",
 			args: args{
 				name:    "file",
 				val:     "bla bla",
-				ruleVal: "forty",
+				ruleVal: "40",
 			},
 			wantErr:   false,
 			wantPanic: true,
@@ -3002,7 +3002,7 @@ func Test_sizeMaxRule(t *testing.T) {
 			wantPanic: false,
 		},
 		{
-			name: "test sizeMaxRule non-integer ruleVal",
+			name: "test sizeMaxRule with non-integer ruleVal",
 			args: args{
 				name:    "file",
 				val:     multipart.FileHeader{Size: 44},
@@ -3012,11 +3012,11 @@ func Test_sizeMaxRule(t *testing.T) {
 			wantPanic: true,
 		},
 		{
-			name: "test sizeMaxRule non-file val",
+			name: "test sizeMaxRule with non-file val",
 			args: args{
 				name:    "file",
 				val:     "bla bla",
-				ruleVal: "forty",
+				ruleVal: "40",
 			},
 			wantErr:   false,
 			wantPanic: true,
