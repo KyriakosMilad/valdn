@@ -711,6 +711,25 @@ func sizeRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// sizeMinRule checks if val's size greater than or equal ruleVal or not.
+// it panics if val is not a valid file.
+// it panics if ruleVal is not an integer.
+// It returns error if val's size is lower than ruleVal.
+func sizeMinRule(name string, val interface{}, ruleVal string) error {
+	size, err := strconv.ParseInt(ruleVal, 10, 64)
+	if err != nil {
+		panic("size must be an integer")
+	}
+	err, fileSize := getFileSize(val)
+	if err != nil {
+		panic(err)
+	}
+	if fileSize < size {
+		return errors.New(getErrMsg("sizeMin", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -752,4 +771,5 @@ func init() {
 	AddRule("timeFormatNotIn", timeFormatNotInRule, "[name]'s format must not match any of [ruleVal]")
 	AddRule("file", fileRule, "[name] must be a valid file")
 	AddRule("size", sizeRule, "[name]'s size doesn't equal [ruleVal]")
+	AddRule("sizeMin", sizeMinRule, "[name]'s size must be greater than or equal [ruleVal]")
 }

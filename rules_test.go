@@ -2901,3 +2901,70 @@ func Test_sizeRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_sizeMinRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantPanic bool
+		wantErr   bool
+	}{
+		{
+			name: "test sizeMinRule",
+			args: args{
+				name:    "file",
+				val:     multipart.FileHeader{Size: 44},
+				ruleVal: "44",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test sizeMinRule with unsuitable data",
+			args: args{
+				name:    "file",
+				val:     multipart.FileHeader{Size: 44},
+				ruleVal: "45",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+		{
+			name: "test sizeMinRule non-integer ruleVal",
+			args: args{
+				name:    "file",
+				val:     multipart.FileHeader{Size: 44},
+				ruleVal: "forty",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test sizeMinRule non-file val",
+			args: args{
+				name:    "file",
+				val:     "bla bla",
+				ruleVal: "forty",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("sizeMinRule() panic = %v, wantPanic %v", e, tt.wantPanic)
+				}
+			}()
+			if err := sizeMinRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("sizeMinRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
