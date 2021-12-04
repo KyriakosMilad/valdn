@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"mime/multipart"
 	"testing"
 )
 
@@ -1216,6 +1217,39 @@ func Test_IsURL(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsURL(tt.args.s); got != tt.want {
 				t.Errorf("IsURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsFile(t *testing.T) {
+	type args struct {
+		v interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsFile",
+			args: args{
+				v: multipart.FileHeader{Size: 44},
+			},
+			want: true,
+		},
+		{
+			name: "test IsFile with unsuitable data",
+			args: args{
+				v: "bla bla",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsFile(tt.args.v); got != tt.want {
+				t.Errorf("IsFile() = %v, want %v", got, tt.want)
 			}
 		})
 	}

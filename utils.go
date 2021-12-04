@@ -285,3 +285,15 @@ func IsURL(s string) bool {
 	}
 	return false
 }
+
+// IsFile reports weather v is a valid file or not.
+func IsFile(v interface{}) bool {
+	err, size := getFileSize(v)
+	if err != nil {
+		return false
+	}
+	if size > 0 {
+		return true
+	}
+	return false
+}
