@@ -795,6 +795,23 @@ func extRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// notExtRule checks if val's extension does not equal ruleVal.
+// it panics if val is not a valid file.
+// It returns error if val's extension equals ruleVal.
+func notExtRule(name string, val interface{}, ruleVal string) error {
+	err, ext := getFileExt(val)
+	if err != nil {
+		panic(err)
+	}
+	if ruleVal[0] != '.' {
+		ruleVal = "." + ruleVal
+	}
+	if ruleVal == ext {
+		return errors.New(getErrMsg("notExt", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -840,4 +857,5 @@ func init() {
 	AddRule("sizeMax", sizeMaxRule, "[name]'s size must be lower than or equal [ruleVal]")
 	AddRule("sizeBetween", sizeBetweenRule, "[name]'s size must be between [ruleVal]")
 	AddRule("ext", extRule, "[name]'s extension must be [ruleVal]")
+	AddRule("notExt", notExtRule, "[name]'s extension must not be [ruleVal]")
 }
