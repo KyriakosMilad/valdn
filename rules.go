@@ -731,5 +731,5 @@ func init() {
 	AddRule("timeFormat", timeFormatRule, "[name]'s format must match [ruleVal]")
 	AddRule("timeFormatIn", timeFormatInRule, "[name]'s format must match at least one of [ruleVal]")
 	AddRule("timeFormatNotIn", timeFormatNotInRule, "[name]'s format must not match any of [ruleVal]")
-	AddRule("file", timeRule, "[name] must be a valid file")
+	AddRule("file", fileRule, "[name] must be a valid file")
 }
