@@ -1222,7 +1222,7 @@ func Test_IsURL(t *testing.T) {
 	}
 }
 
-func TestIsFile(t *testing.T) {
+func Test_IsFile(t *testing.T) {
 	type args struct {
 		v interface{}
 	}

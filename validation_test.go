@@ -762,7 +762,7 @@ func Test_validation_validateNonExistRequiredFields(t *testing.T) {
 	}
 }
 
-func TestValidateRequest(t *testing.T) {
+func Test_ValidateRequest(t *testing.T) {
 	type args struct {
 		r     *http.Request
 		rules Rules
