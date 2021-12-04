@@ -187,18 +187,18 @@ func requestToMap(r *http.Request, rules Rules) map[string]interface{} {
 
 func getFileSize(v interface{}) (error, int64) {
 	if f, ok := v.(*os.File); ok {
-		fs, err := f.Stat()
+		s, err := f.Stat()
 		if err != nil {
 			return err, 0
 		}
-		return nil, fs.Size()
+		return nil, s.Size()
 	}
 	if f, ok := v.(os.File); ok {
-		fs, err := f.Stat()
+		s, err := f.Stat()
 		if err != nil {
 			return err, 0
 		}
-		return nil, fs.Size()
+		return nil, s.Size()
 	}
 	if f, ok := v.(*multipart.FileHeader); ok {
 		return nil, f.Size
