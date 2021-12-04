@@ -692,6 +692,25 @@ func fileRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// sizeRule checks if val is a file, and it's size equals ruleVal.
+// it panics if val is not a valid file.
+// it panics if ruleVal is not an integer.
+// It returns error if val's size doesn't equal ruleVal.
+func sizeRule(name string, val interface{}, ruleVal string) error {
+	size, err := strconv.ParseInt(ruleVal, 10, 64)
+	if err != nil {
+		panic("size must be an integer")
+	}
+	err, fileSize := getFileSize(val)
+	if err != nil {
+		panic(err)
+	}
+	if size != fileSize {
+		return errors.New(getErrMsg("size", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -732,4 +751,5 @@ func init() {
 	AddRule("timeFormatIn", timeFormatInRule, "[name]'s format must match at least one of [ruleVal]")
 	AddRule("timeFormatNotIn", timeFormatNotInRule, "[name]'s format must not match any of [ruleVal]")
 	AddRule("file", fileRule, "[name] must be a valid file")
+	AddRule("size", sizeRule, "[name]'s size doesn't equal [ruleVal]")
 }
