@@ -2802,7 +2802,7 @@ func Test_fileRule(t *testing.T) {
 			name: "test fileRule with multipart.FileHeaders",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "",
 			},
 			wantErr: false,
@@ -2851,7 +2851,7 @@ func Test_sizeRule(t *testing.T) {
 			name: "test sizeRule",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "44",
 			},
 			wantErr:   false,
@@ -2861,7 +2861,7 @@ func Test_sizeRule(t *testing.T) {
 			name: "test sizeRule with unsuitable data",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "43",
 			},
 			wantErr:   true,
@@ -2871,7 +2871,7 @@ func Test_sizeRule(t *testing.T) {
 			name: "test sizeRule with non-integer ruleVal",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "forty",
 			},
 			wantErr:   false,
@@ -2918,7 +2918,7 @@ func Test_sizeMinRule(t *testing.T) {
 			name: "test sizeMinRule",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "44",
 			},
 			wantErr:   false,
@@ -2928,7 +2928,7 @@ func Test_sizeMinRule(t *testing.T) {
 			name: "test sizeMinRule with unsuitable data",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "45",
 			},
 			wantErr:   true,
@@ -2938,7 +2938,7 @@ func Test_sizeMinRule(t *testing.T) {
 			name: "test sizeMinRule with non-integer ruleVal",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "forty",
 			},
 			wantErr:   false,
@@ -2985,7 +2985,7 @@ func Test_sizeMaxRule(t *testing.T) {
 			name: "test sizeMaxRule",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "44",
 			},
 			wantErr:   false,
@@ -2995,7 +2995,7 @@ func Test_sizeMaxRule(t *testing.T) {
 			name: "test sizeMaxRule with unsuitable data",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "43",
 			},
 			wantErr:   true,
@@ -3005,7 +3005,7 @@ func Test_sizeMaxRule(t *testing.T) {
 			name: "test sizeMaxRule with non-integer ruleVal",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "forty",
 			},
 			wantErr:   false,
@@ -3052,7 +3052,7 @@ func Test_sizeBetweenRule(t *testing.T) {
 			name: "test sizeBetweenRule",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "44,45",
 			},
 			wantErr:   false,
@@ -3062,7 +3062,7 @@ func Test_sizeBetweenRule(t *testing.T) {
 			name: "test sizeBetweenRule with unsuitable data",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "1,40",
 			},
 			wantErr:   true,
@@ -3072,7 +3072,7 @@ func Test_sizeBetweenRule(t *testing.T) {
 			name: "test sizeBetweenRule with unsuitable ruleVal",
 			args: args{
 				name:    "file",
-				val:     multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44},
 				ruleVal: "66",
 			},
 			wantErr:   false,

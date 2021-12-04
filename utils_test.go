@@ -1234,7 +1234,7 @@ func TestIsFile(t *testing.T) {
 		{
 			name: "test IsFile",
 			args: args{
-				v: multipart.FileHeader{Size: 44},
+				v: &multipart.FileHeader{Size: 44},
 			},
 			want: true,
 		},
