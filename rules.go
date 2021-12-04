@@ -751,7 +751,9 @@ func sizeMaxRule(name string, val interface{}, ruleVal string) error {
 
 // sizeBetweenRule checks if val's size is between ruleVal[0] and ruleVal[1].
 // it panics if val is not a valid file.
-// it panics if ruleVal is not an integer.
+// It panics if min or max is not set.
+// It panics if min is not an integer.
+// It panics if max is not an integer.
 // It returns error if val's size is not between ruleVal[0] and ruleVal[1].
 func sizeBetweenRule(name string, val interface{}, ruleVal string) error {
 	err, fileSize := getFileSize(val)
