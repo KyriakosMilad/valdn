@@ -1,6 +1,8 @@
 package validation
 
 import (
+	"mime/multipart"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -2776,6 +2778,58 @@ func Test_timeFormatNotInRule(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := timeFormatNotInRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
 				t.Errorf("timeFormatNotInRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_fileRule(t *testing.T) {
+	f, err := os.Open("example.json")
+	if err != nil {
+		panic(err)
+	}
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test fileRule with multipart.FileHeaders",
+			args: args{
+				name:    "file",
+				val:     multipart.FileHeader{Size: 44},
+				ruleVal: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test fileRule with os.File",
+			args: args{
+				name:    "file",
+				val:     f,
+				ruleVal: "",
+			},
+			wantErr: false,
+		},
+		{
+			name: "test fileRule with unsuitable data",
+			args: args{
+				name:    "file",
+				val:     "bal bla",
+				ruleVal: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := fileRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("fileRule() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

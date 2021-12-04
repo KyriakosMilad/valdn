@@ -683,6 +683,15 @@ func timeFormatNotInRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// fileRule checks if val is a valid file.
+// It returns error if val is not a valid file.
+func fileRule(name string, val interface{}, ruleVal string) error {
+	if !IsFile(val) {
+		return errors.New(getErrMsg("file", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -722,4 +731,5 @@ func init() {
 	AddRule("timeFormat", timeFormatRule, "[name]'s format must match [ruleVal]")
 	AddRule("timeFormatIn", timeFormatInRule, "[name]'s format must match at least one of [ruleVal]")
 	AddRule("timeFormatNotIn", timeFormatNotInRule, "[name]'s format must not match any of [ruleVal]")
+	AddRule("file", timeRule, "[name] must be a valid file")
 }
