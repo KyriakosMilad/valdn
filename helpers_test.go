@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -653,6 +654,63 @@ func Test_requestToMap(t *testing.T) {
 				if _, ok := got["file"].(*multipart.FileHeader); !ok {
 					t.Errorf("requestToMap() = %v, can't parse file field", got)
 				}
+			}
+		})
+	}
+}
+
+func Test_getFileSize(t *testing.T) {
+	f, err := os.Open("example.json")
+	if err != nil {
+		panic(err)
+	}
+	stat, err := f.Stat()
+	if err != nil {
+		panic(err)
+	}
+	s := stat.Size()
+	type args struct {
+		v interface{}
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantErr  bool
+		wantSize int64
+	}{
+		{
+			name: "test getFileSize with multipart.FileHeader",
+			args: args{
+				&multipart.FileHeader{Size: 44},
+			},
+			wantErr:  false,
+			wantSize: 44,
+		},
+		{
+			name: "test getFileSize with os.File",
+			args: args{
+				f,
+			},
+			wantErr:  false,
+			wantSize: s,
+		},
+		{
+			name: "test getFileSize with empty os.File",
+			args: args{
+				os.File{},
+			},
+			wantErr:  true,
+			wantSize: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err, size := getFileSize(tt.args.v)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getFileSize() err = %v, wantErr %v", err, tt.wantErr)
+			}
+			if size != tt.wantSize {
+				t.Errorf("getFileSize() size = %v, want %v", size, tt.wantSize)
 			}
 		})
 	}

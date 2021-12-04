@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -181,4 +183,28 @@ func requestToMap(r *http.Request, rules Rules) map[string]interface{} {
 		}
 	}
 	return reqMap
+}
+
+func getFileSize(v interface{}) (error, int64) {
+	if f, ok := v.(*os.File); ok {
+		fs, err := f.Stat()
+		if err != nil {
+			return err, 0
+		}
+		return nil, fs.Size()
+	}
+	if f, ok := v.(os.File); ok {
+		fs, err := f.Stat()
+		if err != nil {
+			return err, 0
+		}
+		return nil, fs.Size()
+	}
+	if f, ok := v.(*multipart.FileHeader); ok {
+		return nil, f.Size
+	}
+	if f, ok := v.(multipart.FileHeader); ok {
+		return nil, f.Size
+	}
+	return fmt.Errorf("%v is not a file", v), 0
 }
