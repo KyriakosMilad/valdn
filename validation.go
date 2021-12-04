@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 )
@@ -97,6 +98,17 @@ func ValidateJson(val string, rules Rules) Errors {
 	}
 
 	return ValidateNested(jsonMap, rules)
+}
+
+// ValidateRequest validates request by rules and return Errors.
+// It validates request of content type: multipart/form-data, application/json and application/x-www-form-urlencoded.
+// It validates url parameters.
+// It panics if body is not compatible with header content type.
+// It panics if one of the rules is not registered.
+// If an error is found it will not check the rest of the field's rules and continue to the next field.
+func ValidateRequest(r *http.Request, rules Rules) Errors {
+	reqMap := requestToMap(r, rules)
+	return ValidateNested(reqMap, rules)
 }
 
 func (v *validation) registerField(name string) {

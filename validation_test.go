@@ -2,6 +2,7 @@ package validation
 
 import (
 	"errors"
+	"net/http"
 	"reflect"
 	"testing"
 )
@@ -756,6 +757,95 @@ func Test_validation_validateNonExistRequiredFields(t *testing.T) {
 			v.validateNonExistRequiredFields()
 			if len(v.errors) != tt.expectedErrorsCount {
 				t.Errorf("validateNonExistRequiredFields() errors = %v len = %v, want %v", v.errors, len(v.errors), tt.expectedErrorsCount)
+			}
+		})
+	}
+}
+
+func TestValidateRequest(t *testing.T) {
+	type args struct {
+		r     *http.Request
+		rules Rules
+	}
+	tests := []struct {
+		name                string
+		args                args
+		expectedErrorsCount int
+		wantPanic           bool
+	}{
+		{
+			name: "test requestToMap with multipart/form-data",
+			args: args{
+				r:     formDataRequest(),
+				rules: Rules{"field1": {"required"}, "field2": {"required"}, "file": {"required"}},
+			},
+			wantPanic:           false,
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test requestToMap with application/x-www-form-urlencoded",
+			args: args{
+				r:     urlencodedRequest(),
+				rules: Rules{"lang": {"required"}},
+			},
+			wantPanic:           false,
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test requestToMap with application/json",
+			args: args{
+				r:     jsonRequest(),
+				rules: Rules{"lang": {"required"}},
+			},
+			wantPanic:           false,
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test requestToMap with url params",
+			args: args{
+				r:     paramsRequest(),
+				rules: Rules{"lang": {"required"}},
+			},
+			wantPanic:           false,
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test requestToMap with empty json",
+			args: args{
+				r:     emptyJSONRequest(),
+				rules: Rules{"lang": {"required"}},
+			},
+			wantPanic:           true,
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test requestToMap with unsuitable data",
+			args: args{
+				r:     formDataRequest(),
+				rules: Rules{"lang": {"required"}},
+			},
+			wantPanic:           false,
+			expectedErrorsCount: 1,
+		},
+		{
+			name: "test requestToMap with rule does not exist",
+			args: args{
+				r:     formDataRequest(),
+				rules: Rules{"lang": {"bla bla"}},
+			},
+			wantPanic:           true,
+			expectedErrorsCount: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ValidateRequest() panic = %v, wantPanic %v", e, tt.wantPanic)
+				}
+			}()
+			if got := ValidateRequest(tt.args.r, tt.args.rules); len(got) != tt.expectedErrorsCount {
+				t.Errorf("ValidateRequest() = %v, erros count expected %v", got, tt.expectedErrorsCount)
 			}
 		})
 	}
