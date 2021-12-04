@@ -749,6 +749,33 @@ func sizeMaxRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// sizeBetweenRule checks if val's size is between ruleVal[0] and ruleVal[1].
+// it panics if val is not a valid file.
+// it panics if ruleVal is not an integer.
+// It returns error if val's size is not between ruleVal[0] and ruleVal[1].
+func sizeBetweenRule(name string, val interface{}, ruleVal string) error {
+	err, fileSize := getFileSize(val)
+	if err != nil {
+		panic(err)
+	}
+	ruleValSpliced := strings.Split(ruleVal, ",")
+	if len(ruleValSpliced) != 2 {
+		panic(fmt.Errorf("sizeBetweenRule expects two integer values as min and max, got: %v", len(ruleValSpliced)))
+	}
+	min, err := strconv.ParseInt(ruleValSpliced[0], 10, 64)
+	if err != nil {
+		panic(fmt.Errorf("sizeBetweenRule: min must be an integer, got: %v", ruleValSpliced[0]))
+	}
+	max, err := strconv.ParseInt(ruleValSpliced[1], 10, 64)
+	if err != nil {
+		panic(fmt.Errorf("sizeBetweenRule: max must be an integer, got: %v", ruleValSpliced[1]))
+	}
+	if fileSize < min || fileSize > max {
+		return errors.New(getErrMsg("sizeBetween", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -792,4 +819,5 @@ func init() {
 	AddRule("size", sizeRule, "[name]'s size doesn't equal [ruleVal]")
 	AddRule("sizeMin", sizeMinRule, "[name]'s size must be greater than or equal [ruleVal]")
 	AddRule("sizeMax", sizeMaxRule, "[name]'s size must be lower than or equal [ruleVal]")
+	AddRule("sizeBetween", sizeBetweenRule, "[name]'s size must be between [ruleVal]")
 }

@@ -3035,3 +3035,70 @@ func Test_sizeMaxRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_sizeBetweenRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantPanic bool
+		wantErr   bool
+	}{
+		{
+			name: "test sizeBetweenRule",
+			args: args{
+				name:    "file",
+				val:     multipart.FileHeader{Size: 44},
+				ruleVal: "44,45",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test sizeBetweenRule with unsuitable data",
+			args: args{
+				name:    "file",
+				val:     multipart.FileHeader{Size: 44},
+				ruleVal: "1,40",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+		{
+			name: "test sizeBetweenRule with unsuitable ruleVal",
+			args: args{
+				name:    "file",
+				val:     multipart.FileHeader{Size: 44},
+				ruleVal: "66",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test sizeBetweenRule with non-file val",
+			args: args{
+				name:    "file",
+				val:     "bla bla",
+				ruleVal: "40,55",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("sizeBetweenRule() panic = %v, wantPanic %v", e, tt.wantPanic)
+				}
+			}()
+			if err := sizeBetweenRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("sizeBetweenRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
