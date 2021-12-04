@@ -692,7 +692,7 @@ func fileRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
-// sizeRule checks if val is a file, and it's size equals ruleVal.
+// sizeRule checks if val's size equals ruleVal.
 // it panics if val is not a valid file.
 // it panics if ruleVal is not an integer.
 // It returns error if val's size doesn't equal ruleVal.
