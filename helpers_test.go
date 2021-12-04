@@ -697,7 +697,7 @@ func Test_getFileSize(t *testing.T) {
 		{
 			name: "test getFileSize with empty os.File",
 			args: args{
-				os.File{},
+				&os.File{},
 			},
 			wantErr:  true,
 			wantSize: 0,

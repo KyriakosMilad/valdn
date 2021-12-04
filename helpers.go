@@ -187,13 +187,9 @@ func requestToMap(r *http.Request, rules Rules) map[string]interface{} {
 
 func getFileSize(v interface{}) (error, int64) {
 	if f, ok := v.(*os.File); ok {
-		s, err := f.Stat()
-		if err != nil {
-			return err, 0
+		if (os.File{}) == *f {
+			return errors.New("can't get size from empty os.File"), 0
 		}
-		return nil, s.Size()
-	}
-	if f, ok := v.(os.File); ok {
 		s, err := f.Stat()
 		if err != nil {
 			return err, 0
@@ -203,8 +199,5 @@ func getFileSize(v interface{}) (error, int64) {
 	if f, ok := v.(*multipart.FileHeader); ok {
 		return nil, f.Size
 	}
-	if f, ok := v.(multipart.FileHeader); ok {
-		return nil, f.Size
-	}
-	return fmt.Errorf("%v is not a file", v), 0
+	return fmt.Errorf("%v is not type of *os.File or *multipart.FileHeader", v), 0
 }
