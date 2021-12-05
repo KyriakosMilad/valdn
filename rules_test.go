@@ -3216,3 +3216,60 @@ func Test_notExtRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_extInRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantPanic bool
+		wantErr   bool
+	}{
+		{
+			name: "test extInRule",
+			args: args{
+				name:    "file",
+				val:     &multipart.FileHeader{Filename: "example.json"},
+				ruleVal: ".html,json,.go",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test extInRule with unsuitable data",
+			args: args{
+				name:    "file",
+				val:     &multipart.FileHeader{Filename: "example.md"},
+				ruleVal: ".html,.json,.go",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+		{
+			name: "test extInRule with non-file val",
+			args: args{
+				name:    "file",
+				val:     "bla bla",
+				ruleVal: ".json",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("extInRule() panic = %v, wantPanic %v", e, tt.wantPanic)
+				}
+			}()
+			if err := extInRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("extInRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
