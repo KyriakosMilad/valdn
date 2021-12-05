@@ -837,6 +837,31 @@ func extInRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// extNotInRule checks if val's extension doesn't equal one of ruleVal[] items.
+// It panics if val is not a valid file.
+// It returns error if val's extension equals any item in ruleVal[].
+func extNotInRule(name string, val interface{}, ruleVal string) error {
+	err, ext := getFileExt(val)
+	if err != nil {
+		panic(err)
+	}
+	ruleValSpliced := strings.Split(ruleVal, ",")
+	var in bool
+	for _, v := range ruleValSpliced {
+		if v[0] != '.' {
+			v = "." + v
+		}
+		if v == ext {
+			in = true
+			break
+		}
+	}
+	if in {
+		return errors.New(getErrMsg("extNotIn", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -884,4 +909,5 @@ func init() {
 	AddRule("ext", extRule, "[name]'s extension must be [ruleVal]")
 	AddRule("notExt", notExtRule, "[name]'s extension must not be [ruleVal]")
 	AddRule("extIn", extInRule, "[name]'s extension must be one of [ruleVal]")
+	AddRule("extNotIn", extNotInRule, "[name]'s extension must not be one of [ruleVal]")
 }
