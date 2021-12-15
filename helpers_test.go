@@ -2,67 +2,11 @@ package validation
 
 import (
 	"fmt"
-	"io"
 	"mime/multipart"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
 )
-
-func formDataRequest() *http.Request {
-	postData :=
-		`--xxx
-Content-Disposition: form-data; name="field1"
-
-value1
---xxx
-Content-Disposition: form-data; name="field2"
-
-value2
---xxx
-Content-Disposition: form-data; name="file"; filename="file"
-Content-Type: application/json
-Content-Transfer-Encoding: binary
-
-binary data
---xxx--
-`
-	req := &http.Request{
-		Method: "POST",
-		Header: http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}},
-		Body:   io.NopCloser(strings.NewReader(postData)),
-	}
-
-	return req
-}
-
-func urlencodedRequest() *http.Request {
-	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("lang=go"))
-	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	return r
-}
-
-func jsonRequest() *http.Request {
-	jsonData := `{"lang":"go"}`
-	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(jsonData))
-	r.Header.Set("Content-Type", "application/json")
-	return r
-}
-
-func emptyJSONRequest() *http.Request {
-	jsonData := ``
-	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(jsonData))
-	r.Header.Set("Content-Type", "application/json")
-	return r
-}
-
-func paramsRequest() *http.Request {
-	r := httptest.NewRequest(http.MethodGet, "http://example.com?lang=go", strings.NewReader(""))
-	return r
-}
 
 func Test_copyRules(t *testing.T) {
 	type args struct {
@@ -577,83 +521,6 @@ func Test_getLen(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("getLen() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_requestToMap(t *testing.T) {
-	type args struct {
-		r     *http.Request
-		rules Rules
-	}
-	tests := []struct {
-		name           string
-		args           args
-		wantPanic      bool
-		expectedMapLen int
-	}{
-		{
-			name: "test requestToMap with multipart/form-data",
-			args: args{
-				r:     formDataRequest(),
-				rules: Rules{"field1": {"required"}, "field2": {"required"}, "file": {"required"}},
-			},
-			wantPanic:      false,
-			expectedMapLen: 3,
-		},
-		{
-			name: "test requestToMap with application/x-www-form-urlencoded",
-			args: args{
-				r:     urlencodedRequest(),
-				rules: Rules{"lang": {"required"}},
-			},
-			wantPanic:      false,
-			expectedMapLen: 1,
-		},
-		{
-			name: "test requestToMap with application/json",
-			args: args{
-				r:     jsonRequest(),
-				rules: Rules{"lang": {"required"}},
-			},
-			wantPanic:      false,
-			expectedMapLen: 1,
-		},
-		{
-			name: "test requestToMap with url params",
-			args: args{
-				r:     paramsRequest(),
-				rules: Rules{"lang": {"required"}},
-			},
-			wantPanic:      false,
-			expectedMapLen: 1,
-		},
-		{
-			name: "test requestToMap with empty json",
-			args: args{
-				r:     emptyJSONRequest(),
-				rules: Rules{"lang": {"required"}},
-			},
-			wantPanic:      true,
-			expectedMapLen: 0,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
-					t.Errorf("requestToMap() panic = %v, wantPanic %v", e, tt.wantPanic)
-				}
-			}()
-			got := requestToMap(tt.args.r, tt.args.rules)
-			if len(got) != tt.expectedMapLen {
-				t.Errorf("requestToMap() = %v, length expected %v", got, tt.expectedMapLen)
-			}
-			if strings.Contains(tt.args.r.Header.Get("Content-Type"), "multipart/form-data") {
-				if _, ok := got["file"].(*multipart.FileHeader); !ok {
-					t.Errorf("requestToMap() = %v, can't parse file field", got)
-				}
 			}
 		})
 	}

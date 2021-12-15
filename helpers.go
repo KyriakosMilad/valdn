@@ -1,20 +1,15 @@
 package validation
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"mime/multipart"
-	"net/http"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
 )
-
-const defaultMaxMemory = 32 << 20 // 32 MB
 
 func copyRules(r Rules) Rules {
 	newMap := make(Rules)
@@ -43,6 +38,14 @@ func makeParentNameJoinable(name string) string {
 	return name
 }
 
+func getParentName(name string) string {
+	nameSpliced := strings.Split(name, ".")
+	if len(nameSpliced) > 1 {
+		return strings.Join(nameSpliced[:len(nameSpliced)-1], ".")
+	}
+	return ""
+}
+
 func getStructFieldInfo(number int, parTyp reflect.Type, parVal reflect.Value, parName string) (string, reflect.Type, reflect.Value) {
 	field := parTyp.Field(number)
 	name := parName + field.Name
@@ -60,6 +63,16 @@ func convertInterfaceToMap(value interface{}) map[string]interface{} {
 		}
 	}
 	return newMap
+}
+
+func convertInterfaceToSlice(value interface{}) []interface{} {
+	var s []interface{}
+	if val, ok := value.([]interface{}); ok {
+		for _, v := range val {
+			s = append(s, v)
+		}
+	}
+	return s
 }
 
 // stringToFloat converts val to float64.
@@ -144,46 +157,6 @@ func getLen(v interface{}) (error, int) {
 	default:
 		return fmt.Errorf("can't get length of kind %v", reflect.TypeOf(v).Kind()), 0
 	}
-}
-
-func requestToMap(r *http.Request, rules Rules) map[string]interface{} {
-	reqMap := make(map[string]interface{})
-
-	// parse request by content type
-	contentType := r.Header.Get("Content-Type")
-	switch {
-	case contentType == "application/json":
-		b, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			panic(err)
-		}
-		err = json.Unmarshal(b, &reqMap)
-		if err != nil {
-			panic(err)
-		}
-	case strings.Contains(contentType, "multipart/form-data"):
-		err := r.ParseMultipartForm(defaultMaxMemory)
-		if err != nil {
-			panic(err)
-		}
-		for k := range rules {
-			// check if field is a file
-			if _, fhs, err := r.FormFile(k); err == nil {
-				reqMap[k] = fhs
-			} else {
-				reqMap[k] = r.Form.Get(k)
-			}
-		}
-	default:
-		err := r.ParseForm()
-		if err != nil {
-			panic(err)
-		}
-		for k := range rules {
-			reqMap[k] = r.Form.Get(k)
-		}
-	}
-	return reqMap
 }
 
 func getFileSize(v interface{}) (error, int64) {

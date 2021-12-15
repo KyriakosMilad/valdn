@@ -844,7 +844,7 @@ func Test_ValidateRequest(t *testing.T) {
 		wantPanic           bool
 	}{
 		{
-			name: "test requestToMap with multipart/form-data",
+			name: "test ValidateRequest with multipart/form-data",
 			args: args{
 				r:     formDataRequest(),
 				rules: Rules{"field1": {"required"}, "field2": {"required"}, "file": {"required"}},
@@ -853,7 +853,7 @@ func Test_ValidateRequest(t *testing.T) {
 			expectedErrorsCount: 0,
 		},
 		{
-			name: "test requestToMap with application/x-www-form-urlencoded",
+			name: "test ValidateRequest with application/x-www-form-urlencoded",
 			args: args{
 				r:     urlencodedRequest(),
 				rules: Rules{"lang": {"required"}},
@@ -862,7 +862,7 @@ func Test_ValidateRequest(t *testing.T) {
 			expectedErrorsCount: 0,
 		},
 		{
-			name: "test requestToMap with application/json",
+			name: "test ValidateRequest with application/json",
 			args: args{
 				r:     jsonRequest(),
 				rules: Rules{"lang": {"required"}},
@@ -871,7 +871,7 @@ func Test_ValidateRequest(t *testing.T) {
 			expectedErrorsCount: 0,
 		},
 		{
-			name: "test requestToMap with url params",
+			name: "test ValidateRequest with url params",
 			args: args{
 				r:     paramsRequest(),
 				rules: Rules{"lang": {"required"}},
@@ -880,7 +880,7 @@ func Test_ValidateRequest(t *testing.T) {
 			expectedErrorsCount: 0,
 		},
 		{
-			name: "test requestToMap with empty json",
+			name: "test ValidateRequest with empty json",
 			args: args{
 				r:     emptyJSONRequest(),
 				rules: Rules{"lang": {"required"}},
@@ -889,7 +889,7 @@ func Test_ValidateRequest(t *testing.T) {
 			expectedErrorsCount: 0,
 		},
 		{
-			name: "test requestToMap with unsuitable data",
+			name: "test ValidateRequest with unsuitable data",
 			args: args{
 				r:     formDataRequest(),
 				rules: Rules{"lang": {"required"}},
@@ -898,7 +898,7 @@ func Test_ValidateRequest(t *testing.T) {
 			expectedErrorsCount: 1,
 		},
 		{
-			name: "test requestToMap with rule does not exist",
+			name: "test ValidateRequest with rule does not exist",
 			args: args{
 				r:     formDataRequest(),
 				rules: Rules{"lang": {"bla bla"}},

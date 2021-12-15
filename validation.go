@@ -110,9 +110,9 @@ func ValidateJson(val string, rules Rules) Errors {
 // It panics if body is not compatible with header content type.
 // It panics if one of the rules is not registered.
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
-func ValidateRequest(r *http.Request, rules Rules) Errors {
-	reqMap := requestToMap(r, rules)
-	return ValidateNested(reqMap, rules)
+func ValidateRequest(hr *http.Request, rules Rules) Errors {
+	r := &request{rules, hr, make(map[string]interface{})}
+	return ValidateNested(r.parse(), rules)
 }
 
 func (v *validation) registerField(name string) {
