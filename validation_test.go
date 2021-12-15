@@ -304,12 +304,60 @@ func Test_validation_getFieldRules(t *testing.T) {
 			args:               args{fieldName: "test"},
 			rulesCountExpected: 2,
 		},
+		{
+			name:               "test get field rules using .*",
+			fields:             fields{rules: Rules{"parent.*": {"required", "king:string"}}},
+			args:               args{fieldName: "parent.test"},
+			rulesCountExpected: 2,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(tt.fields.rules)
 			if fieldRules := v.getFieldRules(tt.args.fieldName); len(fieldRules) != tt.rulesCountExpected {
 				t.Errorf("getFieldRules() error getting field rules, got = %v, want %v", len(fieldRules), tt.rulesCountExpected)
+			}
+		})
+	}
+}
+
+func Test_validation_getParentRules(t *testing.T) {
+	type fields struct {
+		rules Rules
+	}
+	type args struct {
+		fieldName string
+	}
+	tests := []struct {
+		name               string
+		fields             fields
+		args               args
+		rulesCountExpected int
+	}{
+		{
+			name:               "test get parent rules",
+			fields:             fields{rules: Rules{"test": {"required", "king:string"}}},
+			args:               args{fieldName: "test"},
+			rulesCountExpected: 2,
+		},
+		{
+			name:               "test get parent rules using .*",
+			fields:             fields{rules: Rules{"parent.*": {"required", "king:string"}}},
+			args:               args{fieldName: "parent.test"},
+			rulesCountExpected: 2,
+		},
+		{
+			name:               "test get parent rules with empty name",
+			fields:             fields{rules: Rules{"parent.*": {"required", "king:string"}}},
+			args:               args{fieldName: ""},
+			rulesCountExpected: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := createNewValidation(tt.fields.rules)
+			if fieldRules := v.getParentRules(tt.args.fieldName); len(fieldRules) != tt.rulesCountExpected {
+				t.Errorf("getParentRules() error getting parent rules, got = %v, want %v", len(fieldRules), tt.rulesCountExpected)
 			}
 		})
 	}

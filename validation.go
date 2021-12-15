@@ -122,7 +122,23 @@ func (v *validation) addError(name string, err error) {
 }
 
 func (v *validation) getFieldRules(name string) []string {
-	return v.rules[name]
+	if val, ok := v.rules[name]; ok {
+		return val
+	} else {
+		return v.rules[getParentName(name)+".*"]
+	}
+}
+
+func (v *validation) getParentRules(name string) []string {
+	if val, ok := v.rules[name]; ok {
+		return val
+	} else {
+		if name != "" {
+			return v.rules[getParentName(name)+".*"]
+		} else {
+			return []string{}
+		}
+	}
 }
 
 // addTagRules gets rules from struct tag for every field and adds them to field rules if field has no rules.
@@ -162,9 +178,9 @@ func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string
 }
 
 func (v *validation) validateStruct(val interface{}, name string) {
-	rules := v.getFieldRules(name)
+	r := v.getParentRules(name)
 
-	err := Validate(name, val, rules)
+	err := Validate(name, val, r)
 	if err != nil {
 		v.addError(name, err)
 		return
@@ -177,10 +193,10 @@ func (v *validation) validateStruct(val interface{}, name string) {
 
 func (v *validation) validateMap(val interface{}, name string) {
 	if !reflect.DeepEqual(reflect.TypeOf(val), reflect.TypeOf(map[string]interface{}{})) {
-		panic(fmt.Errorf("error validating %v: type %v is not supported", name, reflect.TypeOf(val)))
+		panic(fmt.Errorf("error validating %v: type %T is not supported", name, val))
 	}
 
-	r := v.getFieldRules(name)
+	r := v.getParentRules(name)
 	err := Validate(name, val, r)
 	if err != nil {
 		v.addError(name, err)
