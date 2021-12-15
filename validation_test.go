@@ -650,6 +650,28 @@ func Test_validation_validateByType(t *testing.T) {
 			expectedErrorsCount: 1,
 		},
 		{
+			name: "test validate by type - slice",
+			args: args{
+				name:        "Parent",
+				typ:         reflect.TypeOf([]interface{}{}),
+				val:         []interface{}{"Pola"},
+				rules:       Rules{"Parent.0": {"kind:string"}},
+				fieldsExist: map[string]bool{"Parent.0": true},
+			},
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test validate by slice - slice with unsuitable data",
+			args: args{
+				name:        "Parent",
+				typ:         reflect.TypeOf([]interface{}{}),
+				val:         []interface{}{"Pola"},
+				rules:       Rules{"Parent.0": {"kind:int"}},
+				fieldsExist: map[string]bool{"Parent.0": true},
+			},
+			expectedErrorsCount: 1,
+		},
+		{
 			name: "test validate by type - field",
 			args: args{
 				name:        "age",
@@ -894,6 +916,138 @@ func Test_ValidateRequest(t *testing.T) {
 			}()
 			if got := ValidateRequest(tt.args.r, tt.args.rules); len(got) != tt.expectedErrorsCount {
 				t.Errorf("ValidateRequest() = %v, erros count expected %v", got, tt.expectedErrorsCount)
+			}
+		})
+	}
+}
+
+func Test_validation_validateSlice(t *testing.T) {
+	type User struct {
+		Name int
+	}
+	type args struct {
+		val   []interface{}
+		rules Rules
+	}
+	tests := []struct {
+		name                string
+		args                args
+		expectedErrorsCount int
+		wantPanic           bool
+	}{
+		{
+			name: "test validate slice",
+			args: args{
+				val:   []interface{}{"Ramses"},
+				rules: Rules{".*": {"required", "kind:string"}},
+			},
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test validate slice with unsuitable data",
+			args: args{
+				val:   []interface{}{"Ramses"},
+				rules: Rules{"0": {"required", "kind:int"}},
+			},
+			expectedErrorsCount: 1,
+		},
+		{
+			name: "test validate nested slice",
+			args: args{
+				val:   []interface{}{[]interface{}{"Egypt"}},
+				rules: Rules{".*": {"kind:slice"}, "0.*": {"kind:string"}},
+			},
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test validate nested slice with unsuitable data",
+			args: args{
+				val:   []interface{}{[]interface{}{1973}},
+				rules: Rules{".*": {"kind:slice"}, "0.*": {"kind:string"}},
+			},
+			expectedErrorsCount: 1,
+		},
+		{
+			name: "test validate nested slice with unsuitable type",
+			args: args{
+				val:   []interface{}{[]string{"Mina"}},
+				rules: Rules{"*": {"required"}},
+			},
+			expectedErrorsCount: 0,
+			wantPanic:           true,
+		},
+		{
+			name: "test validate slice containing map",
+			args: args{
+				val:   []interface{}{map[string]interface{}{"user": 1973}},
+				rules: Rules{".*": {"required"}, "0.Name": {"required"}},
+			},
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test validate slice containing struct",
+			args: args{
+				val:   []interface{}{User{Name: 1973}},
+				rules: Rules{".*": {"required"}, "0.Name": {"required", "kind:string"}},
+			},
+			expectedErrorsCount: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("validateSlice() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			v := createNewValidation(tt.args.rules)
+			v.validateSlice(tt.args.val, "")
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("validateSlice() errors = %v, wantValidationErrors %v, args %v", v.errors, tt.expectedErrorsCount, tt.args)
+			}
+		})
+	}
+}
+
+func Test_validation_validateSliceFields(t *testing.T) {
+	type args struct {
+		val     []interface{}
+		parName string
+		rules   Rules
+		errors  map[string]string
+	}
+	tests := []struct {
+		name                string
+		args                args
+		expectedErrorsCount int
+	}{
+		{
+			name: "test validate map fields",
+			args: args{
+				val:     []interface{}{"Pola"},
+				parName: "",
+				rules:   Rules{"Parent.0": {"required"}},
+				errors:  map[string]string{},
+			},
+			expectedErrorsCount: 0,
+		},
+		{
+			name: "test validate map fields with unsuitable data",
+			args: args{
+				val:     []interface{}{"Pola"},
+				parName: "Parent",
+				rules:   Rules{"Parent.0": {"kind:int"}},
+				errors:  map[string]string{},
+			},
+			expectedErrorsCount: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := createNewValidation(tt.args.rules)
+			v.validateSliceFields(tt.args.val, tt.args.parName)
+			if len(v.errors) != tt.expectedErrorsCount {
+				t.Errorf("validateSliceFields() errors = %v, expectedErrorsCount %v, args %v", v.errors, tt.expectedErrorsCount, tt.args)
 			}
 		})
 	}

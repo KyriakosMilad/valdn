@@ -67,18 +67,20 @@ func Validate(name string, val interface{}, rules []string) error {
 // It panics if one of the fields is a map and it's type is not map[string]interface{}.
 func ValidateNested(val interface{}, rules Rules) Errors {
 	v := createNewValidation(rules)
-
 	t := reflect.TypeOf(val)
-
-	v.addTagRules(val, t, "")
 
 	switch {
 	case IsStruct(val):
+		v.addTagRules(val, t, "")
 		v.validateStruct(val, "")
 	case IsMap(val):
+		v.addTagRules(val, t, "")
 		v.validateMap(convertInterfaceToMap(val), "")
+	case IsSlice(val):
+		v.addTagRules(val, t, "")
+		v.validateSlice(convertInterfaceToSlice(val), "")
 	default:
-		panic("ValidateNested() can only validate struct and map ")
+		panic("ValidateNested() can only validate struct, map and slice")
 	}
 
 	v.validateNonExistRequiredFields()
@@ -154,6 +156,15 @@ func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string
 		}
 	}
 
+	if s, ok := val.([]interface{}); ok {
+		for k, i := range s {
+			switch {
+			case IsStruct(i), IsMap(i), IsSlice(i):
+				v.addTagRules(i, reflect.TypeOf(i), parName+toString(k))
+			}
+		}
+	}
+
 	if t.Kind() == reflect.Struct {
 		for i := 0; i < t.NumField(); i++ {
 			f := t.Field(i)
@@ -206,6 +217,21 @@ func (v *validation) validateMap(val interface{}, name string) {
 	v.validateMapFields(convertInterfaceToMap(val), name)
 }
 
+func (v *validation) validateSlice(val interface{}, name string) {
+	if !reflect.DeepEqual(reflect.TypeOf(val), reflect.TypeOf([]interface{}{})) {
+		panic(fmt.Errorf("error validating %v: type %T is not supported", name, val))
+	}
+
+	r := v.getParentRules(name)
+	err := Validate(name, val, r)
+	if err != nil {
+		v.addError(name, err)
+		return
+	}
+
+	v.validateSliceFields(convertInterfaceToSlice(val), name)
+}
+
 func (v *validation) validateByType(name string, t reflect.Type, val interface{}) {
 	v.registerField(name)
 	rules := v.getFieldRules(name)
@@ -215,6 +241,8 @@ func (v *validation) validateByType(name string, t reflect.Type, val interface{}
 		v.validateStruct(val, name)
 	case reflect.Map:
 		v.validateMap(val, name)
+	case reflect.Slice:
+		v.validateSlice(val, name)
 	default:
 		err := Validate(name, val, rules)
 		if err != nil {
@@ -236,6 +264,16 @@ func (v *validation) validateMapFields(val map[string]interface{}, parName strin
 	for name, value := range val {
 		name = parName + name
 		typ := reflect.TypeOf(value)
+		v.validateByType(name, typ, value)
+	}
+}
+
+func (v *validation) validateSliceFields(val []interface{}, parName string) {
+	parName = makeParentNameJoinable(parName)
+	for idx, value := range val {
+		name := parName + toString(idx)
+		typ := reflect.TypeOf(value)
+		fmt.Println(name, val)
 		v.validateByType(name, typ, value)
 	}
 }
