@@ -1009,7 +1009,7 @@ func Test_betweenRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("betweenRule() error = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
 				}
 			}()
@@ -1096,7 +1096,7 @@ func Test_minRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("minRule() error = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
 				}
 			}()
@@ -1183,7 +1183,7 @@ func Test_maxRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("maxRule() error = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
 				}
 			}()
@@ -1398,7 +1398,7 @@ func Test_lenRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("lenRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -1535,7 +1535,7 @@ func Test_minLenRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("minLenRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -1672,7 +1672,7 @@ func Test_maxLenRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("maxLenRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -1809,7 +1809,7 @@ func Test_lenBetweenRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("lenBetweenRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -1946,7 +1946,7 @@ func Test_lenInRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("lenInRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2083,7 +2083,7 @@ func Test_lenNotInRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("lenNotInRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2150,7 +2150,7 @@ func Test_regexRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("regexRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2217,7 +2217,7 @@ func Test_notRegexRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("notRegexRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2274,7 +2274,7 @@ func Test_emailRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("emailRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2331,7 +2331,7 @@ func Test_jsonRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("jsonRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2388,7 +2388,7 @@ func Test_ipv4Rule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("ipv4Rule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2445,7 +2445,7 @@ func Test_ipv6Rule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("ipv6Rule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2502,7 +2502,7 @@ func Test_ipRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("ipRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2559,7 +2559,7 @@ func Test_macRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("macRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2616,7 +2616,7 @@ func Test_urlRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("urlRule() error = %v, wantPanic %v", e, tt.wantErr)
 				}
 			}()
@@ -2891,7 +2891,7 @@ func Test_sizeRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("sizeRule() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
@@ -2958,7 +2958,7 @@ func Test_sizeMinRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("sizeMinRule() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
@@ -3025,7 +3025,7 @@ func Test_sizeMaxRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("sizeMaxRule() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
@@ -3092,7 +3092,7 @@ func Test_sizeBetweenRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("sizeBetweenRule() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
@@ -3149,7 +3149,7 @@ func Test_extRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("extRule() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
@@ -3206,7 +3206,7 @@ func Test_notExtRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("notExtRule() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
@@ -3263,7 +3263,7 @@ func Test_extInRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("extInRule() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
@@ -3320,7 +3320,7 @@ func Test_extNotInRule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if e := recover(); (e != nil) && !tt.wantPanic {
+				if e := recover(); (e != nil) != tt.wantPanic {
 					t.Errorf("extNotInRule() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
