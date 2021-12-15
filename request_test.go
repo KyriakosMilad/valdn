@@ -309,35 +309,25 @@ func Test_fhsSliceToInterface(t *testing.T) {
 	}
 }
 
-func Test_request_parseJSON(t *testing.T) {
-	type fields struct {
-		rules   Rules
-		httpReq *http.Request
-		val     map[string]interface{}
-	}
+func Test_parseJSON(t *testing.T) {
 	tests := []struct {
 		name           string
-		fields         fields
+		req            *http.Request
+		m              map[string]interface{}
 		expectedLength int
 		wantPanic      bool
 	}{
 		{
-			name: "test parseJSON",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: jsonRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseJSON",
+			req:            jsonRequest(),
+			m:              make(map[string]interface{}),
 			expectedLength: 1,
 			wantPanic:      false,
 		},
 		{
-			name: "test parseJSON with unsuitable data",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: emptyJSONRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseJSON with unsuitable data",
+			req:            emptyJSONRequest(),
+			m:              make(map[string]interface{}),
 			expectedLength: 0,
 			wantPanic:      true,
 		},
@@ -349,108 +339,84 @@ func Test_request_parseJSON(t *testing.T) {
 					t.Errorf("parseJSON() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
-			r := &request{
-				rules:   tt.fields.rules,
-				httpReq: tt.fields.httpReq,
-				val:     tt.fields.val,
-			}
-			r.parseJSON()
-			if len(r.val) != tt.expectedLength {
-				t.Errorf("parseJSON() = %v, expectedLength %v", r.val, tt.expectedLength)
+			parseJSON(tt.req, tt.m)
+			if len(tt.m) != tt.expectedLength {
+				t.Errorf("parseJSON() = %v, expectedLength %v", tt.m, tt.expectedLength)
 			}
 		})
 	}
 }
 
-func Test_request_parseFormData(t *testing.T) {
-	type fields struct {
-		rules   Rules
-		httpReq *http.Request
-		val     map[string]interface{}
-	}
+func Test_parseFormData(t *testing.T) {
 	tests := []struct {
 		name           string
-		fields         fields
+		rules          Rules
+		req            *http.Request
+		m              map[string]interface{}
 		wantPanic      bool
 		expectedLength int
 	}{
 		{
-			name: "test parseFormData with broken request",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: brokenRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseFormData with broken request",
+			rules:          Rules{},
+			req:            brokenRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      true,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseFormData with empty rules",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: formDataRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseFormData with empty rules",
+			rules:          Rules{},
+			req:            formDataRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseFormData with empty form",
-			fields: fields{
-				rules:   Rules{"field": {"required"}},
-				httpReq: emptyFormDataRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseFormData with empty form",
+			rules:          Rules{"field": {"required"}},
+			req:            emptyFormDataRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseFormData with one value and no files",
-			fields: fields{
-				rules:   Rules{"field": {"required"}},
-				httpReq: oneValueFormDataRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseFormData with one value and no files",
+			rules:          Rules{"field": {"required"}},
+			req:            oneValueFormDataRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 1,
 		},
 		{
-			name: "test parseFormData with two value and no files",
-			fields: fields{
-				rules:   Rules{"field": {"required"}},
-				httpReq: twoValuesFormDataRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseFormData with two value and no files",
+			rules:          Rules{"field": {"required"}},
+			req:            twoValuesFormDataRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 2,
 		},
 		{
-			name: "test parseFormData with one file and no values",
-			fields: fields{
-				rules:   Rules{"field": {"required"}},
-				httpReq: oneFileFormDataRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseFormData with one file and no values",
+			rules:          Rules{"field": {"required"}},
+			req:            oneFileFormDataRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 1,
 		},
 		{
-			name: "test parseFormData with two files and no values",
-			fields: fields{
-				rules:   Rules{"field": {"required"}},
-				httpReq: twoFilesFormDataRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseFormData with two files and no values",
+			rules:          Rules{"field": {"required"}},
+			req:            twoFilesFormDataRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 2,
 		},
 		{
-			name: "test parseFormData with two values and two files",
-			fields: fields{
-				rules:   Rules{"field": {"required"}},
-				httpReq: twoValuesTwoFilesFormDataRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseFormData with two values and two files",
+			rules:          Rules{"field": {"required"}},
+			req:            twoValuesTwoFilesFormDataRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 4,
 		},
@@ -462,100 +428,82 @@ func Test_request_parseFormData(t *testing.T) {
 					t.Errorf("parseFormData() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
-			r := &request{
-				rules:   tt.fields.rules,
-				httpReq: tt.fields.httpReq,
-				val:     tt.fields.val,
-			}
-			r.parseFormData()
-			if _, ok := r.val["field"]; ok {
-				k := reflect.TypeOf(r.val["field"]).Kind()
+			parseFormData(tt.req, tt.rules, tt.m)
+			if _, ok := tt.m["field"]; ok {
+				k := reflect.TypeOf(tt.m["field"]).Kind()
 				switch k {
 				case reflect.String:
-					l := reflect.ValueOf(r.val["field"]).Len()
+					l := reflect.ValueOf(tt.m["field"]).Len()
 					if (tt.expectedLength == 0 && l != 0) || (tt.expectedLength == 1 && l == 0) || tt.expectedLength > 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				case reflect.Ptr:
 					if tt.expectedLength != 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				case reflect.Slice:
-					l := reflect.ValueOf(r.val["field"]).Len()
+					l := reflect.ValueOf(tt.m["field"]).Len()
 					if l != tt.expectedLength {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				default:
-					t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 				}
 			} else {
 				if tt.expectedLength != 0 {
-					t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 				}
 			}
 		})
 	}
 }
 
-func Test_request_parseURLEncoded(t *testing.T) {
-	type fields struct {
-		rules   Rules
-		httpReq *http.Request
-		val     map[string]interface{}
-	}
+func Test_parseURLEncoded(t *testing.T) {
 	tests := []struct {
 		name           string
-		fields         fields
+		rules          Rules
+		req            *http.Request
+		m              map[string]interface{}
 		wantPanic      bool
 		expectedLength int
 	}{
 		{
-			name: "test parseURLEncoded with broken request",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: brokenRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLEncoded with broken request",
+			rules:          Rules{},
+			req:            brokenRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      true,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseURLEncoded with empty rules",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: paramsRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLEncoded with empty rules",
+			rules:          Rules{},
+			req:            paramsRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseURLEncoded with empty form",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: emptyURLEncodedRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLEncoded with empty form",
+			rules:          Rules{"lang": {"required"}},
+			req:            emptyURLEncodedRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseURLEncoded with one value",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: urlencodedRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLEncoded with one value",
+			rules:          Rules{"lang": {"required"}},
+			req:            urlencodedRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 1,
 		},
 		{
-			name: "test parseURLEncoded with two values",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: multipleParamsURLEncodedRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLEncoded with two values",
+			rules:          Rules{"lang": {"required"}},
+			req:            multipleParamsURLEncodedRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 2,
 		},
@@ -567,110 +515,90 @@ func Test_request_parseURLEncoded(t *testing.T) {
 					t.Errorf("parseURLEncoded() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
-			r := &request{
-				rules:   tt.fields.rules,
-				httpReq: tt.fields.httpReq,
-				val:     tt.fields.val,
-			}
-			r.parseURLEncoded()
-			if _, ok := r.val["lang"]; ok {
-				k := reflect.TypeOf(r.val["lang"]).Kind()
+			parseURLEncoded(tt.req, tt.rules, tt.m)
+			if _, ok := tt.m["lang"]; ok {
+				k := reflect.TypeOf(tt.m["lang"]).Kind()
 				switch k {
 				case reflect.String:
-					l := reflect.ValueOf(r.val["lang"]).Len()
+					l := reflect.ValueOf(tt.m["lang"]).Len()
 					if (tt.expectedLength == 0 && l != 0) || (tt.expectedLength == 1 && l == 0) || tt.expectedLength > 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				case reflect.Ptr:
 					if tt.expectedLength != 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				case reflect.Slice:
-					l := reflect.ValueOf(r.val["lang"]).Len()
+					l := reflect.ValueOf(tt.m["lang"]).Len()
 					if l != tt.expectedLength {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				default:
-					t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 				}
 			} else {
 				if tt.expectedLength != 0 {
-					t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 				}
 			}
 		})
 	}
 }
 
-func Test_request_parseURLParams(t *testing.T) {
-	type fields struct {
-		rules   Rules
-		httpReq *http.Request
-		val     map[string]interface{}
-	}
+func Test_parseURLParams(t *testing.T) {
 	tests := []struct {
 		name           string
-		fields         fields
+		rules          Rules
+		req            *http.Request
+		m              map[string]interface{}
 		wantPanic      bool
 		expectedLength int
 	}{
 		{
-			name: "test parseURLParams with broken request",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: brokenRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLParams with broken request",
+			rules:          Rules{},
+			req:            brokenRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      true,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseURLParams with empty rules",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: paramsRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLParams with empty rules",
+			rules:          Rules{},
+			req:            paramsRequest(),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseURLParams with empty params",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: httptest.NewRequest(http.MethodGet, "http://example.com/", strings.NewReader("")),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLParams with empty params",
+			rules:          Rules{"lang": {"required"}},
+			req:            httptest.NewRequest(http.MethodGet, "http://example.com/", strings.NewReader("")),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 0,
 		},
 		{
-			name: "test parseURLParams with empty values",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parseURLParams with empty values",
+			rules:          Rules{"lang": {"required"}},
+			req:            httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
+			m:              make(map[string]interface{}),
 			wantPanic:      false,
 			expectedLength: 1,
 		},
 		{
-			name: "test parseURLParams with one value",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
-				val:     map[string]interface{}{"lang": "python"},
-			},
+			name:           "test parseURLParams with one value",
+			rules:          Rules{"lang": {"required"}},
+			req:            httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
+			m:              map[string]interface{}{"lang": "python"},
 			wantPanic:      false,
 			expectedLength: 2,
 		},
 		{
-			name: "test parseURLParams with two values",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
-				val:     map[string]interface{}{"lang": []interface{}{"python", "java"}},
-			},
+			name:           "test parseURLParams with two values",
+			rules:          Rules{"lang": {"required"}},
+			req:            httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
+			m:              map[string]interface{}{"lang": []interface{}{"python", "java"}},
 			wantPanic:      false,
 			expectedLength: 3,
 		},
@@ -682,104 +610,78 @@ func Test_request_parseURLParams(t *testing.T) {
 					t.Errorf("parseURLParams() panic = %v, wantPanic %v", e, tt.wantPanic)
 				}
 			}()
-			r := &request{
-				rules:   tt.fields.rules,
-				httpReq: tt.fields.httpReq,
-				val:     tt.fields.val,
-			}
-			r.parseURLParams()
-			if _, ok := r.val["lang"]; ok {
-				k := reflect.TypeOf(r.val["lang"]).Kind()
+			parseURLParams(tt.req, tt.rules, tt.m)
+			if _, ok := tt.m["lang"]; ok {
+				k := reflect.TypeOf(tt.m["lang"]).Kind()
 				switch k {
 				case reflect.String:
-					l := reflect.ValueOf(r.val["lang"]).Len()
+					l := reflect.ValueOf(tt.m["lang"]).Len()
 					if (tt.expectedLength == 0 && l != 0) || (tt.expectedLength == 1 && l == 0) || tt.expectedLength > 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				case reflect.Ptr:
 					if tt.expectedLength != 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				case reflect.Slice:
-					l := reflect.ValueOf(r.val["lang"]).Len()
+					l := reflect.ValueOf(tt.m["lang"]).Len()
 					if l != tt.expectedLength {
-						t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 					}
 				default:
-					t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 				}
 			} else {
 				if tt.expectedLength != 0 {
-					t.Errorf("parseFormData() = %v, expectedLength %v", r.val, tt.expectedLength)
+					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
 				}
 			}
 		})
 	}
 }
 
-func Test_request_parse(t *testing.T) {
-	type fields struct {
-		rules   Rules
-		httpReq *http.Request
-		val     map[string]interface{}
-	}
+func Test_parseRequest(t *testing.T) {
 	tests := []struct {
 		name           string
-		fields         fields
+		rules          Rules
+		req            *http.Request
 		expectedLength int
 		wantPanic      bool
 	}{
 		{
-			name: "test parse with json",
-			fields: fields{
-				rules:   Rules{},
-				httpReq: jsonRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parse with json",
+			rules:          Rules{},
+			req:            jsonRequest(),
 			expectedLength: 1,
 			wantPanic:      false,
 		},
 		{
-			name: "test parse with multipart/form-data",
-			fields: fields{
-				rules:   Rules{"field1": {"required"}, "field2": {"required"}, "file": {"required"}},
-				httpReq: formDataRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parse with multipart/form-data",
+			rules:          Rules{"field1": {"required"}, "field2": {"required"}, "file": {"required"}},
+			req:            formDataRequest(),
 			expectedLength: 3,
 			wantPanic:      false,
 		},
 		{
-			name: "test parse with application/x-www-form-urlencoded",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: urlencodedRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parse with application/x-www-form-urlencoded",
+			rules:          Rules{"lang": {"required"}},
+			req:            urlencodedRequest(),
 			expectedLength: 1,
 			wantPanic:      false,
 		},
 		{
-			name: "test parse with url params",
-			fields: fields{
-				rules:   Rules{"lang": {"required"}},
-				httpReq: paramsRequest(),
-				val:     make(map[string]interface{}),
-			},
+			name:           "test parse with url params",
+			rules:          Rules{"lang": {"required"}},
+			req:            paramsRequest(),
 			expectedLength: 1,
 			wantPanic:      false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &request{
-				rules:   tt.fields.rules,
-				httpReq: tt.fields.httpReq,
-				val:     tt.fields.val,
-			}
-			r.parse()
-			if len(r.val) != tt.expectedLength {
-				t.Errorf("parse() = %v, expectedLength %v", r.val, tt.expectedLength)
+			m := parseRequest(tt.req, tt.rules)
+			if len(m) != tt.expectedLength {
+				t.Errorf("parseRequest() = %v, expectedLength %v", m, tt.expectedLength)
 			}
 		})
 	}

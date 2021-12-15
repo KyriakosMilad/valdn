@@ -11,12 +11,6 @@ import (
 
 const defaultMaxMemory = 32 << 20 // 32 MB
 
-type request struct {
-	rules   Rules
-	httpReq *http.Request
-	val     map[string]interface{}
-}
-
 func parseReqVal(v string) interface{} {
 	i, err := strconv.ParseInt(v, 10, 64)
 	if err == nil {
@@ -50,105 +44,107 @@ func fhsSliceToInterface(s []*multipart.FileHeader) []interface{} {
 	return newSlice
 }
 
-func (r *request) parseJSON() {
-	b, err := ioutil.ReadAll(r.httpReq.Body)
+func parseJSON(r *http.Request, m map[string]interface{}) {
+	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
 	}
-	err = json.Unmarshal(b, &r.val)
+	err = json.Unmarshal(b, &m)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (r *request) parseFormData() {
-	err := r.httpReq.ParseMultipartForm(defaultMaxMemory)
+func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
+	err := r.ParseMultipartForm(defaultMaxMemory)
 	if err != nil {
 		panic(err)
 	}
-	for k := range r.rules {
+	for k := range rules {
 		// convert files and values to interface, so it can be merged together
-		v := stringSliceToInterface(r.httpReq.MultipartForm.Value[k])
-		f := fhsSliceToInterface(r.httpReq.MultipartForm.File[k])
+		v := stringSliceToInterface(r.MultipartForm.Value[k])
+		f := fhsSliceToInterface(r.MultipartForm.File[k])
 
 		if len(v) > 0 && len(f) == 0 {
 			// if no files exists
 			// and values length is 1 add it as a string
 			// if length is greater than 1 add it to map as a slice of strings
 			if len(v) > 1 {
-				r.val[k] = r.httpReq.MultipartForm.Value[k]
+				m[k] = r.MultipartForm.Value[k]
 			} else {
-				r.val[k] = parseReqVal(r.httpReq.PostForm.Get(k))
+				m[k] = parseReqVal(r.PostForm.Get(k))
 			}
 		} else if len(f) > 0 && len(v) == 0 {
 			// if no values exists
 			// and files length is 1 add it as a file
 			// if length is greater than 1 add it to map as a slice of files
 			if len(f) > 1 {
-				r.val[k] = r.httpReq.MultipartForm.File[k]
+				m[k] = r.MultipartForm.File[k]
 			} else {
-				_, r.val[k], _ = r.httpReq.FormFile(k)
+				_, m[k], _ = r.FormFile(k)
 			}
 		} else if len(v) > 0 && len(f) > 0 {
 			// if both files and values with that name are exists merge them in one slice
-			r.val[k] = append(f, v...)
+			m[k] = append(f, v...)
 		}
 	}
 }
 
-func (r *request) parseURLEncoded() {
-	err := r.httpReq.ParseForm()
+func parseURLEncoded(r *http.Request, rules Rules, m map[string]interface{}) {
+	err := r.ParseForm()
 	if err != nil {
 		panic(err)
 	}
-	for k := range r.rules {
-		v := r.httpReq.PostForm[k]
+	for k := range rules {
+		v := r.PostForm[k]
 		if len(v) > 1 {
-			r.val[k] = r.httpReq.PostForm[k]
+			m[k] = r.PostForm[k]
 		} else {
-			r.val[k] = parseReqVal(r.httpReq.PostForm.Get(k))
+			m[k] = parseReqVal(r.PostForm.Get(k))
 		}
 	}
 }
 
-func (r *request) parseURLParams() {
-	err := r.httpReq.ParseForm()
+func parseURLParams(r *http.Request, rules Rules, m map[string]interface{}) {
+	err := r.ParseForm()
 	if err != nil {
 		panic(err)
 	}
-	for k := range r.rules {
-		param := r.httpReq.Form.Get(k)
+	for k := range rules {
+		param := r.Form.Get(k)
 		if param != "" {
-			if _, ok := r.val[k]; !ok {
+			if _, ok := m[k]; !ok {
 				// if param exists and no values exists in the map with same name add param value to the map
-				r.val[k] = param
+				m[k] = param
 			} else {
 				// if param exists and values exists in the map merge both param value and map values
-				if v, ok := r.val[k].([]interface{}); ok {
-					r.val[k] = append(v, param)
+				if v, ok := m[k].([]interface{}); ok {
+					m[k] = append(v, param)
 				}
-				if v, ok := r.val[k].(string); ok {
-					r.val[k] = []interface{}{v, param}
+				if v, ok := m[k].(string); ok {
+					m[k] = []interface{}{v, param}
 				}
 			}
 		}
 	}
 }
 
-func (r *request) parse() map[string]interface{} {
+func parseRequest(r *http.Request, rules Rules) map[string]interface{} {
+	m := make(map[string]interface{})
+
 	// parse request body by content type
-	contentType := r.httpReq.Header.Get("Content-Type")
+	contentType := r.Header.Get("Content-Type")
 	switch {
 	case contentType == "application/json":
-		r.parseJSON()
+		parseJSON(r, m)
 	case strings.Contains(contentType, "multipart/form-data"):
-		r.parseFormData()
+		parseFormData(r, rules, m)
 	case contentType == "application/x-www-form-urlencoded":
-		r.parseURLEncoded()
+		parseURLEncoded(r, rules, m)
 	}
 
 	// parse request url params
-	r.parseURLParams()
+	parseURLParams(r, rules, m)
 
-	return r.val
+	return m
 }
