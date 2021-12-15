@@ -69,11 +69,13 @@ func ValidateNested(val interface{}, rules Rules) Errors {
 	v := createNewValidation(rules)
 
 	t := reflect.TypeOf(val)
-	switch t.Kind() {
-	case reflect.Struct:
-		v.addTagRules(t, "")
+
+	v.addTagRules(val, t, "")
+
+	switch {
+	case IsStruct(val):
 		v.validateStruct(val, "")
-	case reflect.Map:
+	case IsMap(val):
 		v.validateMap(convertInterfaceToMap(val), "")
 	default:
 		panic("ValidateNested() can only validate struct and map ")
@@ -124,26 +126,37 @@ func (v *validation) getFieldRules(name string) []string {
 }
 
 // addTagRules gets rules from struct tag for every field and adds them to field rules if field has no rules.
-func (v *validation) addTagRules(t reflect.Type, parName string) {
+func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string) {
 	parName = makeParentNameJoinable(parName)
-	for i := 0; i < t.NumField(); i++ {
-		f := t.Field(i)
-		typ := f.Type
-		name := parName + f.Name
-		tRules := f.Tag.Get(TagName)
 
-		// add tag rules only if field has no rules
-		_, ok := v.rules[name]
-		if !ok && tRules != "" {
-			var rules []string
-			for _, r := range strings.Split(tRules, TagSeparator) {
-				rules = append(rules, r)
+	if m, ok := val.(map[string]interface{}); ok {
+		for k, i := range m {
+			switch {
+			case IsStruct(i), IsMap(i), IsSlice(i):
+				v.addTagRules(i, reflect.TypeOf(i), parName+k)
 			}
-			v.rules[name] = rules
 		}
+	}
 
-		if typ.Kind() == reflect.Struct {
-			v.addTagRules(typ, name)
+	if t.Kind() == reflect.Struct {
+		for i := 0; i < t.NumField(); i++ {
+			f := t.Field(i)
+			typ := f.Type
+			name := parName + f.Name
+			tRules := f.Tag.Get(TagName)
+			fmt.Println(f, f.Name)
+
+			// add tag rules only if field has no rules
+			_, ok := v.rules[name]
+			if !ok && tRules != "" {
+				rules := strings.Split(tRules, TagSeparator)
+				v.rules[name] = rules
+			}
+
+			switch typ.Kind() {
+			case reflect.Struct, reflect.Map, reflect.Slice:
+				v.addTagRules(f, typ, name)
+			}
 		}
 	}
 }
