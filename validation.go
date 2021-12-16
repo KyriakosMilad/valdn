@@ -279,10 +279,11 @@ func (v *validation) validateSliceFields(val []interface{}, parName string) {
 func (v *validation) validateNonExistRequiredFields() {
 	for name, rules := range v.rules {
 		for _, r := range rules {
-			if r == "required" {
+			rName, rVal := splitRuleNameAndRuleValue(r)
+			if rName == "required" {
 				_, ok := v.fieldsExist[name]
 				if !ok {
-					v.addError(name, errors.New(getErrMsg("required", "", name, "")))
+					v.addError(name, errors.New(getErrMsg("required", rVal, name, "")))
 				}
 			}
 		}
