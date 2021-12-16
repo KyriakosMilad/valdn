@@ -13,22 +13,23 @@ func Test_copyRules(t *testing.T) {
 		r Rules
 	}
 	tests := []struct {
-		name               string
-		args               args
-		expectedRulesCount int
+		name string
+		args args
+		want Rules
 	}{
 		{
 			name: "test copy rules",
 			args: args{
 				r: Rules{"test": {"required", "kind:string"}},
 			},
-			expectedRulesCount: 1,
+			want: Rules{"test": {"required", "kind:string"}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := copyRules(tt.args.r); len(got) != tt.expectedRulesCount {
-				t.Errorf("copyRules() = %v, expectedRulesCount %v", got, tt.expectedRulesCount)
+			got := copyRules(tt.args.r)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("copyRules() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -177,6 +178,39 @@ func Test_makeParentNameJoinable(t *testing.T) {
 	}
 }
 
+func Test_getParentName(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test get parent name",
+			args: args{
+				name: "parent.child",
+			},
+			want: "parent",
+		},
+		{
+			name: "test get parent name from child does not have parent",
+			args: args{
+				name: "child",
+			},
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getParentName(tt.args.name); got != tt.want {
+				t.Errorf("getParentName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_getStructFieldInfo(t *testing.T) {
 	type Parent struct {
 		Name string `validation:"required|string"`
@@ -232,23 +266,43 @@ func Test_getStructFieldInfo(t *testing.T) {
 
 func Test_convertInterfaceToMap(t *testing.T) {
 	tests := []struct {
-		name           string
-		value          interface{}
-		lengthExpected int
+		name  string
+		value interface{}
+		want  map[string]interface{}
 	}{
 		{
-			name:           "test convert interface to map",
-			value:          map[string]interface{}{"test": 1},
-			lengthExpected: 1,
+			name:  "test convert interface to map",
+			value: map[string]interface{}{"test": 1},
+			want:  map[string]interface{}{"test": 1},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := convertInterfaceToMap(tt.value); !reflect.DeepEqual(reflect.TypeOf(got), reflect.TypeOf(tt.value)) {
-				t.Errorf("convertInterfaceToMap() type = %v, expectedRulesCount %v", reflect.TypeOf(got), reflect.TypeOf(tt.value))
+			got := convertInterfaceToMap(tt.value)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("convertInterfaceToMap() = %v, want %v", got, tt.want)
 			}
-			if got := convertInterfaceToMap(tt.value); !reflect.DeepEqual(reflect.TypeOf(got), reflect.TypeOf(tt.value)) {
-				t.Errorf("convertInterfaceToMap() length = %v, lengthExpected %v", len(got), tt.lengthExpected)
+		})
+	}
+}
+
+func Test_convertInterfaceToSlice(t *testing.T) {
+	tests := []struct {
+		name  string
+		value interface{}
+		want  []interface{}
+	}{
+		{
+			name:  "test convert interface to slice",
+			value: []interface{}{"test"},
+			want:  []interface{}{"test"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := convertInterfaceToSlice(tt.value)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("convertInterfaceToSlice() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -457,7 +511,7 @@ func Test_getLen(t *testing.T) {
 			want:    3,
 		},
 		{
-			name: "test getLen with array",
+			name: "test getLen with msp",
 			args: args{
 				v: map[int]string{1: "test"},
 			},

@@ -121,8 +121,8 @@ func interfaceToFloat(val interface{}) (error, float64) {
 	return nil, f64
 }
 
-// stringToFloat converts s's to float64.
-// It returns error if s's value is not a float or an integer.
+// stringToFloat converts s to float64.
+// It returns error if s is not a float or an integer.
 func stringToFloat(s string) (error, float64) {
 	var f64 float64
 	i, err := strconv.ParseInt(s, 10, 64)
