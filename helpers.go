@@ -20,7 +20,7 @@ func copyRules(r Rules) Rules {
 }
 
 func toString(val interface{}) string {
-	return fmt.Sprintf("%v", val)
+	return fmt.Sprint(val)
 }
 
 func splitRuleNameAndRuleValue(rule string) (string, string) {
