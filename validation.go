@@ -61,10 +61,11 @@ func Validate(name string, val interface{}, rules []string) error {
 
 // ValidateNested validates val and it's nested fields by rules and returns Errors.
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
-// If a struct or map has error it's nested fields will not be validated.
+// If a parent has error it's nested fields will not be validated.
 // It panics if val's kind is not map or struct.
 // It panics if one of the rules is not registered.
 // It panics if one of the fields is a map and it's type is not map[string]interface{}.
+// It panics if one of the fields is a slice and it's type is not []interface{}.
 func ValidateNested(val interface{}, rules Rules) Errors {
 	v := createNewValidation(rules)
 	t := reflect.TypeOf(val)
@@ -90,7 +91,7 @@ func ValidateNested(val interface{}, rules Rules) Errors {
 
 // ValidateJson transforms json string to a map and validates it by rules and returns Errors.
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
-// If a map has error it's nested fields will not be validated.
+// If parent has error it's nested fields will not be validated.
 // It panics if val is not json.
 // It panics if one of the rules is not registered.
 func ValidateJson(val string, rules Rules) Errors {
@@ -171,13 +172,11 @@ func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string
 			typ := f.Type
 			name := parName + f.Name
 			tRules := f.Tag.Get(TagName)
-			fmt.Println(f, f.Name)
 
 			// add tag rules only if field has no rules
 			_, ok := v.rules[name]
 			if !ok && tRules != "" {
-				rules := strings.Split(tRules, TagSeparator)
-				v.rules[name] = rules
+				v.rules[name] = strings.Split(tRules, TagSeparator)
 			}
 
 			switch typ.Kind() {
@@ -273,7 +272,6 @@ func (v *validation) validateSliceFields(val []interface{}, parName string) {
 	for idx, value := range val {
 		name := parName + toString(idx)
 		typ := reflect.TypeOf(value)
-		fmt.Println(name, val)
 		v.validateByType(name, typ, value)
 	}
 }
@@ -284,7 +282,7 @@ func (v *validation) validateNonExistRequiredFields() {
 			if r == "required" {
 				_, ok := v.fieldsExist[name]
 				if !ok {
-					v.addError(name, errors.New(name+" is required"))
+					v.addError(name, errors.New(getErrMsg("required", "", name, "")))
 				}
 			}
 		}
