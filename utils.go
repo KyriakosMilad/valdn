@@ -7,6 +7,12 @@ import (
 	"regexp"
 )
 
+const (
+	emailRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
+	macRegex   = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
+	urlRegex   = "[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
+)
+
 // IsEmpty reports weather val is empty or not.
 func IsEmpty(val interface{}) bool {
 	t := reflect.TypeOf(val)
@@ -134,26 +140,12 @@ func IsUnsignedInteger(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return true
-	case reflect.Int:
-		if val.(int) > 0 {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		vString := toString(val)
+		if vString[0] != '-' {
 			return true
 		}
-	case reflect.Int8:
-		if val.(int8) > 0 {
-			return true
-		}
-	case reflect.Int16:
-		if val.(int16) > 0 {
-			return true
-		}
-	case reflect.Int32:
-		if val.(int32) > 0 {
-			return true
-		}
-	case reflect.Int64:
-		if val.(int64) > 0 {
-			return true
-		}
+		return false
 	}
 	return false
 }
@@ -212,7 +204,7 @@ func IsCollection(val interface{}) bool {
 
 // IsEmail reports weather s is a valid email address or not.
 func IsEmail(s string) bool {
-	r, _ := regexp.Compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")
+	r, _ := regexp.Compile(emailRegex)
 	match := r.MatchString(s)
 	if match {
 		return true
@@ -268,7 +260,7 @@ func IsIP(s string) bool {
 
 // IsMAC reports weather s is a valid MAC address or not.
 func IsMAC(s string) bool {
-	r, _ := regexp.Compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
+	r, _ := regexp.Compile(macRegex)
 	match := r.MatchString(s)
 	if match {
 		return true
@@ -278,7 +270,7 @@ func IsMAC(s string) bool {
 
 // IsURL reports weather s is a valid URL or not.
 func IsURL(s string) bool {
-	r, _ := regexp.Compile("[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)")
+	r, _ := regexp.Compile(urlRegex)
 	match := r.MatchString(s)
 	if match {
 		return true
