@@ -67,18 +67,16 @@ func Validate(name string, val interface{}, rules []string) error {
 // It panics if one of the fields is a map and it's type is not map[string]interface{}.
 // It panics if one of the fields is a slice and it's type is not []interface{}.
 func ValidateNested(val interface{}, rules Rules) Errors {
-	v := createNewValidation(rules)
 	t := reflect.TypeOf(val)
+	v := createNewValidation(rules)
+	v.addTagRules(val, t, "")
 
 	switch {
 	case IsStruct(val):
-		v.addTagRules(val, t, "")
 		v.validateStruct(val, "")
 	case IsMap(val):
-		v.addTagRules(val, t, "")
 		v.validateMap(convertInterfaceToMap(val), "")
 	case IsSlice(val):
-		v.addTagRules(val, t, "")
 		v.validateSlice(convertInterfaceToSlice(val), "")
 	default:
 		panic("ValidateNested() can only validate struct, map and slice")
@@ -89,12 +87,12 @@ func ValidateNested(val interface{}, rules Rules) Errors {
 	return v.errors
 }
 
-// ValidateJson transforms json string to a map and validates it by rules and returns Errors.
+// ValidateJSON transforms JSON string to a map and validates it by rules and returns Errors.
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If parent has error it's nested fields will not be validated.
-// It panics if val is not json.
+// It panics if val is not JSON.
 // It panics if one of the rules is not registered.
-func ValidateJson(val string, rules Rules) Errors {
+func ValidateJSON(val string, rules Rules) Errors {
 	var jsonMap map[string]interface{}
 
 	err := json.Unmarshal([]byte(val), &jsonMap)
