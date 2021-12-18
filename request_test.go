@@ -28,21 +28,15 @@ Content-Transfer-Encoding: binary
 binary data
 --xxx--
 `
-	req := &http.Request{
-		Method: "POST",
-		Header: http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}},
-		Body:   io.NopCloser(strings.NewReader(postData)),
-	}
+	req := httptest.NewRequest(http.MethodPost, "/", io.NopCloser(strings.NewReader(postData)))
+	req.Header = http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}}
 
 	return req
 }
 
 func emptyFormDataRequest() *http.Request {
-	req := &http.Request{
-		Method: "POST",
-		Header: http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}},
-		Body:   io.NopCloser(strings.NewReader("--xxx--")),
-	}
+	req := httptest.NewRequest(http.MethodPost, "/", io.NopCloser(strings.NewReader("--xxx--")))
+	req.Header = http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}}
 
 	return req
 }
@@ -55,11 +49,8 @@ Content-Disposition: form-data; name="field"
 value1
 --xxx--
 `
-	req := &http.Request{
-		Method: "POST",
-		Header: http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}},
-		Body:   io.NopCloser(strings.NewReader(postData)),
-	}
+	req := httptest.NewRequest(http.MethodPost, "/", io.NopCloser(strings.NewReader(postData)))
+	req.Header = http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}}
 
 	return req
 }
@@ -76,11 +67,8 @@ Content-Disposition: form-data; name="field"
 value2
 --xxx--
 `
-	req := &http.Request{
-		Method: "POST",
-		Header: http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}},
-		Body:   io.NopCloser(strings.NewReader(postData)),
-	}
+	req := httptest.NewRequest(http.MethodPost, "/", io.NopCloser(strings.NewReader(postData)))
+	req.Header = http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}}
 
 	return req
 }
@@ -95,11 +83,8 @@ Content-Transfer-Encoding: binary
 binary data
 --xxx--
 `
-	req := &http.Request{
-		Method: "POST",
-		Header: http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}},
-		Body:   io.NopCloser(strings.NewReader(postData)),
-	}
+	req := httptest.NewRequest(http.MethodPost, "/", io.NopCloser(strings.NewReader(postData)))
+	req.Header = http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}}
 
 	return req
 }
@@ -120,11 +105,8 @@ Content-Transfer-Encoding: binary
 binary data
 --xxx--
 `
-	req := &http.Request{
-		Method: "POST",
-		Header: http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}},
-		Body:   io.NopCloser(strings.NewReader(postData)),
-	}
+	req := httptest.NewRequest(http.MethodPost, "/", io.NopCloser(strings.NewReader(postData)))
+	req.Header = http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}}
 
 	return req
 }
@@ -153,11 +135,8 @@ Content-Transfer-Encoding: binary
 binary data
 --xxx--
 `
-	req := &http.Request{
-		Method: "POST",
-		Header: http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}},
-		Body:   io.NopCloser(strings.NewReader(postData)),
-	}
+	req := httptest.NewRequest(http.MethodPost, "/", io.NopCloser(strings.NewReader(postData)))
+	req.Header = http.Header{"Content-Type": {`multipart/form-data; boundary=xxx`}}
 
 	return req
 }
@@ -311,25 +290,25 @@ func Test_fhsSliceToInterface(t *testing.T) {
 
 func Test_parseJSON(t *testing.T) {
 	tests := []struct {
-		name           string
-		req            *http.Request
-		m              map[string]interface{}
-		expectedLength int
-		wantPanic      bool
+		name      string
+		req       *http.Request
+		m         map[string]interface{}
+		want      map[string]interface{}
+		wantPanic bool
 	}{
 		{
-			name:           "test parseJSON",
-			req:            jsonRequest(),
-			m:              make(map[string]interface{}),
-			expectedLength: 1,
-			wantPanic:      false,
+			name:      "test parseJSON",
+			req:       jsonRequest(),
+			m:         make(map[string]interface{}),
+			want:      map[string]interface{}{"lang": "go"},
+			wantPanic: false,
 		},
 		{
-			name:           "test parseJSON with unsuitable data",
-			req:            emptyJSONRequest(),
-			m:              make(map[string]interface{}),
-			expectedLength: 0,
-			wantPanic:      true,
+			name:      "test parseJSON with unsuitable data",
+			req:       emptyJSONRequest(),
+			m:         make(map[string]interface{}),
+			want:      map[string]interface{}{},
+			wantPanic: true,
 		},
 	}
 	for _, tt := range tests {
@@ -340,8 +319,8 @@ func Test_parseJSON(t *testing.T) {
 				}
 			}()
 			parseJSON(tt.req, tt.m)
-			if len(tt.m) != tt.expectedLength {
-				t.Errorf("parseJSON() = %v, expectedLength %v", tt.m, tt.expectedLength)
+			if !reflect.DeepEqual(tt.m, tt.want) {
+				t.Errorf("parseJSON() = %v, want %v", tt.m, tt.want)
 			}
 		})
 	}
@@ -460,52 +439,52 @@ func Test_parseFormData(t *testing.T) {
 
 func Test_parseURLEncoded(t *testing.T) {
 	tests := []struct {
-		name           string
-		rules          Rules
-		req            *http.Request
-		m              map[string]interface{}
-		wantPanic      bool
-		expectedLength int
+		name      string
+		rules     Rules
+		req       *http.Request
+		m         map[string]interface{}
+		wantPanic bool
+		want      map[string]interface{}
 	}{
 		{
-			name:           "test parseURLEncoded with broken request",
-			rules:          Rules{},
-			req:            brokenRequest(),
-			m:              make(map[string]interface{}),
-			wantPanic:      true,
-			expectedLength: 0,
+			name:      "test parseURLEncoded with broken request",
+			rules:     Rules{},
+			req:       brokenRequest(),
+			m:         make(map[string]interface{}),
+			wantPanic: true,
+			want:      map[string]interface{}{},
 		},
 		{
-			name:           "test parseURLEncoded with empty rules",
-			rules:          Rules{},
-			req:            paramsRequest(),
-			m:              make(map[string]interface{}),
-			wantPanic:      false,
-			expectedLength: 0,
+			name:      "test parseURLEncoded with empty rules",
+			rules:     Rules{},
+			req:       paramsRequest(),
+			m:         make(map[string]interface{}),
+			wantPanic: false,
+			want:      map[string]interface{}{},
 		},
 		{
-			name:           "test parseURLEncoded with empty form",
-			rules:          Rules{"lang": {"required"}},
-			req:            emptyURLEncodedRequest(),
-			m:              make(map[string]interface{}),
-			wantPanic:      false,
-			expectedLength: 0,
+			name:      "test parseURLEncoded with empty form",
+			rules:     Rules{},
+			req:       emptyURLEncodedRequest(),
+			m:         make(map[string]interface{}),
+			wantPanic: false,
+			want:      map[string]interface{}{},
 		},
 		{
-			name:           "test parseURLEncoded with one value",
-			rules:          Rules{"lang": {"required"}},
-			req:            urlencodedRequest(),
-			m:              make(map[string]interface{}),
-			wantPanic:      false,
-			expectedLength: 1,
+			name:      "test parseURLEncoded with one value",
+			rules:     Rules{"lang": {"required"}},
+			req:       urlencodedRequest(),
+			m:         make(map[string]interface{}),
+			wantPanic: false,
+			want:      map[string]interface{}{"lang": "go"},
 		},
 		{
-			name:           "test parseURLEncoded with two values",
-			rules:          Rules{"lang": {"required"}},
-			req:            multipleParamsURLEncodedRequest(),
-			m:              make(map[string]interface{}),
-			wantPanic:      false,
-			expectedLength: 2,
+			name:      "test parseURLEncoded with two values",
+			rules:     Rules{"lang": {"required"}},
+			req:       multipleParamsURLEncodedRequest(),
+			m:         make(map[string]interface{}),
+			wantPanic: false,
+			want:      map[string]interface{}{"lang": []interface{}{"go", "python"}},
 		},
 	}
 	for _, tt := range tests {
@@ -516,30 +495,8 @@ func Test_parseURLEncoded(t *testing.T) {
 				}
 			}()
 			parseURLEncoded(tt.req, tt.rules, tt.m)
-			if _, ok := tt.m["lang"]; ok {
-				k := reflect.TypeOf(tt.m["lang"]).Kind()
-				switch k {
-				case reflect.String:
-					l := reflect.ValueOf(tt.m["lang"]).Len()
-					if (tt.expectedLength == 0 && l != 0) || (tt.expectedLength == 1 && l == 0) || tt.expectedLength > 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-					}
-				case reflect.Ptr:
-					if tt.expectedLength != 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-					}
-				case reflect.Slice:
-					l := reflect.ValueOf(tt.m["lang"]).Len()
-					if l != tt.expectedLength {
-						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-					}
-				default:
-					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-				}
-			} else {
-				if tt.expectedLength != 0 {
-					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-				}
+			if !reflect.DeepEqual(tt.m, tt.want) {
+				t.Errorf("parseURLEncoded() = %v, want %v", tt.m, tt.want)
 			}
 		})
 	}
@@ -547,94 +504,53 @@ func Test_parseURLEncoded(t *testing.T) {
 
 func Test_parseURLParams(t *testing.T) {
 	tests := []struct {
-		name           string
-		rules          Rules
-		req            *http.Request
-		m              map[string]interface{}
-		wantPanic      bool
-		expectedLength int
+		name  string
+		rules Rules
+		req   *http.Request
+		m     map[string]interface{}
+		want  map[string]interface{}
 	}{
 		{
-			name:           "test parseURLParams with broken request",
-			rules:          Rules{},
-			req:            brokenRequest(),
-			m:              make(map[string]interface{}),
-			wantPanic:      true,
-			expectedLength: 0,
+			name:  "test parseURLParams with empty rules",
+			rules: Rules{},
+			req:   paramsRequest(),
+			m:     make(map[string]interface{}),
+			want:  map[string]interface{}{},
 		},
 		{
-			name:           "test parseURLParams with empty rules",
-			rules:          Rules{},
-			req:            paramsRequest(),
-			m:              make(map[string]interface{}),
-			wantPanic:      false,
-			expectedLength: 0,
+			name:  "test parseURLParams with empty params",
+			rules: Rules{"lang": {"required"}},
+			req:   httptest.NewRequest(http.MethodGet, "http://example.com/", strings.NewReader("")),
+			m:     make(map[string]interface{}),
+			want:  map[string]interface{}{},
 		},
 		{
-			name:           "test parseURLParams with empty params",
-			rules:          Rules{"lang": {"required"}},
-			req:            httptest.NewRequest(http.MethodGet, "http://example.com/", strings.NewReader("")),
-			m:              make(map[string]interface{}),
-			wantPanic:      false,
-			expectedLength: 0,
+			name:  "test parseURLParams with empty values",
+			rules: Rules{"lang": {"required"}},
+			req:   httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
+			m:     make(map[string]interface{}),
+			want:  map[string]interface{}{"lang": "go"},
 		},
 		{
-			name:           "test parseURLParams with empty values",
-			rules:          Rules{"lang": {"required"}},
-			req:            httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
-			m:              make(map[string]interface{}),
-			wantPanic:      false,
-			expectedLength: 1,
+			name:  "test parseURLParams with one value",
+			rules: Rules{"lang": {"required"}},
+			req:   httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
+			m:     map[string]interface{}{"lang": "python"},
+			want:  map[string]interface{}{"lang": []interface{}{"python", "go"}},
 		},
 		{
-			name:           "test parseURLParams with one value",
-			rules:          Rules{"lang": {"required"}},
-			req:            httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
-			m:              map[string]interface{}{"lang": "python"},
-			wantPanic:      false,
-			expectedLength: 2,
-		},
-		{
-			name:           "test parseURLParams with two values",
-			rules:          Rules{"lang": {"required"}},
-			req:            httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
-			m:              map[string]interface{}{"lang": []interface{}{"python", "java"}},
-			wantPanic:      false,
-			expectedLength: 3,
+			name:  "test parseURLParams with two values",
+			rules: Rules{"lang": {"required"}},
+			req:   httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
+			m:     map[string]interface{}{"lang": []interface{}{"python", "java"}},
+			want:  map[string]interface{}{"lang": []interface{}{"python", "java", "go"}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			defer func() {
-				if e := recover(); (e != nil) != tt.wantPanic {
-					t.Errorf("parseURLParams() panic = %v, wantPanic %v", e, tt.wantPanic)
-				}
-			}()
 			parseURLParams(tt.req, tt.rules, tt.m)
-			if _, ok := tt.m["lang"]; ok {
-				k := reflect.TypeOf(tt.m["lang"]).Kind()
-				switch k {
-				case reflect.String:
-					l := reflect.ValueOf(tt.m["lang"]).Len()
-					if (tt.expectedLength == 0 && l != 0) || (tt.expectedLength == 1 && l == 0) || tt.expectedLength > 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-					}
-				case reflect.Ptr:
-					if tt.expectedLength != 1 {
-						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-					}
-				case reflect.Slice:
-					l := reflect.ValueOf(tt.m["lang"]).Len()
-					if l != tt.expectedLength {
-						t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-					}
-				default:
-					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-				}
-			} else {
-				if tt.expectedLength != 0 {
-					t.Errorf("parseFormData() = %v, expectedLength %v", tt.m, tt.expectedLength)
-				}
+			if !reflect.DeepEqual(tt.m, tt.want) {
+				t.Errorf("parseURLParams() = %v, want %v", tt.m, tt.want)
 			}
 		})
 	}
@@ -642,46 +558,46 @@ func Test_parseURLParams(t *testing.T) {
 
 func Test_parseRequest(t *testing.T) {
 	tests := []struct {
-		name           string
-		rules          Rules
-		req            *http.Request
-		expectedLength int
-		wantPanic      bool
+		name      string
+		rules     Rules
+		req       *http.Request
+		want      map[string]interface{}
+		wantPanic bool
 	}{
 		{
-			name:           "test parse with json",
-			rules:          Rules{},
-			req:            jsonRequest(),
-			expectedLength: 1,
-			wantPanic:      false,
+			name:      "test parse with json",
+			rules:     Rules{},
+			req:       jsonRequest(),
+			want:      map[string]interface{}{"lang": "go"},
+			wantPanic: false,
 		},
 		{
-			name:           "test parse with multipart/form-data",
-			rules:          Rules{"field1": {"required"}, "field2": {"required"}, "file": {"required"}},
-			req:            formDataRequest(),
-			expectedLength: 3,
-			wantPanic:      false,
+			name:      "test parse with multipart/form-data",
+			rules:     Rules{"field": {"required"}},
+			req:       twoValuesFormDataRequest(),
+			want:      map[string]interface{}{"field": []interface{}{"value1", "value2"}},
+			wantPanic: false,
 		},
 		{
-			name:           "test parse with application/x-www-form-urlencoded",
-			rules:          Rules{"lang": {"required"}},
-			req:            urlencodedRequest(),
-			expectedLength: 1,
-			wantPanic:      false,
+			name:      "test parse with application/x-www-form-urlencoded",
+			rules:     Rules{"lang": {"required"}},
+			req:       urlencodedRequest(),
+			want:      map[string]interface{}{"lang": "go"},
+			wantPanic: false,
 		},
 		{
-			name:           "test parse with url params",
-			rules:          Rules{"lang": {"required"}},
-			req:            paramsRequest(),
-			expectedLength: 1,
-			wantPanic:      false,
+			name:      "test parse with url params",
+			rules:     Rules{"lang": {"required"}},
+			req:       paramsRequest(),
+			want:      map[string]interface{}{"lang": "go"},
+			wantPanic: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			m := parseRequest(tt.req, tt.rules)
-			if len(m) != tt.expectedLength {
-				t.Errorf("parseRequest() = %v, expectedLength %v", m, tt.expectedLength)
+			if !reflect.DeepEqual(m, tt.want) {
+				t.Errorf("getFieldRules() = %v %T, want %v %T", m, m["field"], tt.want, tt.want["field"])
 			}
 		})
 	}

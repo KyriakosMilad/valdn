@@ -2,6 +2,7 @@ package validation
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -65,12 +66,15 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 		v := stringSliceToInterface(r.MultipartForm.Value[k])
 		f := fhsSliceToInterface(r.MultipartForm.File[k])
 
+		fmt.Println(m)
+
 		if len(v) > 0 && len(f) == 0 {
 			// if no files exists
 			// and values length is 1 add it as a string
 			// if length is greater than 1 add it to map as a slice of strings
 			if len(v) > 1 {
-				m[k] = r.MultipartForm.Value[k]
+				m[k] = stringSliceToInterface(r.MultipartForm.Value[k])
+				fmt.Println(m)
 			} else {
 				m[k] = parseReqVal(r.PostForm.Get(k))
 			}
@@ -88,6 +92,7 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 			m[k] = append(f, v...)
 		}
 	}
+	fmt.Println(m)
 }
 
 func parseURLEncoded(r *http.Request, rules Rules, m map[string]interface{}) {
@@ -98,7 +103,7 @@ func parseURLEncoded(r *http.Request, rules Rules, m map[string]interface{}) {
 	for k := range rules {
 		v := r.PostForm[k]
 		if len(v) > 1 {
-			m[k] = r.PostForm[k]
+			m[k] = stringSliceToInterface(r.PostForm[k])
 		} else {
 			m[k] = parseReqVal(r.PostForm.Get(k))
 		}
@@ -106,26 +111,30 @@ func parseURLEncoded(r *http.Request, rules Rules, m map[string]interface{}) {
 }
 
 func parseURLParams(r *http.Request, rules Rules, m map[string]interface{}) {
-	err := r.ParseForm()
-	if err != nil {
-		panic(err)
-	}
 	for k := range rules {
-		param := r.Form.Get(k)
-		if param != "" {
-			if _, ok := m[k]; !ok {
-				// if param exists and no values exists in the map with same name add param value to the map
-				m[k] = param
+		q, ok := r.URL.Query()[k]
+		if !ok {
+			return
+		}
+		param := stringSliceToInterface(q)
+		if _, ok := m[k]; !ok {
+			// if param exists and no values exists in the map with same name add param value to the map
+			if len(param) == 1 {
+				m[k] = param[0]
 			} else {
-				// if param exists and values exists in the map merge both param value and map values
-				if v, ok := m[k].([]interface{}); ok {
-					m[k] = append(v, param)
-				}
-				if v, ok := m[k].(string); ok {
-					m[k] = []interface{}{v, param}
-				}
+				m[k] = param
+			}
+		} else {
+			// if param exists and values exists in the map merge both param values and map values
+			if v, ok := m[k].([]interface{}); ok {
+				m[k] = append(v, param...)
+			}
+			if v, ok := m[k].(string); ok {
+				s := []interface{}{v}
+				m[k] = append(s, param...)
 			}
 		}
+
 	}
 }
 
@@ -143,8 +152,10 @@ func parseRequest(r *http.Request, rules Rules) map[string]interface{} {
 		parseURLEncoded(r, rules, m)
 	}
 
+	fmt.Println(m)
 	// parse request url params
 	parseURLParams(r, rules, m)
+	fmt.Println(m)
 
 	return m
 }
