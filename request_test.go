@@ -1,7 +1,9 @@
 package validation
 
 import (
+	"encoding/json"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -237,6 +239,28 @@ func Test_parseReqVal(t *testing.T) {
 				t.Errorf("parseReqVal() = %v %T, want %v %T", got, got, tt.want, tt.want)
 			}
 		})
+	}
+}
+
+func Test_parseJSONVal(t *testing.T) {
+	b, err := ioutil.ReadAll(advancedJSONRequest().Body)
+	if err != nil {
+		panic(err)
+	}
+	m := make(map[string]interface{})
+	err = json.Unmarshal(b, &m)
+	if err != nil {
+		panic(err)
+	}
+
+	for k, v := range m {
+		m[k] = parseJSONVal(v)
+	}
+
+	want := map[string]interface{}{"val": map[string]interface{}{"numbers": []interface{}{11, 11.1}}}
+
+	if !reflect.DeepEqual(m, want) {
+		t.Errorf("parseJSONVal() = %v, want %v", m, want)
 	}
 }
 
