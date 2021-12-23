@@ -1,4 +1,4 @@
-package validation
+package valdn
 
 import (
 	"mime/multipart"
