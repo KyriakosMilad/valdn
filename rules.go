@@ -496,7 +496,7 @@ func lenNotInRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val doesn't match ruleVal regular expression.
 func regexRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with regexRule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with regexRule", name))
 	}
 	r, err := regexp.Compile(ruleVal)
 	if err != nil {
@@ -515,7 +515,7 @@ func regexRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val matches ruleVal regular expression.
 func notRegexRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with notRegexRule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with notRegexRule", name))
 	}
 	r, err := regexp.Compile(ruleVal)
 	if err != nil {
@@ -533,7 +533,7 @@ func notRegexRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a valid email address.
 func emailRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with emailRule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with emailRule", name))
 	}
 	ok := IsEmail(toString(val))
 	if !ok {
@@ -547,7 +547,7 @@ func emailRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a valid json.
 func jsonRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with jsonRule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with jsonRule", name))
 	}
 	ok := IsJSON(toString(val))
 	if !ok {
@@ -561,7 +561,7 @@ func jsonRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a valid IPv4.
 func ipv4Rule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with ipv4Rule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with ipv4Rule", name))
 	}
 	ok := IsIPv4(toString(val))
 	if !ok {
@@ -575,7 +575,7 @@ func ipv4Rule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a valid IPv6.
 func ipv6Rule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with ipv6Rule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with ipv6Rule", name))
 	}
 	ok := IsIPv6(toString(val))
 	if !ok {
@@ -589,7 +589,7 @@ func ipv6Rule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a valid IP address.
 func ipRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with ipRule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with ipRule", name))
 	}
 	ok := IsIP(toString(val))
 	if !ok {
@@ -603,7 +603,7 @@ func ipRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a valid mac address.
 func macRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with macRule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with macRule", name))
 	}
 	ok := IsMAC(toString(val))
 	if !ok {
@@ -617,7 +617,7 @@ func macRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a valid URL.
 func urlRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
-		panic(fmt.Errorf("%v must be a string to be valdiated with macRule", name))
+		panic(fmt.Errorf("%v must be a string to be validated with macRule", name))
 	}
 	ok := IsURL(toString(val))
 	if !ok {
