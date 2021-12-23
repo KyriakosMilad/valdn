@@ -1,3 +1,4 @@
 language: go
-rvm:
- - 1.17
+
+go:
+- master
