@@ -12,20 +12,55 @@ import (
 
 const defaultMaxMemory = 32 << 20 // 32 MB
 
-func parseReqVal(v string) interface{} {
-	i, err := strconv.ParseInt(v, 10, 64)
+func parseReqVal(val string) interface{} {
+	i, err := strconv.ParseInt(val, 10, 64)
 	if err == nil {
 		return i
 	}
-	f, err := strconv.ParseFloat(v, 64)
+	f, err := strconv.ParseFloat(val, 64)
 	if err == nil {
 		return f
 	}
-	c, err := strconv.ParseComplex(v, 128)
+	c, err := strconv.ParseComplex(val, 128)
 	if err == nil {
 		return c
 	}
-	return v
+	return val
+}
+
+func parseJSONVal(val interface{}) interface{} {
+	if v, ok := val.(float64); ok {
+		s := toString(v)
+		isFloat := false
+		for i := len(s); i > 0; i-- {
+			if s[i-1] == '.' {
+				isFloat = true
+				break
+			}
+		}
+		if !isFloat {
+			return int(v)
+		}
+		return v
+	}
+
+	if v, ok := val.([]interface{}); ok {
+		var s []interface{}
+		for _, i := range v {
+			s = append(s, parseJSONVal(i))
+		}
+		return s
+	}
+
+	if v, ok := val.(map[string]interface{}); ok {
+		m := make(map[string]interface{})
+		for k, i := range v {
+			m[k] = parseJSONVal(i)
+		}
+		return m
+	}
+
+	return val
 }
 
 func stringSliceToInterface(s []string) []interface{} {
@@ -54,6 +89,10 @@ func parseJSON(r *http.Request, m map[string]interface{}) {
 	if err != nil {
 		panic(err)
 	}
+
+	for k, v := range m {
+		m[k] = parseJSONVal(v)
+	}
 }
 
 func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
@@ -66,12 +105,10 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 		v := stringSliceToInterface(r.MultipartForm.Value[k])
 		f := fhsSliceToInterface(r.MultipartForm.File[k])
 
-		fmt.Println(m)
-
 		if len(v) > 0 && len(f) == 0 {
 			// if no files exists
 			// and values length is 1 add it as a string
-			// if length is greater than 1 add it to map as a slice of strings
+			// if length is greater than 1 add it as a slice of strings
 			if len(v) > 1 {
 				m[k] = stringSliceToInterface(r.MultipartForm.Value[k])
 				fmt.Println(m)
@@ -81,7 +118,7 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 		} else if len(f) > 0 && len(v) == 0 {
 			// if no values exists
 			// and files length is 1 add it as a file
-			// if length is greater than 1 add it to map as a slice of files
+			// if length is greater than 1 add it as a slice of files
 			if len(f) > 1 {
 				m[k] = r.MultipartForm.File[k]
 			} else {
@@ -92,7 +129,6 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 			m[k] = append(f, v...)
 		}
 	}
-	fmt.Println(m)
 }
 
 func parseURLEncoded(r *http.Request, rules Rules, m map[string]interface{}) {
@@ -152,10 +188,8 @@ func parseRequest(r *http.Request, rules Rules) map[string]interface{} {
 		parseURLEncoded(r, rules, m)
 	}
 
-	fmt.Println(m)
 	// parse request url params
 	parseURLParams(r, rules, m)
-	fmt.Println(m)
 
 	return m
 }

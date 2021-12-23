@@ -166,6 +166,15 @@ func jsonRequest() *http.Request {
 	return r
 }
 
+func advancedJSONRequest() *http.Request {
+	jsonData := `
+	{"val": {"numbers": [11, 11.1]}}
+`
+	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(jsonData))
+	r.Header.Set("Content-Type", "application/json")
+	return r
+}
+
 func emptyJSONRequest() *http.Request {
 	jsonData := ``
 	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(jsonData))
@@ -301,6 +310,13 @@ func Test_parseJSON(t *testing.T) {
 			req:       jsonRequest(),
 			m:         make(map[string]interface{}),
 			want:      map[string]interface{}{"lang": "go"},
+			wantPanic: false,
+		},
+		{
+			name:      "test parseJSON with advanced json string",
+			req:       advancedJSONRequest(),
+			m:         make(map[string]interface{}),
+			want:      map[string]interface{}{"val": map[string]interface{}{"numbers": []interface{}{11, 11.1}}},
 			wantPanic: false,
 		},
 		{
