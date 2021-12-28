@@ -1,5 +1,5 @@
 # Valdn
-## _Everything you need to validate data in go._
+ _Everything you need to validate data in go._
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/KyriakosMilad/valdn.svg)](https://pkg.go.dev/github.com/KyriakosMilad/valdn)
 [![Go Report Card](https://goreportcard.com/badge/github.com/KyriakosMilad/valdn)](https://goreportcard.com/report/github.com/KyriakosMilad/valdn)
