@@ -28,3 +28,5 @@ Valdn is a golang cross-validation library. Validates request, nested JSON, nest
 ```sh
 go get "github.com/KyriakosMilad/valdn"
 ```
+
+I'm working on the rest of the documentation.
