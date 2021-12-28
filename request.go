@@ -2,7 +2,6 @@ package valdn
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -105,17 +104,17 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 		v := stringSliceToInterface(r.MultipartForm.Value[k])
 		f := fhsSliceToInterface(r.MultipartForm.File[k])
 
-		if len(v) > 0 && len(f) == 0 {
+		switch {
+		case len(v) > 0 && len(f) == 0:
 			// if no files exists
 			// and values length is 1 add it as a string
 			// if length is greater than 1 add it as a slice of strings
 			if len(v) > 1 {
 				m[k] = stringSliceToInterface(r.MultipartForm.Value[k])
-				fmt.Println(m)
 			} else {
 				m[k] = parseReqVal(r.PostForm.Get(k))
 			}
-		} else if len(f) > 0 && len(v) == 0 {
+		case len(f) > 0 && len(v) == 0:
 			// if no values exists
 			// and files length is 1 add it as a file
 			// if length is greater than 1 add it as a slice of files
@@ -124,7 +123,7 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 			} else {
 				_, m[k], _ = r.FormFile(k)
 			}
-		} else if len(v) > 0 && len(f) > 0 {
+		case len(v) > 0 && len(f) > 0:
 			// if both files and values with that name are exists merge them in one slice
 			m[k] = append(f, v...)
 		}
@@ -132,10 +131,10 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 }
 
 func parseURLEncoded(r *http.Request, rules Rules, m map[string]interface{}) {
-	err := r.ParseForm()
-	if err != nil {
+	if err := r.ParseForm(); err != nil {
 		panic(err)
 	}
+
 	for k := range rules {
 		v := r.PostForm[k]
 		if len(v) > 1 {
@@ -170,7 +169,6 @@ func parseURLParams(r *http.Request, rules Rules, m map[string]interface{}) {
 				m[k] = append(s, param...)
 			}
 		}
-
 	}
 }
 
