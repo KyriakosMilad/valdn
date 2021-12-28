@@ -204,22 +204,15 @@ func IsCollection(val interface{}) bool {
 
 // IsEmail reports weather s is a valid email address or not.
 func IsEmail(s string) bool {
-	r, _ := regexp.Compile(emailRegex)
-	match := r.MatchString(s)
-	if match {
-		return true
-	}
-	return false
+	r := regexp.MustCompile(emailRegex)
+	return r.MatchString(s)
 }
 
 // IsJSON reports weather s is a valid json or not.
 func IsJSON(s string) bool {
-	var decodedJson map[string]interface{}
-	err := json.Unmarshal([]byte(s), &decodedJson)
-	if err == nil {
-		return true
-	}
-	return false
+	var decodedJSON map[string]interface{}
+	err := json.Unmarshal([]byte(s), &decodedJSON)
+	return err == nil
 }
 
 // IsIPv4 reports weather s is a valid IPv4 or not.
@@ -228,8 +221,7 @@ func IsIPv4(s string) bool {
 		return false
 	}
 	for i := 0; i < len(s); i++ {
-		switch s[i] {
-		case '.':
+		if s[i] == '.' {
 			return true
 		}
 	}
@@ -242,8 +234,7 @@ func IsIPv6(s string) bool {
 		return false
 	}
 	for i := 0; i < len(s); i++ {
-		switch s[i] {
-		case ':':
+		if s[i] == ':' {
 			return true
 		}
 	}
@@ -252,30 +243,19 @@ func IsIPv6(s string) bool {
 
 // IsIP reports weather s is a valid IP or not.
 func IsIP(s string) bool {
-	if net.ParseIP(s) == nil {
-		return false
-	}
-	return true
+	return net.ParseIP(s) != nil
 }
 
 // IsMAC reports weather s is a valid MAC address or not.
 func IsMAC(s string) bool {
-	r, _ := regexp.Compile(macRegex)
-	match := r.MatchString(s)
-	if match {
-		return true
-	}
-	return false
+	r := regexp.MustCompile(macRegex)
+	return r.MatchString(s)
 }
 
 // IsURL reports weather s is a valid URL or not.
 func IsURL(s string) bool {
-	r, _ := regexp.Compile(urlRegex)
-	match := r.MatchString(s)
-	if match {
-		return true
-	}
-	return false
+	r := regexp.MustCompile(urlRegex)
+	return r.MatchString(s)
 }
 
 // IsFile reports weather v is a valid file or not.
