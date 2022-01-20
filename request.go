@@ -124,7 +124,7 @@ func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
 				_, m[k], _ = r.FormFile(k)
 			}
 		case len(v) > 0 && len(f) > 0:
-			// if both files and values with that name are exists merge them in one slice
+			// if both files and values with that name exists, merge them in one slice
 			m[k] = append(f, v...)
 		}
 	}

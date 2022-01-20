@@ -62,8 +62,8 @@ func Validate(name string, val interface{}, rules []string) error {
 // ValidateNested validates val and it's nested fields by rules and returns Errors.
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
-// It panics if val's kind is not map, struct or slice.
 // It panics if one of the rules is not registered.
+// It panics if val's kind is not map, struct or slice.
 // It panics if one of the fields is a map and it's type is not map[string]interface{}.
 // It panics if one of the fields is a slice and it's type is not []interface{}.
 func ValidateNested(val interface{}, rules Rules) Errors {
@@ -103,7 +103,7 @@ func ValidateJSON(val string, rules Rules) Errors {
 	return ValidateNested(jsonMap, rules)
 }
 
-// ValidateRequest validates request by rules and return Errors.
+// ValidateRequest validates request by rules and returns Errors.
 // It validates request of content type: multipart/form-data, application/json and application/x-www-form-urlencoded.
 // It validates url parameters.
 // It panics if body is not compatible with header content type.
