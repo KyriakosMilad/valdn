@@ -75,10 +75,10 @@ func convertInterfaceToSlice(value interface{}) []interface{} {
 
 // stringToFloat converts val to float64.
 // It returns error if val is not a float or an integer.
-func interfaceToFloat(val interface{}) (error, float64) {
+func interfaceToFloat(val interface{}) (float64, error) {
 	var f64 float64
 	if !IsInteger(val) && !IsFloat(val) {
-		return errors.New("val must be an integer or a float"), f64
+		return f64, errors.New("val must be an integer or a float")
 	}
 	if v, ok := val.(float64); ok {
 		f64 = v
@@ -116,31 +116,31 @@ func interfaceToFloat(val interface{}) (error, float64) {
 	if v, ok := val.(uint64); ok {
 		f64 = float64(v)
 	}
-	return nil, f64
+	return f64, nil
 }
 
 // stringToFloat converts s to float64.
 // It returns error if s is not a float or an integer.
-func stringToFloat(s string) (error, float64) {
+func stringToFloat(s string) (float64, error) {
 	var f64 float64
 	i, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
 		f64, err = strconv.ParseFloat(s, 64)
 		if err != nil {
-			return errors.New("string must contain an integer or a float"), f64
+			return f64, errors.New("string must contain an integer or a float")
 		}
 	} else {
 		f64 = float64(i)
 	}
-	return nil, f64
+	return f64, nil
 }
 
 // getLen gets v's length.
 // It returns error if v is not array, slice, map, string, integer or float.
-func getLen(v interface{}) (error, int) {
+func getLen(v interface{}) (int, error) {
 	switch {
 	case IsCollection(v) || IsString(v):
-		return nil, reflect.ValueOf(v).Len()
+		return reflect.ValueOf(v).Len(), nil
 	case IsInteger(v) || IsFloat(v):
 		l := 0
 		stringVal := toString(v)
@@ -151,38 +151,38 @@ func getLen(v interface{}) (error, int) {
 			l -= 1
 		}
 		l += len(stringVal)
-		return nil, l
+		return l, nil
 	default:
-		return fmt.Errorf("can't get length of kind %v", reflect.TypeOf(v).Kind()), 0
+		return 0, fmt.Errorf("can't get length of kind %v", reflect.TypeOf(v).Kind())
 	}
 }
 
-func getFileSize(v interface{}) (error, int64) {
+func getFileSize(v interface{}) (int64, error) {
 	if f, ok := v.(*os.File); ok {
 		if (os.File{}) == *f {
-			return errors.New("can't get size from empty os.File"), 0
+			return 0, errors.New("can't get size from empty os.File")
 		}
 		s, err := f.Stat()
 		if err != nil {
-			return err, 0
+			return 0, err
 		}
-		return nil, s.Size()
+		return s.Size(), nil
 	}
 	if f, ok := v.(*multipart.FileHeader); ok {
-		return nil, f.Size
+		return f.Size, nil
 	}
-	return fmt.Errorf("%v is not type of *os.File or *multipart.FileHeader", v), 0
+	return 0, fmt.Errorf("%v is not type of *os.File or *multipart.FileHeader", v)
 }
 
-func getFileExt(v interface{}) (error, string) {
+func getFileExt(v interface{}) (string, error) {
 	if f, ok := v.(*os.File); ok {
 		if (os.File{}) == *f {
-			return errors.New("can't get extension from empty os.File"), ""
+			return "", errors.New("can't get extension from empty os.File")
 		}
-		return nil, filepath.Ext(f.Name())
+		return filepath.Ext(f.Name()), nil
 	}
 	if f, ok := v.(*multipart.FileHeader); ok {
-		return nil, filepath.Ext(f.Filename)
+		return filepath.Ext(f.Filename), nil
 	}
-	return fmt.Errorf("%v is not type of *os.File or *multipart.FileHeader", v), ""
+	return "", fmt.Errorf("%v is not type of *os.File or *multipart.FileHeader", v)
 }

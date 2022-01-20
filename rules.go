@@ -253,7 +253,7 @@ func numericRule(name string, val interface{}, ruleVal string) error {
 // It panics if max is not an integer or a float.
 // It returns error if val is not between min and max.
 func betweenRule(name string, val interface{}, ruleVal string) error {
-	err, vFloat := interfaceToFloat(val)
+	vFloat, err := interfaceToFloat(val)
 	if err != nil {
 		panic(name + " must be an integer or a float to be validated by betweenRule")
 	}
@@ -262,11 +262,11 @@ func betweenRule(name string, val interface{}, ruleVal string) error {
 	if len(ruleValSpliced) != 2 {
 		panic(fmt.Errorf("betweenRule expects two numeric values as min and max, got: %v", len(ruleValSpliced)))
 	}
-	err, min := stringToFloat(ruleValSpliced[0])
+	min, err := stringToFloat(ruleValSpliced[0])
 	if err != nil {
 		panic(fmt.Errorf("betweenRule: min must be an integer or a float, got: %v", ruleValSpliced[0]))
 	}
-	err, max := stringToFloat(ruleValSpliced[1])
+	max, err := stringToFloat(ruleValSpliced[1])
 	if err != nil {
 		panic(fmt.Errorf("betweenRule: max must be an integer or a float, got: %v", ruleValSpliced[1]))
 	}
@@ -283,11 +283,11 @@ func betweenRule(name string, val interface{}, ruleVal string) error {
 // It panics if ruleVal is not an integer or a float.
 // It returns error if val is lower than ruleVal.
 func minRule(name string, val interface{}, ruleVal string) error {
-	err, vFloat := interfaceToFloat(val)
+	vFloat, err := interfaceToFloat(val)
 	if err != nil {
 		panic(name + " must be an integer or a float to be validated by minRule")
 	}
-	err, min := stringToFloat(ruleVal)
+	min, err := stringToFloat(ruleVal)
 	if err != nil {
 		panic(fmt.Errorf("minRule: min must be an integer or a float, got: %v", ruleVal))
 	}
@@ -304,11 +304,11 @@ func minRule(name string, val interface{}, ruleVal string) error {
 // It panics if ruleVal is not an integer or a float.
 // It returns error if val is greater than ruleVal.
 func maxRule(name string, val interface{}, ruleVal string) error {
-	err, vFloat := interfaceToFloat(val)
+	vFloat, err := interfaceToFloat(val)
 	if err != nil {
 		panic(name + " must be an integer or a float to be validated by minRule")
 	}
-	err, max := stringToFloat(ruleVal)
+	max, err := stringToFloat(ruleVal)
 	if err != nil {
 		panic(fmt.Errorf("maxRule: max must be an integer or a float, got: %v", ruleVal))
 	}
@@ -361,7 +361,7 @@ func lenRule(name string, val interface{}, ruleVal string) error {
 	if err != nil {
 		panic("length must be an integer")
 	}
-	err, vLen := getLen(val)
+	vLen, err := getLen(val)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -379,7 +379,7 @@ func minLenRule(name string, val interface{}, ruleVal string) error {
 	if err != nil {
 		panic("length must be an integer")
 	}
-	err, vLen := getLen(val)
+	vLen, err := getLen(val)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -397,7 +397,7 @@ func maxLenRule(name string, val interface{}, ruleVal string) error {
 	if err != nil {
 		panic("length must be an integer")
 	}
-	err, vLen := getLen(val)
+	vLen, err := getLen(val)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -414,7 +414,7 @@ func maxLenRule(name string, val interface{}, ruleVal string) error {
 // It panics if max is not an integer.
 // It returns error if val's length is not between ruleVal[0] and ruleVal[1].
 func lenBetweenRule(name string, val interface{}, ruleVal string) error {
-	err, l := getLen(val)
+	l, err := getLen(val)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -441,7 +441,7 @@ func lenBetweenRule(name string, val interface{}, ruleVal string) error {
 // It panics if one of ruleVal items is not an integer.
 // It returns error if val's length doesn't equal any item in ruleVal[].
 func lenInRule(name string, val interface{}, ruleVal string) error {
-	err, vLen := getLen(val)
+	vLen, err := getLen(val)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -468,7 +468,7 @@ func lenInRule(name string, val interface{}, ruleVal string) error {
 // It panics if one of ruleVal items is not an integer.
 // It returns error if val's length equals any item in ruleVal[].
 func lenNotInRule(name string, val interface{}, ruleVal string) error {
-	err, vLen := getLen(val)
+	vLen, err := getLen(val)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -701,7 +701,7 @@ func sizeRule(name string, val interface{}, ruleVal string) error {
 	if err != nil {
 		panic("size must be an integer")
 	}
-	err, fileSize := getFileSize(val)
+	fileSize, err := getFileSize(val)
 	if err != nil {
 		panic(err)
 	}
@@ -720,7 +720,7 @@ func sizeMinRule(name string, val interface{}, ruleVal string) error {
 	if err != nil {
 		panic("size must be an integer")
 	}
-	err, fileSize := getFileSize(val)
+	fileSize, err := getFileSize(val)
 	if err != nil {
 		panic(err)
 	}
@@ -739,7 +739,7 @@ func sizeMaxRule(name string, val interface{}, ruleVal string) error {
 	if err != nil {
 		panic("size must be an integer")
 	}
-	err, fileSize := getFileSize(val)
+	fileSize, err := getFileSize(val)
 	if err != nil {
 		panic(err)
 	}
@@ -756,7 +756,7 @@ func sizeMaxRule(name string, val interface{}, ruleVal string) error {
 // It panics if max is not an integer.
 // It returns error if val's size is not between ruleVal[0] and ruleVal[1].
 func sizeBetweenRule(name string, val interface{}, ruleVal string) error {
-	err, fileSize := getFileSize(val)
+	fileSize, err := getFileSize(val)
 	if err != nil {
 		panic(err)
 	}
@@ -782,7 +782,7 @@ func sizeBetweenRule(name string, val interface{}, ruleVal string) error {
 // it panics if val is not a valid file.
 // It returns error if val's extension doesn't equal ruleVal.
 func extRule(name string, val interface{}, ruleVal string) error {
-	err, ext := getFileExt(val)
+	ext, err := getFileExt(val)
 	if err != nil {
 		panic(err)
 	}
@@ -799,7 +799,7 @@ func extRule(name string, val interface{}, ruleVal string) error {
 // it panics if val is not a valid file.
 // It returns error if val's extension equals ruleVal.
 func notExtRule(name string, val interface{}, ruleVal string) error {
-	err, ext := getFileExt(val)
+	ext, err := getFileExt(val)
 	if err != nil {
 		panic(err)
 	}
@@ -816,7 +816,7 @@ func notExtRule(name string, val interface{}, ruleVal string) error {
 // It panics if val is not a valid file.
 // It returns error if val's extension doesn't equal any item in ruleVal[].
 func extInRule(name string, val interface{}, ruleVal string) error {
-	err, ext := getFileExt(val)
+	ext, err := getFileExt(val)
 	if err != nil {
 		panic(err)
 	}
@@ -841,7 +841,7 @@ func extInRule(name string, val interface{}, ruleVal string) error {
 // It panics if val is not a valid file.
 // It returns error if val's extension equals any item in ruleVal[].
 func extNotInRule(name string, val interface{}, ruleVal string) error {
-	err, ext := getFileExt(val)
+	ext, err := getFileExt(val)
 	if err != nil {
 		panic(err)
 	}

@@ -425,7 +425,7 @@ func Test_interfaceToFloat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, got := interfaceToFloat(tt.args.val)
+			got, err := interfaceToFloat(tt.args.val)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("interfaceToFloat() err = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -473,7 +473,7 @@ func Test_stringToFloat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, got := stringToFloat(tt.args.s)
+			got, err := stringToFloat(tt.args.s)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("stringToFloat() err = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -569,7 +569,7 @@ func Test_getLen(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, got := getLen(tt.args.v)
+			got, err := getLen(tt.args.v)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getLen() err = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -626,7 +626,7 @@ func Test_getFileSize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, size := getFileSize(tt.args.v)
+			size, err := getFileSize(tt.args.v)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getFileSize() err = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -678,7 +678,7 @@ func Test_getFileExt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err, ext := getFileExt(tt.args.v)
+			ext, err := getFileExt(tt.args.v)
 			if !reflect.DeepEqual(ext, tt.wantExt) {
 				t.Errorf("getFileExt() got = %v, want %v", ext, tt.wantExt)
 			}
