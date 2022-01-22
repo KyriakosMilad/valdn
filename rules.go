@@ -110,13 +110,7 @@ func kindNotInRule(name string, val interface{}, ruleVal string) error {
 // typeRule checks if val's type equals ruleVal
 // It returns error if val's type does not equal ruleVal.
 func typeRule(name string, val interface{}, ruleVal string) error {
-	var typeInString string
-	if t := reflect.TypeOf(val); t.Kind() == reflect.Struct {
-		typeInString = t.Name()
-	} else {
-		typeInString = toString(t)
-	}
-	if typeInString != ruleVal {
+	if !IsType(val, ruleVal) {
 		return errors.New(getErrMsg("type", ruleVal, name, val))
 	}
 	return nil

@@ -186,6 +186,117 @@ func Test_IsKindIn(t *testing.T) {
 	}
 }
 
+func Test_IsType(t *testing.T) {
+	type user struct {
+		name string
+	}
+	type args struct {
+		val interface{}
+		typ string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsType with string",
+			args: args{
+				val: "string",
+				typ: "string",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with int",
+			args: args{
+				val: -44,
+				typ: "int",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with uint",
+			args: args{
+				val: uint(44),
+				typ: "uint",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with float",
+			args: args{
+				val: 44.44,
+				typ: "float64",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with complex",
+			args: args{
+				val: 44 + 22i,
+				typ: "complex128",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with bool",
+			args: args{
+				val: true,
+				typ: "bool",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with map",
+			args: args{
+				val: map[string]interface{}{},
+				typ: "map[string]interface {}",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with array",
+			args: args{
+				val: [1]string{"array"},
+				typ: "[1]string",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with slice",
+			args: args{
+				val: []string{"slice"},
+				typ: "[]string",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with struct",
+			args: args{
+				val: user{name: "test"},
+				typ: "user",
+			},
+			want: true,
+		},
+		{
+			name: "test IsType with with unsuitable data",
+			args: args{
+				val: 1,
+				typ: "string",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsType(tt.args.val, tt.args.typ); got != tt.want {
+				t.Errorf("IsType() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_IsString(t *testing.T) {
 	type args struct {
 		val interface{}
