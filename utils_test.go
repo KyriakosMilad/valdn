@@ -53,14 +53,6 @@ func Test_IsKind(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "test IsKind with string",
-			args: args{
-				val:  "string",
-				kind: "string",
-			},
-			want: true,
-		},
-		{
 			name: "test IsKind with int",
 			args: args{
 				val:  -44,
