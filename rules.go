@@ -3,7 +3,6 @@ package valdn
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -119,20 +118,7 @@ func typeRule(name string, val interface{}, ruleVal string) error {
 // typeInRule checks if val's type is one of ruleVal[].
 // It returns error if val's type is not one of ruleVal[].
 func typeInRule(name string, val interface{}, ruleVal string) error {
-	var typeInString string
-	if t := reflect.TypeOf(val); t.Kind() == reflect.Struct {
-		typeInString = t.Name()
-	} else {
-		typeInString = toString(t)
-	}
-	in := false
-	for _, v := range strings.Split(ruleVal, ",") {
-		if v == typeInString {
-			in = true
-			break
-		}
-	}
-	if !in {
+	if !IsTypeIn(val, strings.Split(ruleVal, ",")) {
 		return errors.New(getErrMsg("typeIn", ruleVal, name, val))
 	}
 	return nil
@@ -141,20 +127,7 @@ func typeInRule(name string, val interface{}, ruleVal string) error {
 // typeNotInRule checks if val's type is not one of ruleVal[].
 // It returns error if val's type is one of ruleVal[].
 func typeNotInRule(name string, val interface{}, ruleVal string) error {
-	var typeInString string
-	if t := reflect.TypeOf(val); t.Kind() == reflect.Struct {
-		typeInString = t.Name()
-	} else {
-		typeInString = toString(t)
-	}
-	in := false
-	for _, v := range strings.Split(ruleVal, ",") {
-		if v == typeInString {
-			in = true
-			break
-		}
-	}
-	if in {
+	if IsTypeIn(val, strings.Split(ruleVal, ",")) {
 		return errors.New(getErrMsg("typeNotIn", ruleVal, name, val))
 	}
 	return nil

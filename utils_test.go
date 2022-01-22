@@ -289,6 +289,42 @@ func Test_IsType(t *testing.T) {
 	}
 }
 
+func Test_IsTypeIn(t *testing.T) {
+	type args struct {
+		val   interface{}
+		types []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsTypeIn",
+			args: args{
+				val:   map[string]interface{}{},
+				types: []string{"string", "int", "map[string]interface {}"},
+			},
+			want: true,
+		},
+		{
+			name: "test IsTypeIn with unsuitable data",
+			args: args{
+				val:   map[string]interface{}{},
+				types: []string{"string", "int", "int8"},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsTypeIn(tt.args.val, tt.args.types); got != tt.want {
+				t.Errorf("IsTypeIn() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_IsString(t *testing.T) {
 	type args struct {
 		val interface{}

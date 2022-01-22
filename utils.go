@@ -58,6 +58,22 @@ func IsType(val interface{}, typ string) bool {
 	return false
 }
 
+// IsTypeIn reports weather val's type is one of types.
+func IsTypeIn(val interface{}, types []string) bool {
+	var typeInString string
+	if t := reflect.TypeOf(val); t.Kind() == reflect.Struct {
+		typeInString = t.Name()
+	} else {
+		typeInString = toString(t)
+	}
+	for _, t := range types {
+		if t == typeInString {
+			return true
+		}
+	}
+	return false
+}
+
 // IsString reports weather val's kind is string or not.
 func IsString(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.String
