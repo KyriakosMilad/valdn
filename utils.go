@@ -33,6 +33,16 @@ func IsKind(val interface{}, kind string) bool {
 	return false
 }
 
+func IsKindIn(val interface{}, kinds []string) bool {
+	kind := toString(reflect.TypeOf(val).Kind())
+	for _, k := range kinds {
+		if k == kind {
+			return true
+		}
+	}
+	return false
+}
+
 // IsString reports weather val's kind is string or not.
 func IsString(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.String

@@ -150,6 +150,42 @@ func Test_IsKind(t *testing.T) {
 	}
 }
 
+func Test_IsKindIn(t *testing.T) {
+	type args struct {
+		val   interface{}
+		kinds []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsKindIn",
+			args: args{
+				val:   44,
+				kinds: []string{"int8", "string", "int"},
+			},
+			want: true,
+		},
+		{
+			name: "test IsKindIn with unsuitable data",
+			args: args{
+				val:   44,
+				kinds: []string{"int8", "string", "int32"},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsKindIn(tt.args.val, tt.args.kinds); got != tt.want {
+				t.Errorf("IsKindIn() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_IsString(t *testing.T) {
 	type args struct {
 		val interface{}

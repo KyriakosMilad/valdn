@@ -92,15 +92,7 @@ func kindRule(name string, val interface{}, ruleVal string) error {
 // kindInRule checks if val's kind is one of ruleVal[].
 // It returns error if val's kind is not one of ruleVal[].
 func kindInRule(name string, val interface{}, ruleVal string) error {
-	k := toString(reflect.TypeOf(val).Kind())
-	in := false
-	for _, v := range strings.Split(ruleVal, ",") {
-		if v == k {
-			in = true
-			break
-		}
-	}
-	if !in {
+	if !IsKindIn(val, strings.Split(ruleVal, ",")) {
 		return errors.New(getErrMsg("kindIn", ruleVal, name, val))
 	}
 	return nil
@@ -109,16 +101,7 @@ func kindInRule(name string, val interface{}, ruleVal string) error {
 // kindNotInRule checks if val's kind is not one of ruleVal[].
 // It returns error if val's kind is one of ruleVal[].
 func kindNotInRule(name string, val interface{}, ruleVal string) error {
-	k := toString(reflect.TypeOf(val).Kind())
-	fmt.Println(k)
-	in := false
-	for _, v := range strings.Split(ruleVal, ",") {
-		if v == k {
-			in = true
-			break
-		}
-	}
-	if in {
+	if IsKindIn(val, strings.Split(ruleVal, ",")) {
 		return errors.New(getErrMsg("kindNotIn", ruleVal, name, val))
 	}
 	return nil
