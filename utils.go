@@ -33,6 +33,7 @@ func IsKind(val interface{}, kind string) bool {
 	return false
 }
 
+// IsKindIn reports weather val's kind is one of kinds.
 func IsKindIn(val interface{}, kinds []string) bool {
 	kind := toString(reflect.TypeOf(val).Kind())
 	for _, k := range kinds {
