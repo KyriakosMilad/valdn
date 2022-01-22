@@ -83,7 +83,7 @@ func requiredRule(name string, val interface{}, ruleVal string) error {
 // kindRule checks if val's kind equals ruleVal.
 // It returns error if val's kind does not equal ruleVal.
 func kindRule(name string, val interface{}, ruleVal string) error {
-	if k := reflect.TypeOf(val).Kind(); toString(k) != ruleVal {
+	if !IsKind(val, ruleVal) {
 		return errors.New(getErrMsg("kind", ruleVal, name, val))
 	}
 	return nil

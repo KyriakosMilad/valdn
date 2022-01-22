@@ -25,6 +25,14 @@ func IsEmpty(val interface{}) bool {
 	}
 }
 
+// IsKind reports weather val's kind equals kind.
+func IsKind(val interface{}, kind string) bool {
+	if k := reflect.TypeOf(val).Kind(); toString(k) == kind {
+		return true
+	}
+	return false
+}
+
 // IsString reports weather val's kind is string or not.
 func IsString(val interface{}) bool {
 	return reflect.ValueOf(val).Kind() == reflect.String

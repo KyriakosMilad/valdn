@@ -34,6 +34,122 @@ func Test_IsEmpty(t *testing.T) {
 	}
 }
 
+func Test_IsKind(t *testing.T) {
+	type args struct {
+		val  interface{}
+		kind string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsKind with string",
+			args: args{
+				val:  "string",
+				kind: "string",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with string",
+			args: args{
+				val:  "string",
+				kind: "string",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with int",
+			args: args{
+				val:  -44,
+				kind: "int",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with uint",
+			args: args{
+				val:  uint(44),
+				kind: "uint",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with float",
+			args: args{
+				val:  44.44,
+				kind: "float64",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with complex",
+			args: args{
+				val:  44 + 22i,
+				kind: "complex128",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with bool",
+			args: args{
+				val:  true,
+				kind: "bool",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with map",
+			args: args{
+				val:  map[string]interface{}{},
+				kind: "map",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with array",
+			args: args{
+				val:  [1]string{"array"},
+				kind: "array",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with slice",
+			args: args{
+				val:  []string{"slice"},
+				kind: "slice",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with struct",
+			args: args{
+				val:  struct{}{},
+				kind: "struct",
+			},
+			want: true,
+		},
+		{
+			name: "test IsKind with with unsuitable data",
+			args: args{
+				val:  1,
+				kind: "string",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsKind(tt.args.val, tt.args.kind); got != tt.want {
+				t.Errorf("IsKind() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_IsString(t *testing.T) {
 	type args struct {
 		val interface{}
