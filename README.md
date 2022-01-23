@@ -29,4 +29,67 @@ Valdn is a golang cross-validation library. Validates request, nested JSON, nest
 go get "github.com/KyriakosMilad/valdn"
 ```
 
-I'm working on the rest of the documentation.
+## Quick-Start
+
+Validate single value:
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+)
+
+func main() {
+	name := "valdn"
+	err := valdn.Validate("name", name, []string{"required", "kind:string", "minLen:6"})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+output:
+
+```
+name's length must be greater than or equal: 6
+```
+
+Validate nested value:
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+)
+
+type User struct {
+	Name string `validation:"required"`
+	Roles map[string]interface{}
+}
+
+func main() {
+        user := User{
+            Roles: map[string]interface{}{"read": true, "write": false},
+        }
+        
+        rules := valdn.Rules{"Roles": {"required", "kind:map", "len:2"}, "Roles.write": {"equal:true"}}
+        
+        errors := valdn.ValidateStruct(user, rules)
+    
+        if len(errors) > 0 {
+            log.Fatal(errors)
+        }
+}
+```
+
+output:
+
+```
+Name is required
+Roles.write does not equal true
+```
+
+I'm working on the rest of the documentation.****
