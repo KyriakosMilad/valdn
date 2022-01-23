@@ -37,7 +37,7 @@ func createNewValidation(rules Rules) *validation {
 	return &v
 }
 
-// Validate validates val by rules.
+// Validate validates single value by rules.
 // If an error is found it will not check the rest of the rules and return the error.
 // It panics if one of the rules is not registered.
 func Validate(name string, val interface{}, rules []string) error {
@@ -59,29 +59,56 @@ func Validate(name string, val interface{}, rules []string) error {
 	return nil
 }
 
-// ValidateNested validates val and it's nested fields by rules and returns Errors.
+// ValidateStruct validates struct, and it's nested fields by rules and returns Errors.
+// It panics if val is not a struct.
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
 // It panics if one of the rules is not registered.
-// It panics if val's kind is not map, struct or slice.
 // It panics if one of the fields is a map and it's type is not map[string]interface{}.
 // It panics if one of the fields is a slice and it's type is not []interface{}.
-func ValidateNested(val interface{}, rules Rules) Errors {
+func ValidateStruct(val interface{}, rules Rules) Errors {
+	if !IsStruct(val) {
+		panic("val is not a struct")
+	}
 	t := reflect.TypeOf(val)
 	v := createNewValidation(rules)
 	v.addTagRules(val, t, "")
 
-	switch {
-	case IsStruct(val):
-		v.validateStruct(val, "")
-	case IsMap(val):
-		v.validateMap(convertInterfaceToMap(val), "")
-	case IsSlice(val):
-		v.validateSlice(convertInterfaceToSlice(val), "")
-	default:
-		panic("ValidateNested() can only validate struct, map and slice")
-	}
+	v.validateStruct(val, "")
+	v.validateNonExistRequiredFields()
 
+	return v.errors
+}
+
+// ValidateMap validates map, and it's nested fields by rules and returns Errors.
+// If an error is found it will not check the rest of the field's rules and continue to the next field.
+// If a parent has error it's nested fields will not be validated.
+// It panics if one of the rules is not registered.
+// It panics if one of the fields is a map and it's type is not map[string]interface{}.
+// It panics if one of the fields is a slice and it's type is not []interface{}.
+func ValidateMap(val map[string]interface{}, rules Rules) Errors {
+	t := reflect.TypeOf(val)
+	v := createNewValidation(rules)
+	v.addTagRules(val, t, "")
+
+	v.validateMap(val, "")
+	v.validateNonExistRequiredFields()
+
+	return v.errors
+}
+
+// ValidateSlice validates slice, and it's nested fields by rules and returns Errors.
+// If an error is found it will not check the rest of the field's rules and continue to the next field.
+// If a parent has error it's nested fields will not be validated.
+// It panics if one of the rules is not registered.
+// It panics if one of the fields is a map and it's type is not map[string]interface{}.
+// It panics if one of the fields is a slice and it's type is not []interface{}.
+func ValidateSlice(val []interface{}, rules Rules) Errors {
+	t := reflect.TypeOf(val)
+	v := createNewValidation(rules)
+	v.addTagRules(val, t, "")
+
+	v.validateSlice(val, "")
 	v.validateNonExistRequiredFields()
 
 	return v.errors
@@ -100,7 +127,7 @@ func ValidateJSON(val string, rules Rules) Errors {
 		panic(err)
 	}
 
-	return ValidateNested(jsonMap, rules)
+	return ValidateMap(jsonMap, rules)
 }
 
 // ValidateRequest validates request by rules and returns Errors.
@@ -111,7 +138,7 @@ func ValidateJSON(val string, rules Rules) Errors {
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 func ValidateRequest(r *http.Request, rules Rules) Errors {
 	m := parseRequest(r, rules)
-	return ValidateNested(m, rules)
+	return ValidateMap(m, rules)
 }
 
 func (v *validation) registerField(name string) {

@@ -100,7 +100,7 @@ func Test_Validate(t *testing.T) {
 	}
 }
 
-func Test_ValidateNested(t *testing.T) {
+func Test_ValidateStruct(t *testing.T) {
 	type Child struct {
 		Name string `validation:"required|kind:string"`
 		Age  int
@@ -118,6 +118,15 @@ func Test_ValidateNested(t *testing.T) {
 		{
 			name: "test validate nested struct",
 			args: args{
+				val:   Child{Name: "Mina"},
+				rules: Rules{},
+			},
+			want:      Errors{},
+			wantPanic: false,
+		},
+		{
+			name: "test validate nested struct with unsuitable data",
+			args: args{
 				val:   Child{},
 				rules: Rules{"Age": {"required"}},
 			},
@@ -128,33 +137,10 @@ func Test_ValidateNested(t *testing.T) {
 			wantPanic: false,
 		},
 		{
-			name: "test validate nested map",
+			name: "test validate nested struct with non struct value",
 			args: args{
-				val:   map[string]interface{}{"Name": ""},
-				rules: Rules{"Name": {"required"}, "Age": {"required"}},
-			},
-			want: Errors{
-				"Name": getErrMsg("required", "", "Name", ""),
-				"Age":  getErrMsg("required", "", "Age", 0),
-			},
-			wantPanic: false,
-		},
-		{
-			name: "test validate nested slice",
-			args: args{
-				val:   []interface{}{"Name"},
-				rules: Rules{"0": {"kind:int"}},
-			},
-			want: Errors{
-				"0": getErrMsg("kind", "int", "0", ""),
-			},
-			wantPanic: false,
-		},
-		{
-			name: "test validate with non-struct, non-map, non-slice value",
-			args: args{
-				val:   "test",
-				rules: Rules{"Name": {"bla"}},
+				val:   map[string]interface{}{"kind": "map"},
+				rules: Rules{"Age": {"required"}},
 			},
 			want:      Errors{},
 			wantPanic: true,
@@ -164,18 +150,112 @@ func Test_ValidateNested(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				if e := recover(); (e != nil) && !tt.wantPanic {
-					t.Errorf("ValidateNested() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+					t.Errorf("ValidateStruct() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
 				}
 			}()
-			got := ValidateNested(tt.args.val, tt.args.rules)
+			got := ValidateStruct(tt.args.val, tt.args.rules)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ValidateNested() = %v, want %v", got, tt.want)
+				t.Errorf("ValidateStruct() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_ValidateJson(t *testing.T) {
+func Test_ValidateMap(t *testing.T) {
+	type args struct {
+		val   map[string]interface{}
+		rules Rules
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      Errors
+		wantPanic bool
+	}{
+		{
+			name: "test validate nested map",
+			args: args{
+				val:   map[string]interface{}{"Age": 44},
+				rules: Rules{"Age": {"required"}},
+			},
+			want:      Errors{},
+			wantPanic: false,
+		},
+		{
+			name: "test validate nested map with unsuitable data",
+			args: args{
+				val:   map[string]interface{}{"Age": 44},
+				rules: Rules{"Name": {"required"}},
+			},
+			want: Errors{
+				"Name": getErrMsg("required", "", "Name", ""),
+			},
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ValidateMap() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			got := ValidateMap(tt.args.val, tt.args.rules)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ValidateMap() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_ValidateSlice(t *testing.T) {
+	type args struct {
+		val   []interface{}
+		rules Rules
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      Errors
+		wantPanic bool
+	}{
+		{
+			name: "test validate nested slice",
+			args: args{
+				val:   []interface{}{44},
+				rules: Rules{"0": {"kind:int"}},
+			},
+			want:      Errors{},
+			wantPanic: false,
+		},
+		{
+			name: "test validate nested slice with unsuitable data",
+			args: args{
+				val:   []interface{}{44},
+				rules: Rules{"0": {"kind:string"}},
+			},
+			want: Errors{
+				"0": getErrMsg("kind", "string", "0", ""),
+			},
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ValidateSlice() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			got := ValidateSlice(tt.args.val, tt.args.rules)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ValidateSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_ValidateJSON(t *testing.T) {
 	type args struct {
 		val   string
 		rules Rules
