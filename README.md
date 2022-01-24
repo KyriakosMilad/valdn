@@ -1,4 +1,5 @@
 # Valdn
+
 _Everything you need to validate data in go._
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/KyriakosMilad/valdn.svg)](https://pkg.go.dev/github.com/KyriakosMilad/valdn)
@@ -7,7 +8,8 @@ _Everything you need to validate data in go._
 [![Coverage Status](https://coveralls.io/repos/github/KyriakosMilad/valdn/badge.svg?branch=master)](https://coveralls.io/github/KyriakosMilad/valdn?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
-Valdn is a golang cross-validation library. Validates request, nested JSON, nested struct, nested map, and nested slice. Validates any other Kind as a non-nested value.
+Valdn is a golang cross-validation library. Validates request, nested JSON, nested struct, nested map, and nested slice. Validates
+any other Kind as a non-nested value.
 
 ## Features
 
@@ -32,6 +34,7 @@ go get "github.com/KyriakosMilad/valdn"
 ## Quick-Start
 
 Validate single value:
+
 ```go
 package main
 
@@ -57,6 +60,7 @@ name's length must be greater than or equal: 6
 ```
 
 Validate nested value:
+
 ```go
 package main
 
@@ -66,22 +70,22 @@ import (
 )
 
 type User struct {
-	Name string `valdn:"required"`
+	Name  string `valdn:"required"`
 	Roles map[string]interface{}
 }
 
 func main() {
-        user := User{
-            Roles: map[string]interface{}{"read": true, "write": false},
-        }
+	user := User{
+		Roles: map[string]interface{}{"read": true, "write": false},
+	}
 
-        rules := valdn.Rules{"Roles": {"required", "len:2"}, "Roles.write": {"equal:true"}}
+	rules := valdn.Rules{"Roles": {"required", "len:2"}, "Roles.write": {"equal:true"}}
 
-        errors := valdn.ValidateStruct(user, rules)
+	errors := valdn.ValidateStruct(user, rules)
 
-        if len(errors) > 0 {
-            log.Fatal(errors)
-        }
+	if len(errors) > 0 {
+		log.Fatal(errors)
+	}
 }
 ```
 
@@ -125,6 +129,7 @@ name's length must be greater than or equal: 6
 ```
 
 Keep in mind when using valdn.Validate:
+
 - It doesn't validate nested fields.
 - If an error is found it will not check the rest of the rules and returns the error.
 - It panics if one of the rules is not registered.
@@ -172,6 +177,7 @@ Roles.write does not equal true
 ```
 
 Validate struct using struct field tag
+
 ```go
 package main
 
@@ -182,7 +188,7 @@ import (
 
 // struct and it's nested fields must be exported, so it can be accessed by valdn
 type User struct {
-	Name  string `valdn:"required|maxLen:3"`
+	Name string `valdn:"required|maxLen:3"`
 }
 
 func main() {
@@ -216,6 +222,55 @@ Keep in mind when using valdn.ValidateStruct:
 - It panics if val is not kind of struct.
 - It panics if val is not exported, or it's fields is not exported.
 - It panics if val is not a struct.
+- If an error is found it will not check the rest of the field's rules and continue to the next field.
+- If a parent has error it's nested fields will not be validated.
+- It panics if one of the rules is not registered.
+- It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
+- It panics if one of the nested fields is a slice and it's type is not []interface{}.
+
+## Validate Map
+
+Use valdn.ValidateMap() to validate map.
+
+valdn.ValidateMap() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+
+Example:
+
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+)
+
+func main() {
+	egyptianClubsFoundedYear := map[string]int{
+		"Zamalek SC":         1811,
+		"Al Ahly SC":         1907,
+		"Ismailly SC":        1924,
+		"Al Masry SC":        1920,
+		"Ittihad of Alex SC": 1914,
+	}
+
+	// use * to apply rules to all nested fields
+	rules := valdn.Rules{"*": {"required", "numerical", "min:1"}, "Zamalek SC": {"equal:1911"}}
+
+	errors := valdn.ValidateMap(egyptianClubsFoundedYear, rules)
+
+	if len(errors) > 0 {
+		log.Fatal(errors)
+	}
+}
+```
+
+this will output:
+
+```
+Zamalek SC does not equal 1911
+```
+
+Keep in mind when using valdn.ValidateMap:
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
