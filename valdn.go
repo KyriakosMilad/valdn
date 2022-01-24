@@ -16,7 +16,7 @@ type (
 )
 
 var (
-	TagName      = "validation"
+	TagName      = "valdn"
 	TagSeparator = "|"
 )
 

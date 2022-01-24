@@ -66,7 +66,7 @@ import (
 )
 
 type User struct {
-	Name string `validation:"required"`
+	Name string `valdn:"required"`
 	Roles map[string]interface{}
 }
 
@@ -74,11 +74,11 @@ func main() {
         user := User{
             Roles: map[string]interface{}{"read": true, "write": false},
         }
-        
-        rules := valdn.Rules{"Roles": {"required", "kind:map", "len:2"}, "Roles.write": {"equal:true"}}
-        
+
+        rules := valdn.Rules{"Roles": {"required", "len:2"}, "Roles.write": {"equal:true"}}
+
         errors := valdn.ValidateStruct(user, rules)
-    
+
         if len(errors) > 0 {
             log.Fatal(errors)
         }

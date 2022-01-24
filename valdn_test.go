@@ -102,7 +102,7 @@ func Test_Validate(t *testing.T) {
 
 func Test_ValidateStruct(t *testing.T) {
 	type Child struct {
-		Name string `validation:"required|kind:string"`
+		Name string `valdn:"required|kind:string"`
 		Age  int
 	}
 	type args struct {
@@ -538,8 +538,8 @@ func Test_validation_getParentRules(t *testing.T) {
 
 func Test_validation_addTagRules(t *testing.T) {
 	type Parent struct {
-		Name string `validation:"required|string"`
-		Age  int    `validation:"required|int"`
+		Name string `valdn:"required|string"`
+		Age  int    `valdn:"required|int"`
 	}
 	type args struct {
 		val     interface{}
@@ -953,7 +953,7 @@ func Test_validation_validateByType(t *testing.T) {
 
 func Test_validation_validateStructFields(t *testing.T) {
 	type Parent struct {
-		Name string `validation:"required|string"`
+		Name string `valdn:"required|string"`
 	}
 	type args struct {
 		t       reflect.Type
