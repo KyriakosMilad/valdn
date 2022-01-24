@@ -11,6 +11,18 @@ _Everything you need to validate data in go._
 Valdn is a golang cross-validation library. Validates request, nested JSON, nested struct, nested map, and nested slice. Validates
 any other Kind as a non-nested value.
 
+## Table of Contents
+
+<!--ts-->
+* [Installation](#installation)
+* [Features](#features)
+* [Validate Single Value](#validate-single-value)
+* [Validate Struct](#validate-struct)
+* [Validate Map](#validate-map)
+* [Validate Slice](#validate-slice)
+* [Validate JSON](#validate-json)
+<!--te-->
+
 ## Features
 
 - Validate all kinds.
