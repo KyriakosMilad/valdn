@@ -328,4 +328,48 @@ Keep in mind when using valdn.ValidateSlice:
 - It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
 - It panics if one of the nested fields is a slice and it's type is not []interface{}.
 
+## Validate JSON
+
+Use valdn.ValidateJSON() to validate JSON.
+
+valdn.ValidateJSON() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+
+Example:
+
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+)
+
+func main() {
+	stringJSON := `{"name":11}`
+
+	// use * to apply rules to all nested fields
+	rules := valdn.Rules{"type": {"required", "kind:string"}, "value": {"required"}}
+
+	errors := valdn.ValidateJSON(stringJSON, rules)
+
+	if len(errors) > 0 {
+		log.Fatal(errors)
+	}
+}
+```
+
+this will output:
+
+```
+name must be kind of string
+value is required
+```
+
+Keep in mind when using valdn.ValidateJSON:
+
+- It panics if val is not JSON.
+- If an error is found it will not check the rest of the field's rules and continue to the next field.
+- If parent has error it's nested fields will not be validated.
+- It panics if one of the rules is not registered.
+
 I'm working on the rest of the documentation.****
