@@ -206,7 +206,7 @@ this will output:
 Name's length must be lower than or equal: 3
 ```
 
-You change the TagName and Separator used to identify rules in struct field tag:
+You can change the TagName and Separator used to identify rules in struct field tag:
 
 `valdn.TagName = "valdn"`
 
