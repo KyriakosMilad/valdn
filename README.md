@@ -219,6 +219,7 @@ You can change the TagName and Separator used to identify rules in struct field 
 `valdn.Separator = "|"`
 
 Keep in mind when using valdn.ValidateStruct:
+
 - It panics if val is not kind of struct.
 - It panics if val is not exported, or it's fields is not exported.
 - It panics if val is not a struct.
@@ -245,7 +246,7 @@ import (
 )
 
 func main() {
-	egyptianClubsFoundedYear := map[string]int{
+	egyptianClubsFoundedYear := map[string]interface{}{
 		"Zamalek SC":         1811,
 		"Al Ahly SC":         1907,
 		"Ismailly SC":        1924,
@@ -271,6 +272,56 @@ Zamalek SC does not equal 1911
 ```
 
 Keep in mind when using valdn.ValidateMap:
+
+- If an error is found it will not check the rest of the field's rules and continue to the next field.
+- If a parent has error it's nested fields will not be validated.
+- It panics if one of the rules is not registered.
+- It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
+- It panics if one of the nested fields is a slice and it's type is not []interface{}.
+
+## Validate Slice
+
+Use valdn.ValidateSlice() to validate slice.
+
+valdn.ValidateSlice() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+
+Example:
+
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+)
+
+func main() {
+	letters := []interface{}{
+		"a", // 0
+		"b", // 1
+		"c", // 2
+		"d", // 3
+	}
+
+	// use * to apply rules to all nested fields
+	rules := valdn.Rules{"*": {"required", "kind:string", "len:1"}, "0": {"equal:a"}}
+
+	errors := valdn.ValidateSlice(letters, rules)
+
+	if len(errors) > 0 {
+		log.Fatal(errors)
+	}
+}
+```
+
+this will output:
+
+```
+0 does not equal a
+```
+
+Keep in mind when using valdn.ValidateSlice:
+
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
