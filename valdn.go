@@ -64,8 +64,8 @@ func Validate(name string, val interface{}, rules []string) error {
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
 // It panics if one of the rules is not registered.
-// It panics if one of the fields is a map and it's type is not map[string]interface{}.
-// It panics if one of the fields is a slice and it's type is not []interface{}.
+// It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
+// It panics if one of the nested fields is a slice and it's type is not []interface{}.
 func ValidateStruct(val interface{}, rules Rules) Errors {
 	if !IsStruct(val) {
 		panic("val is not a struct")
@@ -84,8 +84,8 @@ func ValidateStruct(val interface{}, rules Rules) Errors {
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
 // It panics if one of the rules is not registered.
-// It panics if one of the fields is a map and it's type is not map[string]interface{}.
-// It panics if one of the fields is a slice and it's type is not []interface{}.
+// It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
+// It panics if one of the nested fields is a slice and it's type is not []interface{}.
 func ValidateMap(val map[string]interface{}, rules Rules) Errors {
 	t := reflect.TypeOf(val)
 	v := createNewValidation(rules)
@@ -101,8 +101,8 @@ func ValidateMap(val map[string]interface{}, rules Rules) Errors {
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
 // It panics if one of the rules is not registered.
-// It panics if one of the fields is a map and it's type is not map[string]interface{}.
-// It panics if one of the fields is a slice and it's type is not []interface{}.
+// It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
+// It panics if one of the nested fields is a slice and it's type is not []interface{}.
 func ValidateSlice(val []interface{}, rules Rules) Errors {
 	t := reflect.TypeOf(val)
 	v := createNewValidation(rules)
