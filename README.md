@@ -92,7 +92,14 @@ Name is required
 Roles.write does not equal true
 ```
 
-Validate nested value:
+## Validate Single Value
+
+Use valdn.Validate() to validate one single value.
+
+valdn.Validate takes three arguments: `name, value, and slice of rules ([]string{...})` and returns `error`
+
+Example:
+
 ```go
 package main
 
@@ -101,8 +108,45 @@ import (
 	"log"
 )
 
+func main() {
+	name := "Narmer"
+	err := valdn.Validate("name", name, []string{"required", "kind:string", "minLen:6"})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+this will output:
+
+```
+name's length must be greater than or equal: 6
+```
+
+Keep in mind when using valdn.Validate:
+- It doesn't validate nested fields.
+- If an error is found it will not check the rest of the rules and returns the error.
+- It panics if one of the rules is not registered.
+
+## Validate Struct
+
+Use valdn.ValidateStruct() to validate struct.
+
+valdn.ValidateStruct() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+
+Example:
+
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+)
+
+// struct and it's nested fields must be exported, so it can be accessed by valdn
 type User struct {
-	Name string `valdn:"required"`
 	Roles map[string]interface{}
 }
 
@@ -121,21 +165,13 @@ func main() {
 }
 ```
 
-output:
+this will output:
 
 ```
-Name is required
 Roles.write does not equal true
 ```
 
-## Validate single value
-
-Use valdn.Validate() to validate one single value.
-
-valdn.Validate takes three arguments: `name, value, and slice of rules ([]string{...})`
-
-Example:
-
+Validate struct using struct field tag
 ```go
 package main
 
@@ -144,12 +180,22 @@ import (
 	"log"
 )
 
-func main() {
-	name := "valdn"
-	err := valdn.Validate("name", name, []string{"required", "kind:string", "minLen:6"})
+// struct and it's nested fields must be exported, so it can be accessed by valdn
+type User struct {
+	Name  string `valdn:"required|maxLen:3"`
+}
 
-	if err != nil {
-		log.Fatal(err)
+func main() {
+	user := User{
+		Name: "Ramses",
+	}
+
+	rules := valdn.Rules{}
+
+	errors := valdn.ValidateStruct(user, rules)
+
+	if len(errors) > 0 {
+		log.Fatal(errors)
 	}
 }
 ```
@@ -157,12 +203,23 @@ func main() {
 this will output:
 
 ```
-name's length must be greater than or equal: 6
+Name's length must be lower than or equal: 3
 ```
 
-Keep in mind when using valdn.Validate:
-- It doesn't validate nested fields.
-- If an error is found it will not check the rest of the rules and return the error.
+You change the TagName and Separator used to identify rules in struct field tag:
+
+`valdn.TagName = "valdn"`
+
+`valdn.Separator = "|"`
+
+Keep in mind when using valdn.ValidateStruct:
+- It panics if val is not kind of struct.
+- It panics if val is not exported, or it's fields is not exported.
+- It panics if val is not a struct.
+- If an error is found it will not check the rest of the field's rules and continue to the next field.
+- If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
+- It panics if one of the fields is a map and it's type is not map[string]interface{}.
+- It panics if one of the fields is a slice and it's type is not []interface{}.
 
 I'm working on the rest of the documentation.****
