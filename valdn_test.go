@@ -628,6 +628,9 @@ func Test_validation_validateStruct(t *testing.T) {
 		InterfaceSlice []interface{}
 		Child
 	}
+	type unexported struct {
+		name string
+	}
 	type args struct {
 		val   interface{}
 		rules Rules
@@ -690,6 +693,16 @@ func Test_validation_validateStruct(t *testing.T) {
 				rules: Rules{"InterfaceSlice.0": {"kind:int"}},
 			},
 			want: Errors{"InterfaceSlice.0": getErrMsg("kind", "int", "InterfaceSlice.0", "Tia")},
+		},
+		{
+			name: "validate struct has unexported fields",
+			args: args{
+				val: unexported{
+					name: "unexported field",
+				},
+				rules: Rules{"name": {"required", "kind:string"}},
+			},
+			want: Errors{},
 		},
 	}
 	for _, tt := range tests {
@@ -955,6 +968,9 @@ func Test_validation_validateStructFields(t *testing.T) {
 	type Parent struct {
 		Name string `valdn:"required|string"`
 	}
+	type unexported struct {
+		name string
+	}
 	type args struct {
 		t       reflect.Type
 		v       reflect.Value
@@ -988,6 +1004,16 @@ func Test_validation_validateStructFields(t *testing.T) {
 				errors:  map[string]string{},
 			},
 			want: Errors{"Name": getErrMsg("required", "", "Name", "")},
+		},
+		{
+			name: "test validate unexported field",
+			args: args{
+				t:       reflect.TypeOf(unexported{name: "unexported field"}),
+				v:       reflect.ValueOf(unexported{name: "unexported field"}),
+				parName: "",
+				rules:   Rules{"name": {"required", "kind:string"}},
+			},
+			want: Errors{},
 		},
 	}
 	for _, tt := range tests {

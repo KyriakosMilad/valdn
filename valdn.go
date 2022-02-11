@@ -275,6 +275,10 @@ func (v *validation) validateStructFields(parTyp reflect.Type, parVal reflect.Va
 	parName = makeParentNameJoinable(parName)
 	for i := 0; i < parTyp.NumField(); i++ {
 		name, typ, val := getStructFieldInfo(i, parTyp, parVal, parName)
+		// ignore unexported field
+		if !val.CanInterface() {
+			continue
+		}
 		v.validateByType(name, typ, val.Interface())
 	}
 }
