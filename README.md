@@ -14,8 +14,8 @@ any other Kind as a non-nested value.
 ## Table of Contents
 
 <!--ts-->
-* [Installation](#installation)
 * [Features](#features)
+* [Installation](#installation)
 * [Validate Single Value](#validate-single-value)
 * [Validate Struct](#validate-struct)
 * [Validate Map](#validate-map)
@@ -162,7 +162,6 @@ import (
 	"log"
 )
 
-// struct and it's nested fields must be exported, so it can be accessed by valdn
 type User struct {
 	Roles map[string]interface{}
 }
@@ -198,7 +197,6 @@ import (
 	"log"
 )
 
-// struct and it's nested fields must be exported, so it can be accessed by valdn
 type User struct {
 	Name string `valdn:"required|maxLen:3"`
 }
@@ -232,6 +230,7 @@ You can change the TagName and Separator used to identify rules in struct field 
 
 Keep in mind when using valdn.ValidateStruct:
 
+- Unexported fields cannot be validated.
 - It panics if val is not kind of struct.
 - It panics if val is not exported, or it's fields is not exported.
 - It panics if val is not a struct.
