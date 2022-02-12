@@ -230,9 +230,8 @@ You can change the TagName and Separator used to identify rules in struct field 
 
 Keep in mind when using valdn.ValidateStruct:
 
-- Unexported fields cannot be validated.
+- Unexported fields will be ignored.
 - It panics if val is not kind of struct.
-- It panics if val is not exported, or it's fields is not exported.
 - It panics if val is not a struct.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
