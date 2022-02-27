@@ -14,13 +14,15 @@ any other Kind as a non-nested value.
 ## Table of Contents
 
 <!--ts-->
+
 * [Features](#features)
 * [Installation](#installation)
-* [Validate Single Value](#validate-single-value)
+* [Validate single value](#validate-single-value)
 * [Validate Struct](#validate-struct)
 * [Validate Map](#validate-map)
 * [Validate Slice](#validate-slice)
 * [Validate JSON](#validate-json)
+
 <!--te-->
 
 ## Features
@@ -264,7 +266,7 @@ func main() {
 		"Ittihad of Alex SC": 1914,
 	}
 
-	// use * to apply rules to all nested fields
+	// use * to apply rules to all direct nested fields
 	rules := valdn.Rules{"*": {"required", "numerical", "min:1"}, "Zamalek SC": {"equal:1911"}}
 
 	errors := valdn.ValidateMap(egyptianClubsFoundedYear, rules)
@@ -313,7 +315,7 @@ func main() {
 		"d", // 3
 	}
 
-	// use * to apply rules to all nested fields
+	// use * to apply rules to all direct nested fields
 	rules := valdn.Rules{"*": {"required", "kind:string", "len:1"}, "0": {"equal:a"}}
 
 	errors := valdn.ValidateSlice(letters, rules)
@@ -357,7 +359,6 @@ import (
 func main() {
 	stringJSON := `{"name":11}`
 
-	// use * to apply rules to all nested fields
 	rules := valdn.Rules{"type": {"required", "kind:string"}, "value": {"required"}}
 
 	errors := valdn.ValidateJSON(stringJSON, rules)
