@@ -22,6 +22,7 @@ any other Kind as a non-nested value.
 * [Validate Map](#validate-map)
 * [Validate Slice](#validate-slice)
 * [Validate JSON](#validate-json)
+* [Validate Request](#validate-request)
 
 <!--te-->
 
@@ -383,4 +384,53 @@ Keep in mind when using valdn.ValidateJSON:
 - If parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
 
-I'm working on the rest of the documentation.****
+## Validate Request
+
+Use valdn.ValidateRequest() to validate all Request types (application/json, multipart/form-data,
+application/x-www-form-urlencoded) + URL params.
+
+valdn.ValidateRequest() takes two arguments: `*http.Request and rules (valdn.Rules{...})` and returns `valdn.Errors`
+
+Example:
+
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+)
+
+func main() {
+	// Create fake request for example only
+	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("lang=go")) // set request values: lang = go
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded") // set request header type to application/x-www-form-urlencoded
+
+	rules := valdn.Rules{"lang": {"required", "len:3"}, "value": {"required"}}
+
+	errors := valdn.ValidateRequest(r, rules)
+
+	if len(errors) > 0 {
+		log.Fatal(errors)
+	}
+}
+```
+
+this will output:
+
+```
+lang's length must be greater than or equal: 3
+```
+
+Keep in mind when using valdn.ValidateRequest:
+
+- It panics if body is not compatible with header content type.
+- It panics if one of the rules is not registered.
+- If name has many values it will be treated as slice.
+- If name has values in URL params and request body, they will be merged into one slice with that name.
+- If an error is found it will not check the rest of the field's rules and continue to the next field.
+
+I'm working on the documentation.****
