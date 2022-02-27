@@ -409,7 +409,7 @@ func main() {
 	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("lang=go")) // set request values: lang = go
 	r.Header.Set("Content-Type", "application/x-www-form-urlencoded") // set request header type to application/x-www-form-urlencoded
 
-	rules := valdn.Rules{"lang": {"required", "len:3"}, "value": {"required"}}
+	rules := valdn.Rules{"lang": {"required", "minLen:3"}, "value": {"required"}}
 
 	errors := valdn.ValidateRequest(r, rules)
 
