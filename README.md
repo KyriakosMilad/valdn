@@ -23,6 +23,7 @@ any other Kind as a non-nested value.
 * [Validate Slice](#validate-slice)
 * [Validate JSON](#validate-json)
 * [Validate Request](#validate-request)
+* [Add custom rules](#add-custom-rules)
 
 <!--te-->
 
@@ -407,7 +408,7 @@ import (
 func main() {
 	// Create fake request for example only
 	r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("lang=go")) // set request values: lang = go
-	r.Header.Set("Content-Type", "application/x-www-form-urlencoded") // set request header type to application/x-www-form-urlencoded
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")            // set request header type to application/x-www-form-urlencoded
 
 	rules := valdn.Rules{"lang": {"required", "minLen:3"}, "value": {"required"}}
 
@@ -432,5 +433,60 @@ Keep in mind when using valdn.ValidateRequest:
 - If name has many values it will be treated as slice.
 - If name has values in URL params and request body, they will be merged into one slice with that name.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
+
+## Add custom rules
+
+Use valdn.AddRule() to add custom rule. valdn.AddRule() takes three
+arguments: `name (string) and ruleFunction (valdn.RuleFunc) and error message`
+
+Example:
+
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+	"fmt"
+	"errors"
+	"reflect"
+)
+
+// Create rule to check if value starts with specific part
+func startsWithRule(name string, val interface{}, ruleVal string) error {
+	if v, ok := val.(string); ok {
+		for i := 0; i < len(ruleVal); i++ {
+			if v[i] == ruleVal[i] {
+				return errors.New(valdn.GetErrMsg("startsWith", ruleVal, name, val))
+			}
+		}
+	} else {
+		panic(fmt.Errorf("startsWithRule expects value to be string, got: %v", reflect.TypeOf(val).Kind()))
+	}
+
+	return nil
+}
+
+func main() {
+	valdn.AddRule("startsWith", startsWithRule, "[name] must start with '[ruleVal]'") // rule name, rule function, validation error message
+
+	s := []string{
+		"testnewcustomrule", // 0
+	}
+
+	rules := valdn.Rules{"0": {"startsWith:test"}}
+
+	errs := valdn.ValidateSlice(s, rules)
+
+	if len(errs) > 0 {
+		log.Fatal(errs)
+	}
+}
+```
+this will output:
+
+```
+0 must start with 'test'
+```
 
 I'm working on the documentation.****
