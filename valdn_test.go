@@ -131,8 +131,8 @@ func Test_ValidateStruct(t *testing.T) {
 				rules: Rules{"Age": {"required"}},
 			},
 			want: Errors{
-				"Name": getErrMsg("required", "", "Name", ""),
-				"Age":  getErrMsg("required", "", "Age", 0),
+				"Name": GetErrMsg("required", "", "Name", ""),
+				"Age":  GetErrMsg("required", "", "Age", 0),
 			},
 			wantPanic: false,
 		},
@@ -188,7 +188,7 @@ func Test_ValidateMap(t *testing.T) {
 				rules: Rules{"Name": {"required"}},
 			},
 			want: Errors{
-				"Name": getErrMsg("required", "", "Name", ""),
+				"Name": GetErrMsg("required", "", "Name", ""),
 			},
 			wantPanic: false,
 		},
@@ -235,7 +235,7 @@ func Test_ValidateSlice(t *testing.T) {
 				rules: Rules{"0": {"kind:string"}},
 			},
 			want: Errors{
-				"0": getErrMsg("kind", "string", "0", ""),
+				"0": GetErrMsg("kind", "string", "0", ""),
 			},
 			wantPanic: false,
 		},
@@ -283,7 +283,7 @@ func Test_ValidateJSON(t *testing.T) {
 			},
 			wantPanic: false,
 			want: Errors{
-				"city": getErrMsg("required", "", "city", 0),
+				"city": GetErrMsg("required", "", "city", 0),
 			}},
 		{
 			name: `test validate json with non-json-string`,
@@ -328,7 +328,7 @@ func Test_ValidateRequest(t *testing.T) {
 				rules: Rules{"field1": {"required"}, "field2": {"required"}, "field3": {"required"}, "file": {"required"}},
 			},
 			wantPanic: false,
-			want:      Errors{"field3": getErrMsg("required", "", "field3", "")},
+			want:      Errors{"field3": GetErrMsg("required", "", "field3", "")},
 		},
 		{
 			name: "test ValidateRequest with application/x-www-form-urlencoded",
@@ -337,7 +337,7 @@ func Test_ValidateRequest(t *testing.T) {
 				rules: Rules{"lang": {"required", "kind:int"}},
 			},
 			wantPanic: false,
-			want:      Errors{"lang": getErrMsg("kind", "int", "lang", "go")},
+			want:      Errors{"lang": GetErrMsg("kind", "int", "lang", "go")},
 		},
 		{
 			name: "test ValidateRequest with application/json",
@@ -346,7 +346,7 @@ func Test_ValidateRequest(t *testing.T) {
 				rules: Rules{"lang": {"required", "kind:int"}},
 			},
 			wantPanic: false,
-			want:      Errors{"lang": getErrMsg("kind", "int", "lang", "go")},
+			want:      Errors{"lang": GetErrMsg("kind", "int", "lang", "go")},
 		},
 		{
 			name: "test ValidateRequest with url params",
@@ -355,7 +355,7 @@ func Test_ValidateRequest(t *testing.T) {
 				rules: Rules{"lang": {"required", "kind:int"}},
 			},
 			wantPanic: false,
-			want:      Errors{"lang": getErrMsg("kind", "int", "lang", "go")},
+			want:      Errors{"lang": GetErrMsg("kind", "int", "lang", "go")},
 		},
 		{
 			name: "test ValidateRequest with empty json",
@@ -373,7 +373,7 @@ func Test_ValidateRequest(t *testing.T) {
 				rules: Rules{"lang": {"required"}},
 			},
 			wantPanic: false,
-			want:      Errors{"lang": getErrMsg("required", "", "lang", "")},
+			want:      Errors{"lang": GetErrMsg("required", "", "lang", "")},
 		},
 		{
 			name: "test ValidateRequest with rule does not exist",
@@ -668,7 +668,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				},
 				rules: Rules{"Name": {"required", "kind:string"}, "Child.Name": {"required"}},
 			},
-			want: Errors{"Child.Name": getErrMsg("required", "", "Child.Name", "")},
+			want: Errors{"Child.Name": GetErrMsg("required", "", "Child.Name", "")},
 		},
 		{
 			name: "validate struct contains map with unsuitable data",
@@ -680,7 +680,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				},
 				rules: Rules{"StringKeyMap.name": {"kind:int"}},
 			},
-			want: Errors{"StringKeyMap.name": getErrMsg("kind", "int", "StringKeyMap.name", "Tia")},
+			want: Errors{"StringKeyMap.name": GetErrMsg("kind", "int", "StringKeyMap.name", "Tia")},
 		},
 		{
 			name: "validate struct contains slice with unsuitable data",
@@ -692,7 +692,7 @@ func Test_validation_validateStruct(t *testing.T) {
 				},
 				rules: Rules{"InterfaceSlice.0": {"kind:int"}},
 			},
-			want: Errors{"InterfaceSlice.0": getErrMsg("kind", "int", "InterfaceSlice.0", "Tia")},
+			want: Errors{"InterfaceSlice.0": GetErrMsg("kind", "int", "InterfaceSlice.0", "Tia")},
 		},
 		{
 			name: "validate struct has unexported fields",
@@ -744,7 +744,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"Name": "Ramses", "age": 90},
 				rules: Rules{"Name": {"required", "kind:int"}},
 			},
-			want: Errors{"Name": getErrMsg("kind", "int", "Name", "Ramses")},
+			want: Errors{"Name": GetErrMsg("kind", "int", "Name", "Ramses")},
 		},
 		{
 			name: "test validate nested map",
@@ -760,7 +760,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"user": map[string]interface{}{"Name": 1}},
 				rules: Rules{"user.Name": {"required", "kind:string"}},
 			},
-			want: Errors{"user.Name": getErrMsg("kind", "string", "user.Name", 1)},
+			want: Errors{"user.Name": GetErrMsg("kind", "string", "user.Name", 1)},
 		},
 		{
 			name: "test validate nested map with non-string key",
@@ -777,7 +777,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"user": User{Name: 5}},
 				rules: Rules{"user.Name": {"required", "kind:string"}},
 			},
-			want: Errors{"user.Name": getErrMsg("kind", "string", "user.Name", 1)},
+			want: Errors{"user.Name": GetErrMsg("kind", "string", "user.Name", 1)},
 		},
 		{
 			name: "validate struct contains slice with unsuitable data",
@@ -785,7 +785,7 @@ func Test_validation_validateMap(t *testing.T) {
 				val:   map[string]interface{}{"slice": []interface{}{"Tia"}},
 				rules: Rules{"slice.0": {"kind:int"}},
 			},
-			want: Errors{"slice.0": getErrMsg("kind", "int", "slice.0", "Tia")},
+			want: Errors{"slice.0": GetErrMsg("kind", "int", "slice.0", "Tia")},
 		},
 	}
 	for _, tt := range tests {
@@ -832,7 +832,7 @@ func Test_validation_validateSlice(t *testing.T) {
 				val:   []interface{}{"Ramses"},
 				rules: Rules{"0": {"required", "kind:int"}},
 			},
-			want: Errors{"0": getErrMsg("kind", "int", "0", "Ramses")},
+			want: Errors{"0": GetErrMsg("kind", "int", "0", "Ramses")},
 		},
 		{
 			name: "test validate nested slice",
@@ -848,7 +848,7 @@ func Test_validation_validateSlice(t *testing.T) {
 				val:   []interface{}{[]interface{}{1973}},
 				rules: Rules{".*": {"kind:slice"}, "0.*": {"kind:string"}},
 			},
-			want: Errors{"0.0": getErrMsg("kind", "string", "0.0", 1973)},
+			want: Errors{"0.0": GetErrMsg("kind", "string", "0.0", 1973)},
 		},
 		{
 			name: "test validate nested slice with unsuitable type",
@@ -865,7 +865,7 @@ func Test_validation_validateSlice(t *testing.T) {
 				val:   []interface{}{map[string]interface{}{"user": 1973}},
 				rules: Rules{".*": {"required"}, "0.user": {"required", "kind:string"}},
 			},
-			want: Errors{"0.user": getErrMsg("kind", "string", "0.user", 1973)},
+			want: Errors{"0.user": GetErrMsg("kind", "string", "0.user", 1973)},
 		},
 		{
 			name: "test validate slice containing struct",
@@ -873,7 +873,7 @@ func Test_validation_validateSlice(t *testing.T) {
 				val:   []interface{}{User{Name: 1973}},
 				rules: Rules{".*": {"required"}, "0.Name": {"required", "kind:string"}},
 			},
-			want: Errors{"0.Name": getErrMsg("kind", "string", "0.Name", 1973)},
+			want: Errors{"0.Name": GetErrMsg("kind", "string", "0.Name", 1973)},
 		},
 	}
 	for _, tt := range tests {
@@ -917,7 +917,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"Parent.Name": {"required"}},
 				fieldsExist: map[string]bool{},
 			},
-			want: Errors{"Parent.Name": getErrMsg("required", "", "Parent.Name", "")},
+			want: Errors{"Parent.Name": GetErrMsg("required", "", "Parent.Name", "")},
 		},
 		{
 			name: "test validate by type - map with unsuitable data",
@@ -928,7 +928,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"Parent.Name": {"kind:string"}},
 				fieldsExist: map[string]bool{},
 			},
-			want: Errors{"Parent.Name": getErrMsg("kind", "string", "Parent.Name", 22)},
+			want: Errors{"Parent.Name": GetErrMsg("kind", "string", "Parent.Name", 22)},
 		},
 		{
 			name: "test validate by slice - slice with unsuitable data",
@@ -939,7 +939,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"Parent.0": {"kind:int"}},
 				fieldsExist: map[string]bool{"Parent.0": true},
 			},
-			want: Errors{"Parent.0": getErrMsg("kind", "int", "Parent.0", "")},
+			want: Errors{"Parent.0": GetErrMsg("kind", "int", "Parent.0", "")},
 		},
 		{
 			name: "test validate by type - field with unsuitable data",
@@ -950,7 +950,7 @@ func Test_validation_validateByType(t *testing.T) {
 				rules:       Rules{"age": {"required"}},
 				fieldsExist: map[string]bool{},
 			},
-			want: Errors{"age": getErrMsg("required", "", "age", "")},
+			want: Errors{"age": GetErrMsg("required", "", "age", "")},
 		},
 	}
 	for _, tt := range tests {
@@ -1003,7 +1003,7 @@ func Test_validation_validateStructFields(t *testing.T) {
 				rules:   Rules{"Name": {"required"}},
 				errors:  map[string]string{},
 			},
-			want: Errors{"Name": getErrMsg("required", "", "Name", "")},
+			want: Errors{"Name": GetErrMsg("required", "", "Name", "")},
 		},
 		{
 			name: "test validate unexported field",
@@ -1057,7 +1057,7 @@ func Test_validation_validateMapFields(t *testing.T) {
 				rules:   Rules{"Parent.Name": {"required"}},
 				errors:  map[string]string{},
 			},
-			want: Errors{"Parent.Name": getErrMsg("required", "", "Parent.Name", "")},
+			want: Errors{"Parent.Name": GetErrMsg("required", "", "Parent.Name", "")},
 		},
 	}
 	for _, tt := range tests {
@@ -1101,7 +1101,7 @@ func Test_validation_validateSliceFields(t *testing.T) {
 				rules:   Rules{"Parent.0": {"kind:int"}},
 				errors:  map[string]string{},
 			},
-			want: Errors{"Parent.0": getErrMsg("kind", "int", "Parent.0", "Pola")},
+			want: Errors{"Parent.0": GetErrMsg("kind", "int", "Parent.0", "Pola")},
 		},
 	}
 	for _, tt := range tests {
@@ -1133,7 +1133,7 @@ func Test_validation_validateNonExistRequiredFields(t *testing.T) {
 				fieldsExist: map[string]bool{"field1": true, "field2": true},
 				errors:      map[string]string{},
 			},
-			want: Errors{"field3": getErrMsg("required", "", "field3", "")},
+			want: Errors{"field3": GetErrMsg("required", "", "field3", "")},
 		},
 	}
 	for _, tt := range tests {

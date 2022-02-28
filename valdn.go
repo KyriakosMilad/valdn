@@ -308,7 +308,7 @@ func (v *validation) validateNonExistRequiredFields() {
 			if rName == "required" {
 				_, ok := v.fieldsExist[name]
 				if !ok {
-					v.addError(name, errors.New(getErrMsg("required", rVal, name, "")))
+					v.addError(name, errors.New(GetErrMsg("required", rVal, name, "")))
 				}
 			}
 		}

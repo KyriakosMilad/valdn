@@ -52,7 +52,7 @@ func SetErrMsg(ruleName string, errMsg string) {
 	r.errMsg = errMsg
 }
 
-func getErrMsg(ruleName string, ruleVal string, name string, val interface{}) string {
+func GetErrMsg(ruleName string, ruleVal string, name string, val interface{}) string {
 	errMsg := registeredRules[ruleName].errMsg
 	errMsg = strings.ReplaceAll(errMsg, "[name]", name)
 	errMsg = strings.ReplaceAll(errMsg, "[val]", toString(val))
@@ -74,7 +74,7 @@ func getRuleInfo(r string) (string, string, RuleFunc, bool) {
 // It returns error if val is not exist or empty.
 func requiredRule(name string, val interface{}, ruleVal string) error {
 	if IsEmpty(val) {
-		return errors.New(getErrMsg("required", ruleVal, name, val))
+		return errors.New(GetErrMsg("required", ruleVal, name, val))
 	}
 	return nil
 }
@@ -83,7 +83,7 @@ func requiredRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val's kind does not equal ruleVal.
 func kindRule(name string, val interface{}, ruleVal string) error {
 	if !IsKind(val, ruleVal) {
-		return errors.New(getErrMsg("kind", ruleVal, name, val))
+		return errors.New(GetErrMsg("kind", ruleVal, name, val))
 	}
 	return nil
 }
@@ -92,7 +92,7 @@ func kindRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val's kind is not one of ruleVal[].
 func kindInRule(name string, val interface{}, ruleVal string) error {
 	if !IsKindIn(val, strings.Split(ruleVal, ",")) {
-		return errors.New(getErrMsg("kindIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("kindIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -101,7 +101,7 @@ func kindInRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val's kind is one of ruleVal[].
 func kindNotInRule(name string, val interface{}, ruleVal string) error {
 	if IsKindIn(val, strings.Split(ruleVal, ",")) {
-		return errors.New(getErrMsg("kindNotIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("kindNotIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -110,7 +110,7 @@ func kindNotInRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val's type does not equal ruleVal.
 func typeRule(name string, val interface{}, ruleVal string) error {
 	if !IsType(val, ruleVal) {
-		return errors.New(getErrMsg("type", ruleVal, name, val))
+		return errors.New(GetErrMsg("type", ruleVal, name, val))
 	}
 	return nil
 }
@@ -119,7 +119,7 @@ func typeRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val's type is not one of ruleVal[].
 func typeInRule(name string, val interface{}, ruleVal string) error {
 	if !IsTypeIn(val, strings.Split(ruleVal, ",")) {
-		return errors.New(getErrMsg("typeIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("typeIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -128,7 +128,7 @@ func typeInRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val's type is one of ruleVal[].
 func typeNotInRule(name string, val interface{}, ruleVal string) error {
 	if IsTypeIn(val, strings.Split(ruleVal, ",")) {
-		return errors.New(getErrMsg("typeNotIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("typeNotIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -137,7 +137,7 @@ func typeNotInRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val does not equal ruleVal.
 func equalRule(name string, val interface{}, ruleVal string) error {
 	if toString(val) != ruleVal {
-		return errors.New(getErrMsg("equal", ruleVal, name, val))
+		return errors.New(GetErrMsg("equal", ruleVal, name, val))
 	}
 	return nil
 }
@@ -146,7 +146,7 @@ func equalRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not an integer.
 func intRule(name string, val interface{}, ruleVal string) error {
 	if !IsInteger(val) {
-		return errors.New(getErrMsg("int", ruleVal, name, val))
+		return errors.New(GetErrMsg("int", ruleVal, name, val))
 	}
 	return nil
 }
@@ -155,7 +155,7 @@ func intRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not an unsigned integer.
 func uintRule(name string, val interface{}, ruleVal string) error {
 	if !IsUnsignedInteger(val) {
-		return errors.New(getErrMsg("uint", ruleVal, name, val))
+		return errors.New(GetErrMsg("uint", ruleVal, name, val))
 	}
 	return nil
 }
@@ -164,7 +164,7 @@ func uintRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a complex number.
 func complexRule(name string, val interface{}, ruleVal string) error {
 	if !IsComplex(val) {
-		return errors.New(getErrMsg("complex", ruleVal, name, val))
+		return errors.New(GetErrMsg("complex", ruleVal, name, val))
 	}
 	return nil
 }
@@ -173,7 +173,7 @@ func complexRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a float.
 func floatRule(name string, val interface{}, ruleVal string) error {
 	if !IsFloat(val) {
-		return errors.New(getErrMsg("float", ruleVal, name, val))
+		return errors.New(GetErrMsg("float", ruleVal, name, val))
 	}
 	return nil
 }
@@ -182,7 +182,7 @@ func floatRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not an unsigned float.
 func ufloatRule(name string, val interface{}, ruleVal string) error {
 	if !IsUnsignedFloat(val) {
-		return errors.New(getErrMsg("ufloat", ruleVal, name, val))
+		return errors.New(GetErrMsg("ufloat", ruleVal, name, val))
 	}
 	return nil
 }
@@ -191,7 +191,7 @@ func ufloatRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a numeric.
 func numericRule(name string, val interface{}, ruleVal string) error {
 	if !IsNumeric(val) {
-		return errors.New(getErrMsg("numeric", ruleVal, name, val))
+		return errors.New(GetErrMsg("numeric", ruleVal, name, val))
 	}
 	return nil
 }
@@ -222,7 +222,7 @@ func betweenRule(name string, val interface{}, ruleVal string) error {
 	}
 
 	if vFloat < min || vFloat > max {
-		return errors.New(getErrMsg("between", ruleVal, name, val))
+		return errors.New(GetErrMsg("between", ruleVal, name, val))
 	}
 	return nil
 }
@@ -243,7 +243,7 @@ func minRule(name string, val interface{}, ruleVal string) error {
 	}
 
 	if vFloat < min {
-		return errors.New(getErrMsg("min", ruleVal, name, val))
+		return errors.New(GetErrMsg("min", ruleVal, name, val))
 	}
 	return nil
 }
@@ -264,7 +264,7 @@ func maxRule(name string, val interface{}, ruleVal string) error {
 	}
 
 	if vFloat > max {
-		return errors.New(getErrMsg("max", ruleVal, name, val))
+		return errors.New(GetErrMsg("max", ruleVal, name, val))
 	}
 	return nil
 }
@@ -281,7 +281,7 @@ func inRule(name string, val interface{}, ruleVal string) error {
 		}
 	}
 	if !in {
-		return errors.New(getErrMsg("in", ruleVal, name, val))
+		return errors.New(GetErrMsg("in", ruleVal, name, val))
 	}
 	return nil
 }
@@ -298,7 +298,7 @@ func notInRule(name string, val interface{}, ruleVal string) error {
 		}
 	}
 	if in {
-		return errors.New(getErrMsg("notIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("notIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -316,7 +316,7 @@ func lenRule(name string, val interface{}, ruleVal string) error {
 		panic(err.Error())
 	}
 	if vLen != int(l) {
-		return errors.New(getErrMsg("len", ruleVal, name, val))
+		return errors.New(GetErrMsg("len", ruleVal, name, val))
 	}
 	return nil
 }
@@ -334,7 +334,7 @@ func minLenRule(name string, val interface{}, ruleVal string) error {
 		panic(err.Error())
 	}
 	if vLen < int(l) {
-		return errors.New(getErrMsg("minLen", ruleVal, name, val))
+		return errors.New(GetErrMsg("minLen", ruleVal, name, val))
 	}
 	return nil
 }
@@ -352,7 +352,7 @@ func maxLenRule(name string, val interface{}, ruleVal string) error {
 		panic(err.Error())
 	}
 	if vLen > int(l) {
-		return errors.New(getErrMsg("maxLen", ruleVal, name, val))
+		return errors.New(GetErrMsg("maxLen", ruleVal, name, val))
 	}
 	return nil
 }
@@ -381,7 +381,7 @@ func lenBetweenRule(name string, val interface{}, ruleVal string) error {
 		panic(fmt.Errorf("lenBetweenRule: max must be an integer, got: %v", ruleValSpliced[1]))
 	}
 	if l < int(min) || l > int(max) {
-		return errors.New(getErrMsg("lenBetween", ruleVal, name, val))
+		return errors.New(GetErrMsg("lenBetween", ruleVal, name, val))
 	}
 	return nil
 }
@@ -408,7 +408,7 @@ func lenInRule(name string, val interface{}, ruleVal string) error {
 		}
 	}
 	if !in {
-		return errors.New(getErrMsg("lenIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("lenIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -435,7 +435,7 @@ func lenNotInRule(name string, val interface{}, ruleVal string) error {
 		}
 	}
 	if in {
-		return errors.New(getErrMsg("lenNotIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("lenNotIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -454,7 +454,7 @@ func regexRule(name string, val interface{}, ruleVal string) error {
 	}
 	match := r.MatchString(toString(val))
 	if !match {
-		return errors.New(getErrMsg("regex", ruleVal, name, val))
+		return errors.New(GetErrMsg("regex", ruleVal, name, val))
 	}
 	return nil
 }
@@ -473,7 +473,7 @@ func notRegexRule(name string, val interface{}, ruleVal string) error {
 	}
 	match := r.MatchString(toString(val))
 	if match {
-		return errors.New(getErrMsg("notRegex", ruleVal, name, val))
+		return errors.New(GetErrMsg("notRegex", ruleVal, name, val))
 	}
 	return nil
 }
@@ -487,7 +487,7 @@ func emailRule(name string, val interface{}, ruleVal string) error {
 	}
 	ok := IsEmail(toString(val))
 	if !ok {
-		return errors.New(getErrMsg("email", ruleVal, name, val))
+		return errors.New(GetErrMsg("email", ruleVal, name, val))
 	}
 	return nil
 }
@@ -501,7 +501,7 @@ func jsonRule(name string, val interface{}, ruleVal string) error {
 	}
 	ok := IsJSON(toString(val))
 	if !ok {
-		return errors.New(getErrMsg("json", ruleVal, name, val))
+		return errors.New(GetErrMsg("json", ruleVal, name, val))
 	}
 	return nil
 }
@@ -515,7 +515,7 @@ func ipv4Rule(name string, val interface{}, ruleVal string) error {
 	}
 	ok := IsIPv4(toString(val))
 	if !ok {
-		return errors.New(getErrMsg("ipv4", ruleVal, name, val))
+		return errors.New(GetErrMsg("ipv4", ruleVal, name, val))
 	}
 	return nil
 }
@@ -529,7 +529,7 @@ func ipv6Rule(name string, val interface{}, ruleVal string) error {
 	}
 	ok := IsIPv6(toString(val))
 	if !ok {
-		return errors.New(getErrMsg("ipv6", ruleVal, name, val))
+		return errors.New(GetErrMsg("ipv6", ruleVal, name, val))
 	}
 	return nil
 }
@@ -543,7 +543,7 @@ func ipRule(name string, val interface{}, ruleVal string) error {
 	}
 	ok := IsIP(toString(val))
 	if !ok {
-		return errors.New(getErrMsg("ip", ruleVal, name, val))
+		return errors.New(GetErrMsg("ip", ruleVal, name, val))
 	}
 	return nil
 }
@@ -557,7 +557,7 @@ func macRule(name string, val interface{}, ruleVal string) error {
 	}
 	ok := IsMAC(toString(val))
 	if !ok {
-		return errors.New(getErrMsg("mac", ruleVal, name, val))
+		return errors.New(GetErrMsg("mac", ruleVal, name, val))
 	}
 	return nil
 }
@@ -571,7 +571,7 @@ func urlRule(name string, val interface{}, ruleVal string) error {
 	}
 	ok := IsURL(toString(val))
 	if !ok {
-		return errors.New(getErrMsg("url", ruleVal, name, val))
+		return errors.New(GetErrMsg("url", ruleVal, name, val))
 	}
 	return nil
 }
@@ -580,7 +580,7 @@ func urlRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not type of time.Time.
 func timeRule(name string, val interface{}, ruleVal string) error {
 	if _, ok := val.(time.Time); !ok {
-		return errors.New(getErrMsg("time", ruleVal, name, val))
+		return errors.New(GetErrMsg("time", ruleVal, name, val))
 	}
 	return nil
 }
@@ -590,7 +590,7 @@ func timeRule(name string, val interface{}, ruleVal string) error {
 func timeFormatRule(name string, val interface{}, ruleVal string) error {
 	_, err := time.Parse(ruleVal, toString(val))
 	if err != nil {
-		return errors.New(getErrMsg("timeFormat", ruleVal, name, val))
+		return errors.New(GetErrMsg("timeFormat", ruleVal, name, val))
 	}
 	return nil
 }
@@ -609,7 +609,7 @@ func timeFormatInRule(name string, val interface{}, ruleVal string) error {
 		}
 	}
 	if !in {
-		return errors.New(getErrMsg("timeFormatIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("timeFormatIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -628,7 +628,7 @@ func timeFormatNotInRule(name string, val interface{}, ruleVal string) error {
 		}
 	}
 	if in {
-		return errors.New(getErrMsg("timeFormatNotIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("timeFormatNotIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -637,7 +637,7 @@ func timeFormatNotInRule(name string, val interface{}, ruleVal string) error {
 // It returns error if val is not a valid file.
 func fileRule(name string, val interface{}, ruleVal string) error {
 	if !IsFile(val) {
-		return errors.New(getErrMsg("file", ruleVal, name, val))
+		return errors.New(GetErrMsg("file", ruleVal, name, val))
 	}
 	return nil
 }
@@ -656,7 +656,7 @@ func sizeRule(name string, val interface{}, ruleVal string) error {
 		panic(err)
 	}
 	if size != fileSize {
-		return errors.New(getErrMsg("size", ruleVal, name, val))
+		return errors.New(GetErrMsg("size", ruleVal, name, val))
 	}
 	return nil
 }
@@ -675,7 +675,7 @@ func sizeMinRule(name string, val interface{}, ruleVal string) error {
 		panic(err)
 	}
 	if fileSize < size {
-		return errors.New(getErrMsg("sizeMin", ruleVal, name, val))
+		return errors.New(GetErrMsg("sizeMin", ruleVal, name, val))
 	}
 	return nil
 }
@@ -694,7 +694,7 @@ func sizeMaxRule(name string, val interface{}, ruleVal string) error {
 		panic(err)
 	}
 	if fileSize > size {
-		return errors.New(getErrMsg("sizeMax", ruleVal, name, val))
+		return errors.New(GetErrMsg("sizeMax", ruleVal, name, val))
 	}
 	return nil
 }
@@ -723,7 +723,7 @@ func sizeBetweenRule(name string, val interface{}, ruleVal string) error {
 		panic(fmt.Errorf("sizeBetweenRule: max must be an integer, got: %v", ruleValSpliced[1]))
 	}
 	if fileSize < min || fileSize > max {
-		return errors.New(getErrMsg("sizeBetween", ruleVal, name, val))
+		return errors.New(GetErrMsg("sizeBetween", ruleVal, name, val))
 	}
 	return nil
 }
@@ -740,7 +740,7 @@ func extRule(name string, val interface{}, ruleVal string) error {
 		ruleVal = "." + ruleVal
 	}
 	if ruleVal != ext {
-		return errors.New(getErrMsg("ext", ruleVal, name, val))
+		return errors.New(GetErrMsg("ext", ruleVal, name, val))
 	}
 	return nil
 }
@@ -757,7 +757,7 @@ func notExtRule(name string, val interface{}, ruleVal string) error {
 		ruleVal = "." + ruleVal
 	}
 	if ruleVal == ext {
-		return errors.New(getErrMsg("notExt", ruleVal, name, val))
+		return errors.New(GetErrMsg("notExt", ruleVal, name, val))
 	}
 	return nil
 }
@@ -782,7 +782,7 @@ func extInRule(name string, val interface{}, ruleVal string) error {
 		}
 	}
 	if !in {
-		return errors.New(getErrMsg("extIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("extIn", ruleVal, name, val))
 	}
 	return nil
 }
@@ -807,7 +807,7 @@ func extNotInRule(name string, val interface{}, ruleVal string) error {
 		}
 	}
 	if in {
-		return errors.New(getErrMsg("extNotIn", ruleVal, name, val))
+		return errors.New(GetErrMsg("extNotIn", ruleVal, name, val))
 	}
 	return nil
 }

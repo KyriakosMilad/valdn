@@ -125,7 +125,7 @@ func Test_SetErrMsg(t *testing.T) {
 	}
 }
 
-func Test_getErrMsg(t *testing.T) {
+func Test_GetErrMsg(t *testing.T) {
 	type args struct {
 		ruleName string
 		ruleVal  string
@@ -150,8 +150,8 @@ func Test_getErrMsg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getErrMsg(tt.args.ruleName, tt.args.ruleVal, tt.args.name, tt.args.val); got != tt.want {
-				t.Errorf("getErrMsg() = %v, want: %v", got, tt.want)
+			if got := GetErrMsg(tt.args.ruleName, tt.args.ruleVal, tt.args.name, tt.args.val); got != tt.want {
+				t.Errorf("GetErrMsg() = %v, want: %v", got, tt.want)
 			}
 		})
 	}

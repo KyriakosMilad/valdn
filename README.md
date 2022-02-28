@@ -440,6 +440,7 @@ Keep in mind when using valdn.ValidateRequest:
 Use valdn.SetErrMsg() to set custom error message for a specific rule.
 
 You can use provided parameters to dynamically set error messages:
+
 - [name]: filed name
 - [val]: field value
 - [ruleVal]: rule value (rule has value like `min:value` accepts dynamic numerical as value)
@@ -456,7 +457,7 @@ import (
 
 func main() {
 	valdn.SetErrMsg("min", "[name]'s value is [val], [name] must be greater than [ruleVal]")
-	
+
 	m := map[string]interface{}{"age": 15}
 
 	rules := valdn.Rules{"age": {"min:17"}}
@@ -528,6 +529,7 @@ func main() {
 	}
 }
 ```
+
 this will output:
 
 ```
