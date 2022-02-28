@@ -23,6 +23,7 @@ any other Kind as a non-nested value.
 * [Validate Slice](#validate-slice)
 * [Validate JSON](#validate-json)
 * [Validate Request](#validate-request)
+* [Change error messages](#change-error-messages)
 * [Add custom rules](#add-custom-rules)
 
 <!--te-->
@@ -433,6 +434,50 @@ Keep in mind when using valdn.ValidateRequest:
 - If name has many values it will be treated as slice.
 - If name has values in URL params and request body, they will be merged into one slice with that name.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
+
+## Change error messages
+
+Use valdn.SetErrMsg() to set custom error message for a specific rule.
+
+You can use provided parameters to dynamically set error messages:
+- [name]: filed name
+- [val]: field value
+- [ruleVal]: rule value (rule has value like `min:value` accepts dynamic numerical as value)
+
+Example:
+
+```go
+package main
+
+import (
+	"github.com/KyriakosMilad/valdn"
+	"log"
+)
+
+func main() {
+	valdn.SetErrMsg("min", "[name]'s value is [val], [name] must be greater than [ruleVal]")
+	
+	m := map[string]interface{}{"age": 15}
+
+	rules := valdn.Rules{"age": {"min:17"}}
+
+	errors := valdn.ValidateMap(m, rules)
+
+	if len(errors) > 0 {
+		log.Fatal(errors)
+	}
+}
+```
+
+this will output:
+
+```
+age's value is 15, age must be greater than 17
+```
+
+Keep in mind when using valdn.SetErrMsg:
+
+- It panics if rule does not exist.
 
 ## Add custom rules
 
