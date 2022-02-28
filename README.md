@@ -38,7 +38,7 @@ any other Kind as a non-nested value.
 - Validate nested struct.
 - Support using rules in struct field tag.
 - +45 rules ready to use.
-- +35 checker functions ready to use.
+- +35 validation functions ready to use.
 - Add custom rule.
 - Add custom validation message.
 
@@ -516,7 +516,7 @@ func startsWithRule(name string, val interface{}, ruleVal string) error {
 func main() {
 	valdn.AddRule("startsWith", startsWithRule, "[name] must start with '[ruleVal]'") // rule name, rule function, validation error message
 
-	s := []string{
+	s := []interface{}{
 		"newcustomrule", // 0
 	}
 
