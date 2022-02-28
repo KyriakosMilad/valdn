@@ -502,7 +502,7 @@ import (
 func startsWithRule(name string, val interface{}, ruleVal string) error {
 	if v, ok := val.(string); ok {
 		for i := 0; i < len(ruleVal); i++ {
-			if v[i] == ruleVal[i] {
+			if v[i] != ruleVal[i] {
 				return errors.New(valdn.GetErrMsg("startsWith", ruleVal, name, val))
 			}
 		}
@@ -517,7 +517,7 @@ func main() {
 	valdn.AddRule("startsWith", startsWithRule, "[name] must start with '[ruleVal]'") // rule name, rule function, validation error message
 
 	s := []string{
-		"testnewcustomrule", // 0
+		"newcustomrule", // 0
 	}
 
 	rules := valdn.Rules{"0": {"startsWith:test"}}
