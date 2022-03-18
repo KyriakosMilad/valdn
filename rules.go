@@ -106,7 +106,7 @@ func kindNotInRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
-// typeRule checks if val's type equals ruleVal
+// typeRule checks if val's type equals ruleVal.
 // It returns error if val's type does not equal ruleVal.
 func typeRule(name string, val interface{}, ruleVal string) error {
 	if !IsType(val, ruleVal) {
