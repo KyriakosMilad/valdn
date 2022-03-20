@@ -25,6 +25,7 @@ any other Kind as a non-nested value.
 * [Validate Request](#validate-request)
 * [Change error messages](#change-error-messages)
 * [Add custom rules](#add-custom-rules)
+* [Rules](#rules)
 
 <!--te-->
 
