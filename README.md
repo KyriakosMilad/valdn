@@ -25,7 +25,8 @@ any other Kind as a non-nested value.
 * [Validate Request](#validate-request)
 * [Change error messages](#change-error-messages)
 * [Add custom rules](#add-custom-rules)
-* [Rules](#rules)
+* [Validation rules](#validation-rules)
+* [Validation functions](#validation-functions)
 
 <!--te-->
 
@@ -537,7 +538,7 @@ this will output:
 0 must start with 'test'
 ```
 
-## Rules
+## Validation rules
 
 
 | ruleName        | ruleVal                           | Example                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                         |
@@ -590,4 +591,31 @@ this will output:
 | extIn           | string,string,...                 | extIn:jpeg,png,jpg,gif                                                       | extInRule checks if val's extension equals one of ruleVal[] items. <br /> It panics if val is not a valid file. <br />  It returns error if val's extension doesn't equal any item in ruleVal[].                                                                                                                                                                                    |
 | extNotIn        | string,string,...                 | extNotIn:js,ts                                                               | extNotInRule checks if val's extension doesn't equal one of ruleVal[] items. <br /> It panics if val is not a valid file. <br />  It returns error if val's extension equals any item in ruleVal[].                                                                                                                                                                                 |
 
+## Validation functions
+
+| Function           | Takes                            | Returns | Description                                                                   |
+|--------------------|----------------------------------|---------|-------------------------------------------------------------------------------|
+| IsEmpty            | val interface{}                  | bool    | IsEmpty reports weather val is empty or not.                                  |
+| IsKind             | val interface{}                  | bool    | IsKind reports weather val's kind equals kind.                                |
+| IsKindIn           | val interface{}, kinds []string  | bool    | IsKindIn reports weather val's kind is one of kinds.                          |
+| IsType             | val interface{}                  | bool    | IsType reports weather val's type equals typ.                                 |
+| IsTypeIn           | val interface{}, types []string  | bool    | IsTypeIn reports weather val's type is one of types.                          |
+| IsInteger          | val interface{}                  | bool    | IsInteger reports weather val is integer or not.                              |
+| IsUnsignedInteger  | val interface{}                  | bool    | IsUnsignedInteger reports weather val is unsigned integer or not.             |
+| IsFloat            | val interface{}                  | bool    | IsFloat reports weather val is float or not.                                  |
+| IsUnsignedFloat    | val interface{}                  | bool    | IsUnsignedFloat reports weather val is unsigned float or not.                 |
+| IsComplex          | val interface{}                  | bool    | IsComplex reports weather val is complex number or not.                       |
+| IsNumeric          | val interface{}                  | bool    | IsNumeric reports weather val is numeric or not.                              |
+| IsCollection       | val interface{}                  | bool    | IsCollection reports weather val's kins is one of (Array, Slice, Map) or not. |
+| IsEmail            | val interface{}                  | bool    | IsEmail reports weather s is a valid email address or not.                    |
+| IsJSON             | val interface{}                  | bool    | IsJSON reports weather s is a valid json or not.                              |
+| IsIPv4             | val interface{}                  | bool    | IsIPv4 reports weather s is a valid IPv4 or not.                              |
+| IsIPv6             | val interface{}                  | bool    | IsIPv6 reports weather s is a valid IPv6 or not.                              |
+| IsIP               | val interface{}                  | bool    | IsIP reports weather s is a valid IP or not.                                  |
+| IsMAC              | val interface{}                  | bool    | IsMAC reports weather s is a valid MAC address or not.                        |
+| IsURL              | val interface{}                  | bool    | IsURL reports weather s is a valid URL or not.                                |
+| IsFile             | val interface{}                  | bool    | IsFile reports weather v is a valid file or not.                              |
+
+
 I'm working on the documentation.****
+
