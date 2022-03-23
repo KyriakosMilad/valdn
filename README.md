@@ -133,7 +133,7 @@ import (
 
 func main() {
 	name := "Narmer"
-	err := valdn.Validate("name", name, []string{"required", "kind:string", "minLen:6"})
+	err := valdn.Validate("name", name, []string{"required", "kind:string", "maxLen:5"})
 
 	if err != nil {
 		log.Fatal(err)
@@ -144,7 +144,7 @@ func main() {
 this will output:
 
 ```
-name's length must be greater than or equal: 6
+name's length must be lower than or equal: 5
 ```
 
 Keep in mind when using valdn.Validate:
