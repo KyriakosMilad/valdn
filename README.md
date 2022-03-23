@@ -364,7 +364,7 @@ import (
 func main() {
 	stringJSON := `{"name":11}`
 
-	rules := valdn.Rules{"type": {"required", "kind:string"}, "value": {"required"}}
+	rules := valdn.Rules{"name": {"required", "kind:string"}, "value": {"required"}}
 
 	errors := valdn.ValidateJSON(stringJSON, rules)
 
