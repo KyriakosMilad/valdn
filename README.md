@@ -427,6 +427,7 @@ this will output:
 
 ```
 lang's length must be greater than or equal: 3
+value is required
 ```
 
 Keep in mind when using valdn.ValidateRequest:
