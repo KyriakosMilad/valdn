@@ -596,10 +596,11 @@ func timeFormatRule(name string, val interface{}, ruleVal string) error {
 }
 
 // timeFormatInRule checks if val's format matches any of ruleVal[].
+// Use [] to split between two formats.
 // It returns error if val's format doesn't match any of ruleVal[].
 func timeFormatInRule(name string, val interface{}, ruleVal string) error {
 	stringVal := toString(val)
-	ruleValSpliced := strings.Split(ruleVal, ",")
+	ruleValSpliced := strings.Split(ruleVal, "[]")
 	in := false
 	for _, v := range ruleValSpliced {
 		_, err := time.Parse(v, stringVal)
@@ -615,10 +616,11 @@ func timeFormatInRule(name string, val interface{}, ruleVal string) error {
 }
 
 // timeFormatNotInRule checks if val's format doesn't match any of ruleVal[].
+// Use [] to split between two formats.
 // It returns error if val's format matches any of ruleVal[].
 func timeFormatNotInRule(name string, val interface{}, ruleVal string) error {
 	stringVal := toString(val)
-	ruleValSpliced := strings.Split(ruleVal, ",")
+	ruleValSpliced := strings.Split(ruleVal, "[]")
 	in := false
 	for _, v := range ruleValSpliced {
 		_, err := time.Parse(v, stringVal)
