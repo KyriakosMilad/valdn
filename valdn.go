@@ -303,6 +303,9 @@ func (v *validation) validateSliceFields(val []interface{}, parName string) {
 
 func (v *validation) validateNonExistRequiredFields() {
 	for name, rules := range v.rules {
+		if name == "*" {
+			continue
+		}
 		for _, r := range rules {
 			rName, rVal := splitRuleNameAndRuleValue(r)
 			if rName == "required" {
