@@ -27,6 +27,7 @@ any other Kind as a non-nested value.
 * [Add custom rules](#add-custom-rules)
 * [Validation rules](#validation-rules)
 * [Validation functions](#validation-functions)
+* [License](#license)
 
 <!--te-->
 
