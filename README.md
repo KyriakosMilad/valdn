@@ -618,5 +618,9 @@ this will output:
 | IsFile             | val interface{}                  | bool    | IsFile reports weather v is a valid file or not.                              |
 
 
+## License
+
+Valdn is open-sourced library licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
 I'm working on the documentation.****
 
