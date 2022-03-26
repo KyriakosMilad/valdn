@@ -51,6 +51,12 @@ any other Kind as a non-nested value.
 go get "github.com/KyriakosMilad/valdn"
 ```
 
+and then import it
+
+```go
+import "github.com/KyriakosMilad/valdn"
+```
+
 ## Quick-Start
 
 Validate single value:
