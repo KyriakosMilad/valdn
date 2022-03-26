@@ -58,6 +58,36 @@ import "github.com/KyriakosMilad/valdn"
 
 ## Quick-Start
 
+Validate request:
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/KyriakosMilad/valdn"
+	"net/http"
+	"encoding/json"
+)
+
+func main() {
+	http.HandleFunc("/", test)
+	http.ListenAndServe(":8080", nil)
+}
+
+func test(w http.ResponseWriter, r *http.Request) {
+	rules := valdn.Rules{"name": []string{"required", "kind:string", "minLen:3", "maxLen:21"}}
+	errs := valdn.ValidateRequest(r, rules)
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(w).Encode(errs)
+	} else {
+		fmt.Fprintf(w, "Hello, %s!", r.URL.Query().Get("name"))
+	}
+}
+```
+
 Validate single value:
 
 ```go
@@ -95,7 +125,7 @@ import (
 )
 
 type User struct {
-	Name  string `valdn:"required"`
+	Name        string `valdn:"required"`
 	Permissions map[string]interface{}
 }
 
