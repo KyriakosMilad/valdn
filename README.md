@@ -25,38 +25,6 @@ any other Kind as a non-nested value.
 - Add custom rule.
 - Add custom validation message.
 
-## Table of Contents
-
-<!--ts-->
-
-* [Installation](#installation)
-* [Quick-Start](#quick-start)
-* [Validate single value](#validate-single-value)
-* [Validate Struct](#validate-struct)
-* [Validate Map](#validate-map)
-* [Validate Slice](#validate-slice)
-* [Validate JSON](#validate-json)
-* [Validate Request](#validate-request)
-* [Change error messages](#change-error-messages)
-* [Add custom rules](#add-custom-rules)
-* [Validation rules](#validation-rules)
-* [Validation functions](#validation-functions)
-* [License](#license)
-
-<!--te-->
-
-## Installation
-
-```sh
-go get "github.com/KyriakosMilad/valdn"
-```
-
-and then import it
-
-```go
-import "github.com/KyriakosMilad/valdn"
-```
-
 ## Quick-Start
 
 ### Validate request example
@@ -123,7 +91,7 @@ how about the lenght? let's add rules to make sure we get the value we need
 
 add ```"minLen:3" and "maxLen:21"``` to rules to be like this ```valdn.Rules{"name": {"required", "kind:string", "minLen:3", "maxLen:21"}}```
 
-now if you try to pass value lower than 3 letters or greather than 21 letters it will fail and output
+now if you try to pass value lower than 3 letters or greater than 21 letters it will fail and output
 
 ```json
 {
@@ -139,7 +107,9 @@ or
 }
 ```
 
-note: you can replace ```minLen:3`` and ``maxLen:21``` rules with ```lenBetween:3,21``` rule
+note: you can replace ```minLen:3``` and ```maxLen:21``` rules with ```lenBetween:3,21``` rule
+
+quick and simple right? [check all the rules you can use](#validation-rules) or continue to [discover more about valdn](#table-of-contents)
 
 ### Validate single value example:
 
@@ -202,6 +172,37 @@ output:
 ```
 Name is required
 Permissions.write does not equal true
+```
+
+## Table of Contents
+
+<!--ts-->
+
+* [Installation](#installation)
+* [Validate single value](#validate-single-value)
+* [Validate Struct](#validate-struct)
+* [Validate Map](#validate-map)
+* [Validate Slice](#validate-slice)
+* [Validate JSON](#validate-json)
+* [Validate Request](#validate-request)
+* [Change error messages](#change-error-messages)
+* [Add custom rules](#add-custom-rules)
+* [Validation rules](#validation-rules)
+* [Validation functions](#validation-functions)
+* [License](#license)
+
+<!--te-->
+
+## Installation
+
+```sh
+go get "github.com/KyriakosMilad/valdn"
+```
+
+and then import it
+
+```go
+import "github.com/KyriakosMilad/valdn"
 ```
 
 ## Validate Single Value
