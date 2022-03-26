@@ -87,7 +87,8 @@ now if you try to pass non-string value it will fail and output
 
 how about the lenght? let's add rules to make sure we get the value we need
 
-add ```"minLen:3" and "maxLen:21"``` to rules to be like this ```valdn.Rules{"name": {"required", "kind:string", "minLen:3", "maxLen:21"}}```
+add ```"minLen:3" and "maxLen:21"``` to rules to be like
+this ```valdn.Rules{"name": {"required", "kind:string", "minLen:3", "maxLen:21"}}```
 
 now if you try to pass value lower than 3 letters or greater than 21 letters it will fail and output
 
@@ -107,9 +108,10 @@ or
 
 note: you can replace ```minLen:3``` and ```maxLen:21``` rules with ```lenBetween:3,21``` rule
 
-quick and simple right? [check all the rules you can use](#validation-rules) or continue to [discover more about valdn](#table-of-contents)
+quick and simple right? [check all the rules you can use](#validation-rules) or continue
+to [discover more about valdn](#table-of-contents)
 
-### One field validation example:
+### Validate Single Value example:
 
 ```go
 package main
@@ -263,7 +265,7 @@ type User struct {
 
 func main() {
 	user := User{
-			Permissions: map[string]interface{}{"read": true, "write": false},
+		Permissions: map[string]interface{}{"read": true, "write": false},
 	}
 
 	rules := valdn.Rules{"Permissions": {"required", "len:2"}, "Permissions.write": {"equal:true"}}
