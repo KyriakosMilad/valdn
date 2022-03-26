@@ -536,7 +536,7 @@ You can use provided parameters to dynamically set error messages:
 
 - [name]: filed name
 - [val]: field value
-- [ruleVal]: rule value (rule has value like `min:value` accepts dynamic numerical as value)
+- [ruleVal]: rule value (rule has value like `min:value` takes float or integer as value)
 
 Example:
 
