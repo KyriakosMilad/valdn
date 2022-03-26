@@ -25,7 +25,6 @@ any other Kind as a non-nested value.
 - Add custom rule.
 - Add custom validation message.
 
-
 ## Table of Contents
 
 <!--ts-->
@@ -97,15 +96,15 @@ import (
 
 type User struct {
 	Name  string `valdn:"required"`
-	Roles map[string]interface{}
+	Permissions map[string]interface{}
 }
 
 func main() {
 	user := User{
-		Roles: map[string]interface{}{"read": true, "write": false},
+		Permissions: map[string]interface{}{"read": true, "write": false},
 	}
 
-	rules := valdn.Rules{"Roles": {"required", "len:2"}, "Roles.write": {"equal:true"}}
+	rules := valdn.Rules{"Permissions": {"required", "len:2"}, "Permissions.write": {"equal:true"}}
 
 	errors := valdn.ValidateStruct(user, rules)
 
@@ -119,7 +118,7 @@ output:
 
 ```
 Name is required
-Roles.write does not equal true
+Permissions.write does not equal true
 ```
 
 ## Validate Single Value
@@ -548,7 +547,6 @@ this will output:
 
 ## Validation rules
 
-
 | ruleName        | ruleVal                           | Example                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                         |
 |-----------------|-----------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | required        | -                                 | required                                                                     | requiredRule checks if val exists, and it's not empty. <br /> It returns error if val is not exist or empty.                                                                                                                                                                                                                                                                        |
@@ -623,7 +621,6 @@ this will output:
 | IsMAC              | val interface{}                  | bool    | IsMAC reports weather s is a valid MAC address or not.                        |
 | IsURL              | val interface{}                  | bool    | IsURL reports weather s is a valid URL or not.                                |
 | IsFile             | val interface{}                  | bool    | IsFile reports weather v is a valid file or not.                              |
-
 
 ## License
 
