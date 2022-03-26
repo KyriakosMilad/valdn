@@ -104,7 +104,7 @@ func main() {
 		Permissions: map[string]interface{}{"read": true, "write": false},
 	}
 
-	rules := valdn.Rules{"Permissions": {"required", "len:2"}, "Permissions.write": {"equal:true"}}
+	rules := valdn.Rules{"Permissions": {"required", "len:2"}, "Permissions.write": {"required", "equal:true"}}
 
 	errors := valdn.ValidateStruct(user, rules)
 
