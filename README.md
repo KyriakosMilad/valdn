@@ -1,21 +1,19 @@
 # Valdn
 
-_Everything you need to validate data in go._
-
 [![Go Reference](https://pkg.go.dev/badge/github.com/KyriakosMilad/valdn.svg)](https://pkg.go.dev/github.com/KyriakosMilad/valdn)
 [![Go Report Card](https://goreportcard.com/badge/github.com/KyriakosMilad/valdn)](https://goreportcard.com/report/github.com/KyriakosMilad/valdn)
 [![Build Status](https://app.travis-ci.com/KyriakosMilad/valdn.svg?branch=master)](https://app.travis-ci.com/KyriakosMilad/valdn)
 [![Coverage Status](https://coveralls.io/repos/github/KyriakosMilad/valdn/badge.svg?branch=master)](https://coveralls.io/github/KyriakosMilad/valdn?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
-Valdn is a golang cross-validation library. Validates request, nested JSON, nested struct, nested map, and nested slice. Validates
-any other Kind as a non-nested value.
+Valdn is a golang validation library. Validates request, nested JSON, nested struct, nested map, and nested slice.
 
 ## Features
 
-- Validate all kinds.
+- Support all kinds.
+- Support all types.
 - Validate request (application/json, multipart/form-data, application/x-www-form-urlencoded) + URL params.
-- Validate nested json.
+- Validate nested JSON.
 - Validate nested map.
 - Validate nested slice.
 - Validate nested struct.
@@ -27,7 +25,7 @@ any other Kind as a non-nested value.
 
 ## Quick-Start
 
-### Validate request example
+### Validate request example:
 
 ```go
 package main
@@ -111,7 +109,7 @@ note: you can replace ```minLen:3``` and ```maxLen:21``` rules with ```lenBetwee
 
 quick and simple right? [check all the rules you can use](#validation-rules) or continue to [discover more about valdn](#table-of-contents)
 
-### Validate single value example:
+### One field validation example:
 
 ```go
 package main
@@ -148,7 +146,7 @@ import (
 )
 
 type User struct {
-	Name        string `valdn:"required"`
+	Name        string `valdn:"required|kind:string"`
 	Permissions map[string]interface{}
 }
 
@@ -260,15 +258,15 @@ import (
 )
 
 type User struct {
-	Roles map[string]interface{}
+	Permissions map[string]interface{}
 }
 
 func main() {
 	user := User{
-		Roles: map[string]interface{}{"read": true, "write": false},
+			Permissions: map[string]interface{}{"read": true, "write": false},
 	}
 
-	rules := valdn.Rules{"Roles": {"required", "len:2"}, "Roles.write": {"equal:true"}}
+	rules := valdn.Rules{"Permissions": {"required", "len:2"}, "Permissions.write": {"equal:true"}}
 
 	errors := valdn.ValidateStruct(user, rules)
 
@@ -281,7 +279,7 @@ func main() {
 this will output:
 
 ```
-Roles.write does not equal true
+Permissions.write does not equal true
 ```
 
 Validate struct using struct field tag
