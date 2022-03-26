@@ -59,7 +59,7 @@ import "github.com/KyriakosMilad/valdn"
 
 ## Quick-Start
 
-Validate request:
+### Validate request example
 
 ```go
 package main
@@ -77,7 +77,7 @@ func main() {
 }
 
 func test(w http.ResponseWriter, r *http.Request) {
-	rules := valdn.Rules{"name": []string{"required", "kind:string", "minLen:3", "maxLen:21"}}
+	rules := valdn.Rules{}
 	errs := valdn.ValidateRequest(r, rules)
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -89,7 +89,59 @@ func test(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-Validate single value:
+output:
+
+```
+Hello, [whatever value you will pass]
+```
+
+let's add rules
+
+change ```rules := valdn.Rules{}``` to ```rules := valdn.Rules{"name": {"required"}}```
+
+now if you try to pass empty name value it will fail and output
+
+```json
+{
+  "name": "name is required"
+}
+```
+
+let's add more rules
+
+add ```"kind:string"``` to rules to be like this ```valdn.Rules{"name": {"required", "kind:string"}}```
+
+now if you try to pass non-string value it will fail and output
+
+```json
+{
+  "name": "name must be kind of string"
+}
+```
+
+how about the lenght? let's add rules to make sure we get the value we need
+
+add ```"minLen:3" and "maxLen:21"``` to rules to be like this ```valdn.Rules{"name": {"required", "kind:string", "minLen:3", "maxLen:21"}}```
+
+now if you try to pass value lower than 3 letters or greather than 21 letters it will fail and output
+
+```json
+{
+  "name": "name's length must be greater than or equal: 3"
+}
+```
+
+or
+
+```json
+{
+  "name": "name's length must be lower than or equal: 21"
+}
+```
+
+note: you can replace ```minLen:3`` and ``maxLen:21``` rules with ```lenBetween:3,21``` rule
+
+### Validate single value example:
 
 ```go
 package main
@@ -115,7 +167,7 @@ output:
 name's length must be greater than or equal: 6
 ```
 
-Validate nested value:
+### Validate nested value example:
 
 ```go
 package main
