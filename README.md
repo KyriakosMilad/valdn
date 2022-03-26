@@ -30,6 +30,7 @@ any other Kind as a non-nested value.
 <!--ts-->
 
 * [Installation](#installation)
+* [Quick-Start](#quick-start)
 * [Validate single value](#validate-single-value)
 * [Validate Struct](#validate-struct)
 * [Validate Map](#validate-map)
