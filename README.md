@@ -111,69 +111,6 @@ note: you can replace ```minLen:3``` and ```maxLen:21``` rules with ```lenBetwee
 quick and simple right? [check all the rules you can use](#validation-rules) or continue
 to [discover more about valdn](#table-of-contents)
 
-### Validate Single Value example:
-
-```go
-package main
-
-import (
-	"github.com/KyriakosMilad/valdn"
-	"log"
-)
-
-func main() {
-	name := "valdn"
-	err := valdn.Validate("name", name, []string{"required", "kind:string", "minLen:6"})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-```
-
-output:
-
-```
-name's length must be greater than or equal: 6
-```
-
-### Validate nested value example:
-
-```go
-package main
-
-import (
-	"github.com/KyriakosMilad/valdn"
-	"log"
-)
-
-type User struct {
-	Name        string `valdn:"required|kind:string"`
-	Permissions map[string]interface{}
-}
-
-func main() {
-	user := User{
-		Permissions: map[string]interface{}{"read": true, "write": false},
-	}
-
-	rules := valdn.Rules{"Permissions": {"required", "len:2"}, "Permissions.write": {"required", "equal:true"}}
-
-	errors := valdn.ValidateStruct(user, rules)
-
-	if len(errors) > 0 {
-		log.Fatal(errors)
-	}
-}
-```
-
-output:
-
-```
-Name is required
-Permissions.write does not equal true
-```
-
 ## Table of Contents
 
 <!--ts-->
