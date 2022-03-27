@@ -506,7 +506,11 @@ this will output:
 age's value is 15, age must be greater than 17
 ```
 
-Keep in mind when using valdn.SetErrMsg:
+you can use ```valdn.GetErrMsg``` to get error message
+
+```valdn.GetErrMsg``` takes three parameters ruleName (string), ruleValue (string), fieldName (string), fieldValue (interface{}) and returns the error message
+
+Keep in mind when using valdn.SetErrMsg and valdn.GetErrMsg:
 
 - It panics if rule does not exist.
 
