@@ -154,9 +154,10 @@ func parseURLParams(r *http.Request, rules Rules, m map[string]interface{}) {
 		param := stringSliceToInterface(q)
 		if _, ok := m[k]; !ok {
 			// if param exists and no values exists in the map with same name add param value to the map
-			if len(param) == 1 {
+			l := len(param)
+			if l == 1 {
 				m[k] = param[0]
-			} else {
+			} else if l > 1 {
 				m[k] = param
 			}
 		} else {

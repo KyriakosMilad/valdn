@@ -565,6 +565,13 @@ func Test_parseURLParams(t *testing.T) {
 			want:  map[string]interface{}{},
 		},
 		{
+			name:  "test parseURLParams with one param",
+			rules: Rules{"lang": {"required"}},
+			req:   httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go&lang=js", strings.NewReader("")),
+			m:     make(map[string]interface{}),
+			want:  map[string]interface{}{"lang": []interface{}{"go", "js"}},
+		},
+		{
 			name:  "test parseURLParams with empty values",
 			rules: Rules{"lang": {"required"}},
 			req:   httptest.NewRequest(http.MethodGet, "http://example.com/?lang=go", strings.NewReader("")),
