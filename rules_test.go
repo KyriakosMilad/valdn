@@ -95,13 +95,18 @@ func Test_OverwriteRule(t *testing.T) {
 }
 
 func Test_SetErrMsg(t *testing.T) {
+	rFunc := func(fieldName string, fieldValue interface{}, ruleValue string) error {
+		return nil
+	}
+	AddRule("test_add_err_msg", rFunc, "test")
 	type args struct {
 		ruleName string
 		errMsg   string
 	}
 	tests := []struct {
-		name string
-		args args
+		name      string
+		args      args
+		wantPanic bool
 	}{
 		{
 			name: "test set error message",
@@ -109,14 +114,24 @@ func Test_SetErrMsg(t *testing.T) {
 				ruleName: "test_add_err_msg",
 				errMsg:   "test",
 			},
+			wantPanic: false,
+		},
+		{
+			name: "test set error message to rule doesn't exist",
+			args: args{
+				ruleName: "test_add_err_msg_fail",
+				errMsg:   "",
+			},
+			wantPanic: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rFunc := func(fieldName string, fieldValue interface{}, ruleValue string) error {
-				return nil
-			}
-			AddRule(tt.args.ruleName, rFunc, tt.args.errMsg)
+			defer func() {
+				if err := recover(); err != nil && !tt.wantPanic {
+					t.Errorf("SetErrMsg() error: failed to set error message, wantPanic: %v, error: %v, args: %v", tt.wantPanic, err, tt.args)
+				}
+			}()
 			SetErrMsg(tt.args.ruleName, tt.args.errMsg)
 			if registeredRules[tt.args.ruleName].errMsg != tt.args.errMsg {
 				t.Errorf("SetErrMsg() can't set err msg, ruleName= %v, errMsg %v", tt.args.ruleName, tt.args.errMsg)
@@ -133,9 +148,10 @@ func Test_GetErrMsg(t *testing.T) {
 		val      interface{}
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name      string
+		args      args
+		want      string
+		wantPanic bool
 	}{
 		{
 			name: "test get error message",
@@ -145,11 +161,28 @@ func Test_GetErrMsg(t *testing.T) {
 				name:     "title",
 				val:      44,
 			},
-			want: "title must be kind of map",
+			want:      "title must be kind of map",
+			wantPanic: false,
+		},
+		{
+			name: "test get non-exist error message",
+			args: args{
+				ruleName: "foo",
+				ruleVal:  "map",
+				name:     "title",
+				val:      44,
+			},
+			want:      "",
+			wantPanic: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if err := recover(); err != nil && !tt.wantPanic {
+					t.Errorf("GetErrMsg() error: failed to get error message, wantPanic: %v, error: %v, args: %v", tt.wantPanic, err, tt.args)
+				}
+			}()
 			if got := GetErrMsg(tt.args.ruleName, tt.args.ruleVal, tt.args.name, tt.args.val); got != tt.want {
 				t.Errorf("GetErrMsg() = %v, want: %v", got, tt.want)
 			}
