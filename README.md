@@ -6,7 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/KyriakosMilad/valdn/badge.svg?branch=master)](https://coveralls.io/github/KyriakosMilad/valdn?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
-Valdn is a golang validation library. Validates request, nested JSON, nested struct, nested map, and nested slice.
+Valdn is a golang rich validation library. Validates request, nested JSON, nested struct, nested map, and nested slice.
 
 ## Features
 
