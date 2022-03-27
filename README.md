@@ -126,6 +126,7 @@ to [discover more about valdn](#table-of-contents)
 * [Add custom rules](#add-custom-rules)
 * [Validation rules](#validation-rules)
 * [Validation functions](#validation-functions)
+* [Contribution](#contribution)
 * [License](#license)
 
 <!--te-->
@@ -646,6 +647,9 @@ this will output:
 | IsMAC              | val interface{}                  | bool    | IsMAC reports weather s is a valid MAC address or not.                        |
 | IsURL              | val interface{}                  | bool    | IsURL reports weather s is a valid URL or not.                                |
 | IsFile             | val interface{}                  | bool    | IsFile reports weather v is a valid file or not.                              |
+
+## Contribution
+See [CONTRIBUTING.md](CONTRIBUTION.md).
 
 ## License
 
