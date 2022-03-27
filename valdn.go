@@ -29,12 +29,11 @@ type validation struct {
 // createNewValidation copies rules and initialise new validation with it.
 // rules are copied in case they will be manipulated later it doesn't affect the original rules.
 func createNewValidation(rules Rules) *validation {
-	v := validation{
+	return &validation{
 		rules:       copyRules(rules),
 		errors:      make(Errors),
 		fieldsExist: make(fieldsExist),
 	}
-	return &v
 }
 
 // Validate validates single value by rules.
@@ -51,8 +50,7 @@ func Validate(name string, val interface{}, rules []string) error {
 			panic("unknown rule: " + rName)
 		}
 
-		err := rFunc(name, val, rVal)
-		if err != nil {
+		if err := rFunc(name, val, rVal); err != nil {
 			return err
 		}
 	}
@@ -122,11 +120,9 @@ func ValidateSlice(val []interface{}, rules Rules) Errors {
 func ValidateJSON(val string, rules Rules) Errors {
 	var jsonMap map[string]interface{}
 
-	err := json.Unmarshal([]byte(val), &jsonMap)
-	if err != nil {
+	if err := json.Unmarshal([]byte(val), &jsonMap); err != nil {
 		panic(err)
 	}
-
 	return ValidateMap(jsonMap, rules)
 }
 
