@@ -2721,7 +2721,7 @@ func Test_timeFormatInRule(t *testing.T) {
 			args: args{
 				name:    "deletedAt",
 				val:     "06/13/1973",
-				ruleVal: "01/02/2006,02/01/2006",
+				ruleVal: "01/02/2006[]02/01/2006",
 			},
 			wantErr: false,
 		},
@@ -2730,7 +2730,7 @@ func Test_timeFormatInRule(t *testing.T) {
 			args: args{
 				name:    "deletedAt",
 				val:     "06/10/1973",
-				ruleVal: "02/01,Jan 2006",
+				ruleVal: "02/01[]Jan 2006",
 			},
 			wantErr: true,
 		},
@@ -2760,7 +2760,7 @@ func Test_timeFormatNotInRule(t *testing.T) {
 			args: args{
 				name:    "deletedAt",
 				val:     "06/10/1973",
-				ruleVal: "02/01,Jan 2006",
+				ruleVal: "02/01[]Jan 2006",
 			},
 			wantErr: false,
 		},
@@ -2769,7 +2769,7 @@ func Test_timeFormatNotInRule(t *testing.T) {
 			args: args{
 				name:    "deletedAt",
 				val:     "06/13/1973",
-				ruleVal: "01/02/2006,02/01/2006",
+				ruleVal: "01/02/2006[]02/01/2006",
 			},
 			wantErr: true,
 		},
