@@ -12,7 +12,7 @@ import (
 )
 
 func copyRules(r Rules) Rules {
-	newMap := make(Rules)
+	newMap := make(Rules, len(r))
 	for k, v := range r {
 		newMap[k] = v
 	}
