@@ -649,7 +649,7 @@ this will output:
 | IsFile             | val interface{}                  | bool    | IsFile reports weather v is a valid file or not.                              |
 
 ## Contribution
-See [CONTRIBUTING.md](CONTRIBUTION.md).
+See [CONTRIBUTION.md](CONTRIBUTION.md).
 
 ## License
 
