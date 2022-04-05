@@ -294,7 +294,7 @@ func Test_kindRule(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "test type rule with string",
+			name: "test kind rule with string",
 			args: args{
 				fName: "kindField",
 				fVal:  "string",
@@ -303,7 +303,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with uint",
+			name: "test kind rule with uint",
 			args: args{
 				fName: "kindField",
 				fVal:  uint(44),
@@ -312,7 +312,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with int",
+			name: "test kind rule with int",
 			args: args{
 				fName: "kindField",
 				fVal:  -44,
@@ -321,7 +321,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with float",
+			name: "test kind rule with float",
 			args: args{
 				fName: "kindField",
 				fVal:  44.44,
@@ -330,7 +330,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with complex number",
+			name: "test kind rule with complex number",
 			args: args{
 				fName: "kindField",
 				fVal:  44 + 22i,
@@ -339,7 +339,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with bool",
+			name: "test kind rule with bool",
 			args: args{
 				fName: "kindField",
 				fVal:  true,
@@ -348,7 +348,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with map",
+			name: "test kind rule with map",
 			args: args{
 				fName: "kindField",
 				fVal:  map[string]interface{}{"key": 55},
@@ -357,7 +357,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with struct",
+			name: "test kind rule with struct",
 			args: args{
 				fName: "kindField",
 				fVal:  struct{}{},
@@ -366,7 +366,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with array",
+			name: "test kind rule with array",
 			args: args{
 				fName: "kindField",
 				fVal:  [2]int{1, 2},
@@ -375,7 +375,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with slice",
+			name: "test kind rule with slice",
 			args: args{
 				fName: "kindField",
 				fVal:  []int{1, 2},
@@ -384,7 +384,7 @@ func Test_kindRule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test type rule with unsuitable data",
+			name: "test kind rule with unsuitable data",
 			args: args{
 				fName: "kindField",
 				fVal:  []int{1, 2},
