@@ -403,6 +403,127 @@ func Test_kindRule(t *testing.T) {
 	}
 }
 
+func Test_notKindRule(t *testing.T) {
+	type args struct {
+		fName string
+		fVal  interface{}
+		rVal  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test notKind rule with string",
+			args: args{
+				fName: "kindField",
+				fVal:  "string",
+				rVal:  "string",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with uint",
+			args: args{
+				fName: "kindField",
+				fVal:  uint(44),
+				rVal:  "uint",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with int",
+			args: args{
+				fName: "kindField",
+				fVal:  -44,
+				rVal:  "int",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with float",
+			args: args{
+				fName: "kindField",
+				fVal:  44.44,
+				rVal:  "float64",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with complex number",
+			args: args{
+				fName: "kindField",
+				fVal:  44 + 22i,
+				rVal:  "complex128",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with bool",
+			args: args{
+				fName: "kindField",
+				fVal:  true,
+				rVal:  "bool",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with map",
+			args: args{
+				fName: "kindField",
+				fVal:  map[string]interface{}{"key": 55},
+				rVal:  "map",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with struct",
+			args: args{
+				fName: "kindField",
+				fVal:  struct{}{},
+				rVal:  "struct",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with array",
+			args: args{
+				fName: "kindField",
+				fVal:  [2]int{1, 2},
+				rVal:  "array",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with slice",
+			args: args{
+				fName: "kindField",
+				fVal:  []int{1, 2},
+				rVal:  "slice",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test notKind rule with unsuitable data",
+			args: args{
+				fName: "kindField",
+				fVal:  []int{1, 2},
+				rVal:  "array",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := notKindRule(tt.args.fName, tt.args.fVal, tt.args.rVal)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("notKindRule() err = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_kindInRule(t *testing.T) {
 	type args struct {
 		name    string

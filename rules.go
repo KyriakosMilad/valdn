@@ -88,6 +88,15 @@ func kindRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// notKindRule checks if val's kind doesn't equal ruleVal.
+// It returns error if val's kind equals ruleVal.
+func notKindRule(name string, val interface{}, ruleVal string) error {
+	if IsKind(val, ruleVal) {
+		return errors.New(GetErrMsg("notKind", ruleVal, name, val))
+	}
+	return nil
+}
+
 // kindInRule checks if val's kind is one of ruleVal[].
 // It returns error if val's kind is not one of ruleVal[].
 func kindInRule(name string, val interface{}, ruleVal string) error {
@@ -820,6 +829,7 @@ func init() {
 	AddRule("typeIn", typeInRule, "[name]'s type must be one of [ruleVal]")
 	AddRule("typeNotIn", typeNotInRule, "[name]'s type must not be one of [ruleVal]")
 	AddRule("kind", kindRule, "[name] must be kind of [ruleVal]")
+	AddRule("notKind", notKindRule, "[name] must not be kind of [ruleVal]")
 	AddRule("kindIn", kindInRule, "[name]'s kind must be one of [ruleVal]")
 	AddRule("kindNotIn", kindNotInRule, "[name] must not be kind of [ruleVal]")
 	AddRule("equal", equalRule, "[name] does not equal [ruleVal]")
