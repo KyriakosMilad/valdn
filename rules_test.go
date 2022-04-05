@@ -726,6 +726,130 @@ func Test_typeRule(t *testing.T) {
 	}
 }
 
+func Test_notTypeRule(t *testing.T) {
+	type user struct {
+		name string
+	}
+	type args struct {
+		fieldName string
+		fVal      interface{}
+		rVal      string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test not type rule with string",
+			args: args{
+				fieldName: "typeField",
+				fVal:      "string",
+				rVal:      "string",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with uint",
+			args: args{
+				fieldName: "typeField",
+				fVal:      uint(44),
+				rVal:      "uint",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with int",
+			args: args{
+				fieldName: "typeField",
+				fVal:      -44,
+				rVal:      "int",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with float",
+			args: args{
+				fieldName: "typeField",
+				fVal:      44.44,
+				rVal:      "float64",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with complex number",
+			args: args{
+				fieldName: "typeField",
+				fVal:      44 + 22i,
+				rVal:      "complex128",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with bool",
+			args: args{
+				fieldName: "typeField",
+				fVal:      true,
+				rVal:      "bool",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with map",
+			args: args{
+				fieldName: "typeField",
+				fVal:      map[string]interface{}{"key": 55},
+				rVal:      "map[string]interface {}",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with struct",
+			args: args{
+				fieldName: "typeField",
+				fVal:      user{name: "test"},
+				rVal:      "user",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with array",
+			args: args{
+				fieldName: "typeField",
+				fVal:      [2]int{1, 2},
+				rVal:      "[2]int",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with slice",
+			args: args{
+				fieldName: "typeField",
+				fVal:      []int{1, 2},
+				rVal:      "[]int",
+			},
+			wantErr: true,
+		},
+		{
+			name: "test not type rule with unsuitable data",
+			args: args{
+				fieldName: "typeField",
+				fVal:      []int{1, 2},
+				rVal:      "[2]int",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := notTypeRule(tt.args.fieldName, tt.args.fVal, tt.args.rVal)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("notTypeRule() err = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_typeInRule(t *testing.T) {
 	type args struct {
 		name    string

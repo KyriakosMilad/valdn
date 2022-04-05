@@ -124,6 +124,15 @@ func typeRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// notTypeRule checks if val's type doesn't equal ruleVal.
+// It returns error if val's type equals ruleVal.
+func notTypeRule(name string, val interface{}, ruleVal string) error {
+	if IsType(val, ruleVal) {
+		return errors.New(GetErrMsg("notType", ruleVal, name, val))
+	}
+	return nil
+}
+
 // typeInRule checks if val's type is one of ruleVal[].
 // It returns error if val's type is not one of ruleVal[].
 func typeInRule(name string, val interface{}, ruleVal string) error {
@@ -826,6 +835,7 @@ func extNotInRule(name string, val interface{}, ruleVal string) error {
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
+	AddRule("notType", notTypeRule, "[name] must not be type of [ruleVal]")
 	AddRule("typeIn", typeInRule, "[name]'s type must be one of [ruleVal]")
 	AddRule("typeNotIn", typeNotInRule, "[name]'s type must not be one of [ruleVal]")
 	AddRule("kind", kindRule, "[name] must be kind of [ruleVal]")
