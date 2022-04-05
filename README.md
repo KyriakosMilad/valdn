@@ -627,28 +627,28 @@ this will output:
 
 ## Validation functions
 
-| Function           | Takes                            | Returns | Description                                                                   |
-|--------------------|----------------------------------|---------|-------------------------------------------------------------------------------|
-| IsEmpty            | val interface{}                  | bool    | IsEmpty reports weather val is empty or not.                                  |
-| IsKind             | val interface{}                  | bool    | IsKind reports weather val's kind equals kind.                                |
-| IsKindIn           | val interface{}, kinds []string  | bool    | IsKindIn reports weather val's kind is one of kinds.                          |
-| IsType             | val interface{}                  | bool    | IsType reports weather val's type equals typ.                                 |
-| IsTypeIn           | val interface{}, types []string  | bool    | IsTypeIn reports weather val's type is one of types.                          |
-| IsInteger          | val interface{}                  | bool    | IsInteger reports weather val is integer or not.                              |
-| IsUnsignedInteger  | val interface{}                  | bool    | IsUnsignedInteger reports weather val is unsigned integer or not.             |
-| IsFloat            | val interface{}                  | bool    | IsFloat reports weather val is float or not.                                  |
-| IsUnsignedFloat    | val interface{}                  | bool    | IsUnsignedFloat reports weather val is unsigned float or not.                 |
-| IsComplex          | val interface{}                  | bool    | IsComplex reports weather val is complex number or not.                       |
-| IsNumeric          | val interface{}                  | bool    | IsNumeric reports weather val is numeric or not.                              |
-| IsCollection       | val interface{}                  | bool    | IsCollection reports weather val's kins is one of (Array, Slice, Map) or not. |
-| IsEmail            | val interface{}                  | bool    | IsEmail reports weather s is a valid email address or not.                    |
-| IsJSON             | val interface{}                  | bool    | IsJSON reports weather s is a valid json or not.                              |
-| IsIPv4             | val interface{}                  | bool    | IsIPv4 reports weather s is a valid IPv4 or not.                              |
-| IsIPv6             | val interface{}                  | bool    | IsIPv6 reports weather s is a valid IPv6 or not.                              |
-| IsIP               | val interface{}                  | bool    | IsIP reports weather s is a valid IP or not.                                  |
-| IsMAC              | val interface{}                  | bool    | IsMAC reports weather s is a valid MAC address or not.                        |
-| IsURL              | val interface{}                  | bool    | IsURL reports weather s is a valid URL or not.                                |
-| IsFile             | val interface{}                  | bool    | IsFile reports weather v is a valid file or not.                              |
+| Function           | Takes                            | Returns | Description                                                                     |
+|--------------------|----------------------------------|---------|---------------------------------------------------------------------------------|
+| IsEmpty            | val interface{}                  | bool    | IsEmpty reports weather value is empty or not.                                  |
+| IsKind             | val interface{}                  | bool    | IsKind reports weather value's kind equals kind.                                |
+| IsKindIn           | val interface{}, kinds []string  | bool    | IsKindIn reports weather value's kind is one of kinds.                          |
+| IsType             | val interface{}                  | bool    | IsType reports weather value's type equals typ.                                 |
+| IsTypeIn           | val interface{}, types []string  | bool    | IsTypeIn reports weather value's type is one of types.                          |
+| IsInteger          | val interface{}                  | bool    | IsInteger reports weather value is integer or not.                              |
+| IsUnsignedInteger  | val interface{}                  | bool    | IsUnsignedInteger reports weather value is unsigned integer or not.             |
+| IsFloat            | val interface{}                  | bool    | IsFloat reports weather value is float or not.                                  |
+| IsUnsignedFloat    | val interface{}                  | bool    | IsUnsignedFloat reports weather value is unsigned float or not.                 |
+| IsComplex          | val interface{}                  | bool    | IsComplex reports weather value is complex number or not.                       |
+| IsNumeric          | val interface{}                  | bool    | IsNumeric reports weather value is numeric or not.                              |
+| IsCollection       | val interface{}                  | bool    | IsCollection reports weather value's kins is one of (Array, Slice, Map) or not. |
+| IsEmail            | val interface{}                  | bool    | IsEmail reports weather value is a valid email address or not.                  |
+| IsJSON             | val interface{}                  | bool    | IsJSON reports weather value is a valid json or not.                            |
+| IsIPv4             | val interface{}                  | bool    | IsIPv4 reports weather value is a valid IPv4 or not.                            |
+| IsIPv6             | val interface{}                  | bool    | IsIPv6 reports weather value is a valid IPv6 or not.                            |
+| IsIP               | val interface{}                  | bool    | IsIP reports weather value is a valid IP or not.                                |
+| IsMAC              | val interface{}                  | bool    | IsMAC reports weather value is a valid MAC address or not.                      |
+| IsURL              | val interface{}                  | bool    | IsURL reports weather value is a valid URL or not.                              |
+| IsFile             | val interface{}                  | bool    | IsFile reports weather value is a valid file or not.                            |
 
 ## Contribution
 See [CONTRIBUTION.md](CONTRIBUTION.md).
