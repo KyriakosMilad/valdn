@@ -126,7 +126,7 @@ to [discover more about valdn](#table-of-contents)
 * [Add custom rules](#add-custom-rules)
 * [Validation rules](#validation-rules)
 * [Validation functions](#validation-functions)
-* [Contribution](#contribution)
+* [Contributing](#contributing)
 * [License](#license)
 
 <!--te-->
@@ -650,8 +650,8 @@ this will output:
 | IsURL              | val interface{}                  | bool    | IsURL reports weather value is a valid URL or not.                              |
 | IsFile             | val interface{}                  | bool    | IsFile reports weather value is a valid file or not.                            |
 
-## Contribution
-See [CONTRIBUTION.md](CONTRIBUTION.md).
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
