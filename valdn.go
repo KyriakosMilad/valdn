@@ -65,7 +65,7 @@ func Validate(name string, val interface{}, rules []string) error {
 // It panics if one of the rules is not registered.
 func ValidateStruct(val interface{}, rules Rules) Errors {
 	if !IsStruct(val) {
-		panic("val is not a struct")
+		panic(fmt.Errorf("ValidateStruct: %v is not kind of struct", val))
 	}
 	v := createNewValidation(rules)
 	v.addTagRules(val, "")
