@@ -299,7 +299,7 @@ func Test_convertInterfaceToSlice(t *testing.T) {
 	}{
 		{
 			name:  "test convert interface to slice",
-			value: []interface{}{"test"},
+			value: []string{"test"},
 			want:  []interface{}{"test"},
 		},
 	}

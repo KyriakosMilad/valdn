@@ -66,8 +66,9 @@ func convertInterfaceToMap(value interface{}) map[string]interface{} {
 
 func convertInterfaceToSlice(value interface{}) []interface{} {
 	var s []interface{}
-	if val, ok := value.([]interface{}); ok {
-		s = append(s, val...)
+	v := reflect.ValueOf(value)
+	for i := 0; i < v.Len(); i++ {
+		s = append(s, v.Index(i).Interface())
 	}
 	return s
 }

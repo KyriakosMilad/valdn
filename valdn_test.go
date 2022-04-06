@@ -221,7 +221,7 @@ func Test_ValidateMap(t *testing.T) {
 
 func Test_ValidateSlice(t *testing.T) {
 	type args struct {
-		val   []interface{}
+		val   interface{}
 		rules Rules
 	}
 	tests := []struct {
@@ -242,7 +242,7 @@ func Test_ValidateSlice(t *testing.T) {
 		{
 			name: "test validate nested slice with unsuitable data",
 			args: args{
-				val:   []interface{}{44},
+				val:   []int{44},
 				rules: Rules{"0": {"kind:string"}},
 			},
 			want: Errors{

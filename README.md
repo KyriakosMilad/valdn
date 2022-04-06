@@ -267,11 +267,9 @@ Keep in mind when using valdn.ValidateStruct:
 
 - Unexported fields will be ignored.
 - It panics if val is not kind of struct.
-- It panics if val is not a struct.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
-- It panics if one of the nested fields is a slice and it's type is not []interface{}.
 
 ## Validate Map
 
@@ -321,7 +319,6 @@ Keep in mind when using valdn.ValidateMap:
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
-- It panics if one of the nested fields is a slice and it's type is not []interface{}.
 
 ## Validate Slice
 
@@ -366,10 +363,10 @@ this will output:
 
 Keep in mind when using valdn.ValidateSlice:
 
+- It panics if val is not kind of slice.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
-- It panics if one of the nested fields is a slice and it's type is not []interface{}.
 
 ## Validate JSON
 
