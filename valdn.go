@@ -191,7 +191,6 @@ func (v *validation) addTagRules(val interface{}, parName string) {
 		t := reflect.TypeOf(val)
 		for i := 0; i < t.NumField(); i++ {
 			f := t.Field(i)
-			typ := f.Type
 			name := parName + f.Name
 			tRules := f.Tag.Get(TagName)
 
@@ -201,6 +200,7 @@ func (v *validation) addTagRules(val interface{}, parName string) {
 				v.rules[name] = strings.Split(tRules, TagSeparator)
 			}
 
+			typ := f.Type
 			switch typ.Kind() {
 			case reflect.Struct, reflect.Map, reflect.Slice:
 				v.addTagRules(f, name)
