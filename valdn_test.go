@@ -620,7 +620,7 @@ func Test_validation_addTagRules(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := createNewValidation(tt.args.rules)
-			v.addTagRules(tt.args.val, reflect.TypeOf(tt.args.val), tt.args.parName)
+			v.addTagRules(tt.args.val, tt.args.parName)
 			if !reflect.DeepEqual(v.rules, tt.want) {
 				t.Errorf("addTagRules() = %v, want %v", v.rules, tt.want)
 			}

@@ -67,9 +67,8 @@ func ValidateStruct(val interface{}, rules Rules) Errors {
 	if !IsStruct(val) {
 		panic("val is not a struct")
 	}
-	t := reflect.TypeOf(val)
 	v := createNewValidation(rules)
-	v.addTagRules(val, t, "")
+	v.addTagRules(val, "")
 
 	v.validateStruct(val, "")
 	v.validateNonExistRequiredFields()
@@ -86,9 +85,8 @@ func ValidateMap(val interface{}, rules Rules) Errors {
 	if !IsMap(val) {
 		panic(fmt.Errorf("ValidateMap: %v is not kind of map", val))
 	}
-	t := reflect.TypeOf(val)
 	v := createNewValidation(rules)
-	v.addTagRules(val, t, "")
+	v.addTagRules(val, "")
 
 	v.validateMap(val, "")
 	v.validateNonExistRequiredFields()
@@ -104,9 +102,8 @@ func ValidateSlice(val interface{}, rules Rules) Errors {
 	if !IsSlice(val) {
 		panic(fmt.Errorf("ValidateSlice: %v is not kind of slice", val))
 	}
-	t := reflect.TypeOf(val)
 	v := createNewValidation(rules)
-	v.addTagRules(val, t, "")
+	v.addTagRules(val, "")
 
 	v.validateSlice(val, "")
 	v.validateNonExistRequiredFields()
@@ -167,7 +164,7 @@ func (v *validation) getParentRules(name string) []string {
 }
 
 // addTagRules gets rules from struct tag for every field and adds them to field rules if field has no rules.
-func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string) {
+func (v *validation) addTagRules(val interface{}, parName string) {
 	parName = makeParentNameJoinable(parName)
 
 	if IsMap(val) {
@@ -175,7 +172,7 @@ func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string
 			value := reflect.ValueOf(val).MapIndex(key).Interface()
 			switch {
 			case IsStruct(value), IsMap(value), IsSlice(value):
-				v.addTagRules(value, reflect.TypeOf(value), parName+toString(key))
+				v.addTagRules(value, parName+toString(key))
 			}
 		}
 	}
@@ -185,12 +182,13 @@ func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string
 			value := reflect.ValueOf(val).Index(i).Interface()
 			switch {
 			case IsStruct(value), IsMap(value), IsSlice(value):
-				v.addTagRules(value, reflect.TypeOf(value), parName+toString(i))
+				v.addTagRules(value, parName+toString(i))
 			}
 		}
 	}
 
-	if t.Kind() == reflect.Struct {
+	if IsStruct(val) {
+		t := reflect.TypeOf(val)
 		for i := 0; i < t.NumField(); i++ {
 			f := t.Field(i)
 			typ := f.Type
@@ -205,7 +203,7 @@ func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string
 
 			switch typ.Kind() {
 			case reflect.Struct, reflect.Map, reflect.Slice:
-				v.addTagRules(f, typ, name)
+				v.addTagRules(f, name)
 			}
 		}
 	}
