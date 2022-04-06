@@ -163,7 +163,7 @@ func Test_ValidateStruct(t *testing.T) {
 
 func Test_ValidateMap(t *testing.T) {
 	type args struct {
-		val   map[string]interface{}
+		val   map[interface{}]interface{}
 		rules Rules
 	}
 	tests := []struct {
@@ -175,7 +175,7 @@ func Test_ValidateMap(t *testing.T) {
 		{
 			name: "test validate nested map",
 			args: args{
-				val:   map[string]interface{}{"Age": 44},
+				val:   map[interface{}]interface{}{"Age": 44},
 				rules: Rules{"Age": {"required"}},
 			},
 			want:      Errors{},
@@ -184,7 +184,18 @@ func Test_ValidateMap(t *testing.T) {
 		{
 			name: "test validate nested map with unsuitable data",
 			args: args{
-				val:   map[string]interface{}{"Age": 44},
+				val:   map[interface{}]interface{}{"Age": 44},
+				rules: Rules{"Name": {"required"}},
+			},
+			want: Errors{
+				"Name": GetErrMsg("required", "", "Name", ""),
+			},
+			wantPanic: false,
+		},
+		{
+			name: "test validate nested map with non string key",
+			args: args{
+				val:   map[interface{}]interface{}{14: 44},
 				rules: Rules{"Name": {"required"}},
 			},
 			want: Errors{

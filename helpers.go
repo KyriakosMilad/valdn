@@ -57,10 +57,9 @@ func getStructFieldInfo(number int, parTyp reflect.Type, parVal reflect.Value, p
 
 func convertInterfaceToMap(value interface{}) map[string]interface{} {
 	newMap := make(map[string]interface{})
-	if val, ok := value.(map[string]interface{}); ok {
-		for k, v := range val {
-			newMap[k] = v
-		}
+	val := reflect.ValueOf(value)
+	for _, key := range val.MapKeys() {
+		newMap[toString(key.Interface())] = val.MapIndex(key).Interface()
 	}
 	return newMap
 }

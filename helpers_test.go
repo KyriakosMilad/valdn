@@ -275,6 +275,11 @@ func Test_convertInterfaceToMap(t *testing.T) {
 			value: map[string]interface{}{"test": 1},
 			want:  map[string]interface{}{"test": 1},
 		},
+		{
+			name:  "test convert interface to map with non string key map",
+			value: map[interface{}]interface{}{"test": 1},
+			want:  map[string]interface{}{"test": 1},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

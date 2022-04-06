@@ -62,7 +62,6 @@ func Validate(name string, val interface{}, rules []string) error {
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
 // It panics if one of the rules is not registered.
-// It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
 // It panics if one of the nested fields is a slice and it's type is not []interface{}.
 func ValidateStruct(val interface{}, rules Rules) Errors {
 	if !IsStruct(val) {
@@ -79,12 +78,15 @@ func ValidateStruct(val interface{}, rules Rules) Errors {
 }
 
 // ValidateMap validates map, and it's nested fields by rules and returns Errors.
+// It panics if val is not kind of map.
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
 // It panics if one of the rules is not registered.
-// It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
 // It panics if one of the nested fields is a slice and it's type is not []interface{}.
-func ValidateMap(val map[string]interface{}, rules Rules) Errors {
+func ValidateMap(val interface{}, rules Rules) Errors {
+	if !IsMap(val) {
+		panic(fmt.Errorf("ValidateMap: %v is not kind of map", val))
+	}
 	t := reflect.TypeOf(val)
 	v := createNewValidation(rules)
 	v.addTagRules(val, t, "")
@@ -99,7 +101,6 @@ func ValidateMap(val map[string]interface{}, rules Rules) Errors {
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
 // It panics if one of the rules is not registered.
-// It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
 // It panics if one of the nested fields is a slice and it's type is not []interface{}.
 func ValidateSlice(val []interface{}, rules Rules) Errors {
 	t := reflect.TypeOf(val)
@@ -168,11 +169,12 @@ func (v *validation) getParentRules(name string) []string {
 func (v *validation) addTagRules(val interface{}, t reflect.Type, parName string) {
 	parName = makeParentNameJoinable(parName)
 
-	if m, ok := val.(map[string]interface{}); ok {
-		for k, i := range m {
+	if IsMap(val) {
+		for _, key := range reflect.ValueOf(val).MapKeys() {
+			value := reflect.ValueOf(val).MapIndex(key).Interface()
 			switch {
-			case IsStruct(i), IsMap(i), IsSlice(i):
-				v.addTagRules(i, reflect.TypeOf(i), parName+k)
+			case IsStruct(value), IsMap(value), IsSlice(value):
+				v.addTagRules(value, reflect.TypeOf(value), parName+toString(key))
 			}
 		}
 	}
@@ -221,10 +223,6 @@ func (v *validation) validateStruct(val interface{}, name string) {
 }
 
 func (v *validation) validateMap(val interface{}, name string) {
-	if !reflect.DeepEqual(reflect.TypeOf(val), reflect.TypeOf(map[string]interface{}{})) {
-		panic(fmt.Errorf("error validating %v: type %T is not supported", name, val))
-	}
-
 	r := v.getParentRules(name)
 	if err := Validate(name, val, r); err != nil {
 		v.addError(name, err)

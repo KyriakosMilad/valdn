@@ -271,7 +271,6 @@ Keep in mind when using valdn.ValidateStruct:
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
-- It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
 - It panics if one of the nested fields is a slice and it's type is not []interface{}.
 
 ## Validate Map
@@ -318,10 +317,10 @@ Zamalek SC does not equal 1911
 
 Keep in mind when using valdn.ValidateMap:
 
+- It panics if val is not kind of map.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
-- It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
 - It panics if one of the nested fields is a slice and it's type is not []interface{}.
 
 ## Validate Slice
@@ -370,7 +369,6 @@ Keep in mind when using valdn.ValidateSlice:
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
-- It panics if one of the nested fields is a map and it's type is not map[string]interface{}.
 - It panics if one of the nested fields is a slice and it's type is not []interface{}.
 
 ## Validate JSON
