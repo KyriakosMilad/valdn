@@ -6,15 +6,17 @@
 [![Coverage Status](https://coveralls.io/repos/github/KyriakosMilad/valdn/badge.svg?branch=master)](https://coveralls.io/github/KyriakosMilad/valdn?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
-Valdn is a golang rich validation library. Validates request, nested JSON, nested struct, nested map, and nested slice.
+Valdn is a golang rich validation library. Validates request, nested JSON, nested struct, nested map, nested array, and nested
+slice.
 
 ## Features
 
 - Support all kinds.
-- Support all types.
+- Support all types (even custom types).
 - Validate request (application/json, multipart/form-data, application/x-www-form-urlencoded) + URL params.
 - Validate nested JSON.
 - Validate nested map.
+- Validate nested array.
 - Validate nested slice.
 - Validate nested struct.
 - Support using rules in struct field tag.
@@ -31,10 +33,10 @@ Valdn is a golang rich validation library. Validates request, nested JSON, neste
 package main
 
 import (
-	"fmt"
 	"github.com/KyriakosMilad/valdn"
 	"net/http"
 	"encoding/json"
+	"fmt"
 )
 
 func main() {
@@ -117,9 +119,11 @@ to [discover more about valdn](#table-of-contents)
 
 * [Installation](#installation)
 * [Validate single value](#validate-single-value)
-* [Validate Struct](#validate-struct)
-* [Validate Map](#validate-map)
-* [Validate Slice](#validate-slice)
+* [Validate Collection](#validate-collection)
+    * [Validate Struct](#validate-struct)
+    * [Validate Map](#validate-map)
+    * [Validate Slice](#validate-slice)
+    * [Validate Array](#validate-array)
 * [Validate JSON](#validate-json)
 * [Validate Request](#validate-request)
 * [Change error messages](#change-error-messages)
@@ -181,11 +185,27 @@ Keep in mind when using valdn.Validate:
 - If an error is found it will not check the rest of the rules and returns the error.
 - It panics if one of the rules is not registered.
 
-## Validate Struct
+## Validate Collection
 
-Use valdn.ValidateCollection() to validate struct.
+Use valdn.ValidateCollection() to validate [struct](#validate-struct), [map](#validate-map), [slice](#validate-slice)
+and [array](#validate-array).
 
 valdn.ValidateCollection() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+
+Keep in mind when using valdn.ValidateCollection:
+
+- It panics if val is not kind of struct, map, slice or array.
+- Unexported struct fields will be ignored.
+- If an error is found it will not check the rest of the field's rules and continue to the next field.
+- If a parent has error it's nested fields will not be validated.
+- It panics if one of the rules is not registered.
+- You can use * to apply rules to all direct nested fields, example:
+
+  ``valdn.Rules{"*": "required", "Parent.*": "minLen:5"}``
+
+### Validate Struct
+
+Use [valdn.ValidateCollection()](#validate-collection) to validate struct.
 
 Example:
 
@@ -263,19 +283,9 @@ You can change the TagName and Separator used to identify rules in struct field 
 
 `valdn.Separator = "|"`
 
-Keep in mind when using valdn.ValidateCollection:
+### Validate Map
 
-- It panics if val is not kind of struct, map, slice or array.
-- Unexported struct fields will be ignored.
-- If an error is found it will not check the rest of the field's rules and continue to the next field.
-- If a parent has error it's nested fields will not be validated.
-- It panics if one of the rules is not registered.
-
-## Validate Map
-
-Use valdn.ValidateCollection()) to validate map.
-
-valdn.ValidateCollection()) takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+Use [valdn.ValidateCollection()](#validate-collection) to validate map.
 
 Example:
 
@@ -297,7 +307,7 @@ func main() {
 	}
 
 	// use * to apply rules to all direct nested fields
-	rules := valdn.Rules{"*": {"required", "numerical", "min:1"}, "Zamalek SC": {"equal:1911"}}
+	rules := valdn.Rules{"*": {"required", "int", "min:1"}, "Zamalek SC": {"equal:1911"}}
 
 	errors := valdn.ValidateCollection(egyptianClubsFoundedYear, rules)
 
@@ -313,19 +323,9 @@ this will output:
 Zamalek SC does not equal 1911
 ```
 
-Keep in mind when using valdn.ValidateCollection():
+### Validate Slice
 
-- It panics if val is not kind of struct, map, slice or array.
-- Unexported struct fields will be ignored.
-- If an error is found it will not check the rest of the field's rules and continue to the next field.
-- If a parent has error it's nested fields will not be validated.
-- It panics if one of the rules is not registered.
-
-## Validate Slice
-
-Use valdn.ValidateCollection() to validate slice.
-
-valdn.ValidateCollection() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+Use [valdn.ValidateCollection()](#validate-collection) to validate slice.
 
 Example:
 
@@ -361,14 +361,6 @@ this will output:
 ```
 0 does not equal a
 ```
-
-Keep in mind when using valdn.ValidateCollection:
-
-- It panics if val is not kind of struct, map, slice or array.
-- Unexported struct fields will be ignored.
-- If an error is found it will not check the rest of the field's rules and continue to the next field.
-- If a parent has error it's nested fields will not be validated.
-- It panics if one of the rules is not registered.
 
 ## Validate JSON
 
@@ -506,7 +498,8 @@ age's value is 15, age must be greater than 17
 
 you can use ```valdn.GetErrMsg``` to get error message
 
-```valdn.GetErrMsg``` takes three parameters ruleName (string), ruleValue (string), fieldName (string), fieldValue (interface{}) and returns the error message
+```valdn.GetErrMsg``` takes three parameters ruleName (string), ruleValue (string), fieldName (string), fieldValue (interface{})
+and returns the error message
 
 Keep in mind when using valdn.SetErrMsg and valdn.GetErrMsg:
 
@@ -648,6 +641,7 @@ this will output:
 | IsFile             | val interface{}                  | bool    | IsFile reports weather value is a valid file or not.                            |
 
 ## Contributing
+
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
