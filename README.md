@@ -183,9 +183,9 @@ Keep in mind when using valdn.Validate:
 
 ## Validate Struct
 
-Use valdn.ValidateStruct() to validate struct.
+Use valdn.ValidateCollection() to validate struct.
 
-valdn.ValidateStruct() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+valdn.ValidateCollection() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
 
 Example:
 
@@ -208,7 +208,7 @@ func main() {
 
 	rules := valdn.Rules{"Permissions": {"required", "len:2"}, "Permissions.write": {"equal:true"}}
 
-	errors := valdn.ValidateStruct(user, rules)
+	errors := valdn.ValidateCollection(user, rules)
 
 	if len(errors) > 0 {
 		log.Fatal(errors)
@@ -243,7 +243,7 @@ func main() {
 
 	rules := valdn.Rules{}
 
-	errors := valdn.ValidateStruct(user, rules)
+	errors := valdn.ValidateCollection(user, rules)
 
 	if len(errors) > 0 {
 		log.Fatal(errors)
@@ -263,19 +263,19 @@ You can change the TagName and Separator used to identify rules in struct field 
 
 `valdn.Separator = "|"`
 
-Keep in mind when using valdn.ValidateStruct:
+Keep in mind when using valdn.ValidateCollection:
 
-- Unexported fields will be ignored.
-- It panics if val is not kind of struct.
+- It panics if val is not kind of struct, map, slice or array.
+- Unexported struct fields will be ignored.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
 
 ## Validate Map
 
-Use valdn.ValidateMap() to validate map.
+Use valdn.ValidateCollection()) to validate map.
 
-valdn.ValidateMap() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+valdn.ValidateCollection()) takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
 
 Example:
 
@@ -299,7 +299,7 @@ func main() {
 	// use * to apply rules to all direct nested fields
 	rules := valdn.Rules{"*": {"required", "numerical", "min:1"}, "Zamalek SC": {"equal:1911"}}
 
-	errors := valdn.ValidateMap(egyptianClubsFoundedYear, rules)
+	errors := valdn.ValidateCollection(egyptianClubsFoundedYear, rules)
 
 	if len(errors) > 0 {
 		log.Fatal(errors)
@@ -313,18 +313,19 @@ this will output:
 Zamalek SC does not equal 1911
 ```
 
-Keep in mind when using valdn.ValidateMap:
+Keep in mind when using valdn.ValidateCollection():
 
-- It panics if val is not kind of map.
+- It panics if val is not kind of struct, map, slice or array.
+- Unexported struct fields will be ignored.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
 
 ## Validate Slice
 
-Use valdn.ValidateSlice() to validate slice.
+Use valdn.ValidateCollection() to validate slice.
 
-valdn.ValidateSlice() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
+valdn.ValidateCollection() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
 
 Example:
 
@@ -347,7 +348,7 @@ func main() {
 	// use * to apply rules to all direct nested fields
 	rules := valdn.Rules{"*": {"required", "kind:string", "len:1"}, "0": {"equal:a"}}
 
-	errors := valdn.ValidateSlice(letters, rules)
+	errors := valdn.ValidateCollection(letters, rules)
 
 	if len(errors) > 0 {
 		log.Fatal(errors)
@@ -361,9 +362,10 @@ this will output:
 0 does not equal a
 ```
 
-Keep in mind when using valdn.ValidateSlice:
+Keep in mind when using valdn.ValidateCollection:
 
-- It panics if val is not kind of slice.
+- It panics if val is not kind of struct, map, slice or array.
+- Unexported struct fields will be ignored.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If a parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
@@ -488,7 +490,7 @@ func main() {
 
 	rules := valdn.Rules{"age": {"min:17"}}
 
-	errors := valdn.ValidateMap(m, rules)
+	errors := valdn.ValidateCollection(m, rules)
 
 	if len(errors) > 0 {
 		log.Fatal(errors)
@@ -552,7 +554,7 @@ func main() {
 
 	rules := valdn.Rules{"0": {"startsWith:test"}}
 
-	errs := valdn.ValidateSlice(s, rules)
+	errs := valdn.ValidateCollection(s, rules)
 
 	if len(errs) > 0 {
 		log.Fatal(errs)

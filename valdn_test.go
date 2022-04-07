@@ -100,6 +100,41 @@ func Test_Validate(t *testing.T) {
 	}
 }
 
+func Test_ValidateCollection(t *testing.T) {
+	type args struct {
+		val   interface{}
+		rules Rules
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      Errors
+		wantPanic bool
+	}{
+		{
+			name: "test validate collection with unsuitable kind",
+			args: args{
+				val:   "string kind",
+				rules: nil,
+			},
+			want:      nil,
+			wantPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ValidateCollection() panicErr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			if got := ValidateCollection(tt.args.val, tt.args.rules); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ValidateCollection() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_ValidateStruct(t *testing.T) {
 	type Child struct {
 		Name string `valdn:"required|kind:string"`
@@ -136,15 +171,6 @@ func Test_ValidateStruct(t *testing.T) {
 			},
 			wantPanic: false,
 		},
-		{
-			name: "test validate nested struct with non struct value",
-			args: args{
-				val:   map[string]interface{}{"kind": "map"},
-				rules: Rules{"Age": {"required"}},
-			},
-			want:      Errors{},
-			wantPanic: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -153,7 +179,7 @@ func Test_ValidateStruct(t *testing.T) {
 					t.Errorf("ValidateStruct() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
 				}
 			}()
-			got := ValidateStruct(tt.args.val, tt.args.rules)
+			got := ValidateCollection(tt.args.val, tt.args.rules)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ValidateStruct() = %v, want %v", got, tt.want)
 			}
@@ -211,7 +237,7 @@ func Test_ValidateMap(t *testing.T) {
 					t.Errorf("ValidateMap() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
 				}
 			}()
-			got := ValidateMap(tt.args.val, tt.args.rules)
+			got := ValidateCollection(tt.args.val, tt.args.rules)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ValidateMap() = %v, want %v", got, tt.want)
 			}
@@ -258,7 +284,7 @@ func Test_ValidateSlice(t *testing.T) {
 					t.Errorf("ValidateSlice() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
 				}
 			}()
-			got := ValidateSlice(tt.args.val, tt.args.rules)
+			got := ValidateCollection(tt.args.val, tt.args.rules)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ValidateSlice() = %v, want %v", got, tt.want)
 			}
