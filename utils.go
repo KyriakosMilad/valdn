@@ -241,10 +241,10 @@ func IsNumeric(val interface{}) bool {
 	return true
 }
 
-// IsCollection reports weather val's kins is one of (Array, Slice, Map) or not.
+// IsCollection reports weather val's kins is one of (Array, Slice, Map, Struct) or not.
 func IsCollection(val interface{}) bool {
 	switch reflect.TypeOf(val).Kind() {
-	case reflect.Array, reflect.Slice, reflect.Map:
+	case reflect.Array, reflect.Slice, reflect.Map, reflect.Struct:
 		return true
 	default:
 		return false

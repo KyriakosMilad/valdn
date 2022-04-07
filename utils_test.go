@@ -1265,6 +1265,13 @@ func Test_IsCollection(t *testing.T) {
 			want: true,
 		},
 		{
+			name: "test IsCollection with struct",
+			args: args{
+				val: args{val: nil},
+			},
+			want: true,
+		},
+		{
 			name: "test IsCollection with string",
 			args: args{
 				val: "test",
