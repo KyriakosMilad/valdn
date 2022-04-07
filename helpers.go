@@ -139,7 +139,7 @@ func stringToFloat(s string) (float64, error) {
 // It returns error if v is not array, slice, map, string, integer or float.
 func getLen(v interface{}) (int, error) {
 	switch {
-	case IsCollection(v) || IsString(v):
+	case IsMap(v) || IsSlice(v) || IsArray(v) || IsString(v):
 		return reflect.ValueOf(v).Len(), nil
 	case IsInteger(v) || IsFloat(v):
 		l := 0
