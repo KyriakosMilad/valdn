@@ -64,23 +64,19 @@ func Validate(name string, val interface{}, rules []string) error {
 // If a parent has error it's nested fields will not be validated.
 // It panics if one of the rules is not registered.
 func ValidateCollection(val interface{}, rules Rules) Errors {
-	isMap := IsMap(val)
-	isStruct := IsStruct(val)
-	isSlice := IsSlice(val)
-	isArray := IsArray(val)
-	if !isMap && !isStruct && !isSlice && !isArray {
-		panic(fmt.Errorf("ValidateCollection: val must be kind of struct, map, slice and array got %v", reflect.TypeOf(val).Kind()))
+	if !IsCollection(val) {
+		panic(fmt.Errorf("ValidateCollection: val must be kind of struct, map, slice or array got %v", reflect.TypeOf(val).Kind()))
 	}
 
 	v := createNewValidation(rules)
 	v.addTagRules(val, "")
 
-	switch {
-	case isMap:
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Map:
 		v.validateMap(val, "")
-	case isSlice || isArray:
+	case reflect.Slice, reflect.Array:
 		v.validateSlice(val, "")
-	case isStruct:
+	case reflect.Struct:
 		v.validateStruct(val, "")
 	}
 
@@ -145,27 +141,24 @@ func (v *validation) getParentRules(name string) []string {
 func (v *validation) addTagRules(val interface{}, parName string) {
 	parName = makeParentNameJoinable(parName)
 
-	if IsMap(val) {
+	// if kind is struct add every field's tag rules
+	// if kind is slice or array or map, loop through all fields to find structs
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Map:
 		for _, key := range reflect.ValueOf(val).MapKeys() {
 			value := reflect.ValueOf(val).MapIndex(key).Interface()
-			switch {
-			case IsStruct(value), IsMap(value), IsSlice(value), IsArray(value):
+			if IsCollection(value) {
 				v.addTagRules(value, parName+toString(key))
 			}
 		}
-	}
-
-	if IsSlice(val) || IsArray(val) {
+	case reflect.Slice, reflect.Array:
 		for i := 0; i < reflect.ValueOf(val).Len(); i++ {
 			value := reflect.ValueOf(val).Index(i).Interface()
-			switch {
-			case IsStruct(value), IsMap(value), IsSlice(value), IsArray(val):
+			if IsCollection(value) {
 				v.addTagRules(value, parName+toString(i))
 			}
 		}
-	}
-
-	if IsStruct(val) {
+	case reflect.Struct:
 		t := reflect.TypeOf(val)
 		for i := 0; i < t.NumField(); i++ {
 			f := t.Field(i)
