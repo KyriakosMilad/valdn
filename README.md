@@ -122,8 +122,7 @@ to [discover more about valdn](#table-of-contents)
 * [Validate Collection](#validate-collection)
     * [Validate Struct](#validate-struct)
     * [Validate Map](#validate-map)
-    * [Validate Slice](#validate-slice)
-    * [Validate Array](#validate-array)
+    * [Validate Array/Slice](#Validate Array/Slice)
 * [Validate JSON](#validate-json)
 * [Validate Request](#validate-request)
 * [Change error messages](#change-error-messages)
@@ -187,8 +186,8 @@ Keep in mind when using valdn.Validate:
 
 ## Validate Collection
 
-Use valdn.ValidateCollection() to validate [struct](#validate-struct), [map](#validate-map), [slice](#validate-slice)
-and [array](#validate-array).
+Use valdn.ValidateCollection() to validate [struct](#validate-struct), [map](#validate-map), [slice](#Validate Array/Slice)
+and [array](#Validate Array/Slice).
 
 valdn.ValidateCollection() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
 
@@ -323,9 +322,9 @@ this will output:
 Zamalek SC does not equal 1911
 ```
 
-### Validate Slice
+### Validate Array/Slice
 
-Use [valdn.ValidateCollection()](#validate-collection) to validate slice.
+Use [valdn.ValidateCollection()](#validate-collection) to validate array/slice.
 
 Example:
 
