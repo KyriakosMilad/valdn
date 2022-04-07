@@ -25,6 +25,28 @@ slice.
 - Add custom rule.
 - Add custom validation message.
 
+## Table of Contents
+
+<!--ts-->
+
+* [Quick-Start](#quick-start)
+* [Installation](#installation)
+* [Validate single value](#validate-single-value)
+* [Validate Collection](#validate-collection)
+    * [Validate Struct](#validate-struct)
+    * [Validate Map](#validate-map)
+    * [Validate Array/Slice](#validate-arrayslice)
+* [Validate JSON](#validate-json)
+* [Validate Request](#validate-request)
+* [Change error messages](#change-error-messages)
+* [Add custom rules](#add-custom-rules)
+* [Validation rules](#validation-rules)
+* [Validation functions](#validation-functions)
+* [Contributing](#contributing)
+* [License](#license)
+
+<!--te-->
+
 ## Quick-Start
 
 ### Validate request example:
@@ -111,28 +133,7 @@ or
 note: you can replace ```minLen:3``` and ```maxLen:21``` rules with ```lenBetween:3,21``` rule
 
 quick and simple right? [check all the rules you can use](#validation-rules) or continue
-to [discover more about valdn](#table-of-contents)
-
-## Table of Contents
-
-<!--ts-->
-
-* [Installation](#installation)
-* [Validate single value](#validate-single-value)
-* [Validate Collection](#validate-collection)
-    * [Validate Struct](#validate-struct)
-    * [Validate Map](#validate-map)
-    * [Validate Array/Slice](#validate-arrayslice)
-* [Validate JSON](#validate-json)
-* [Validate Request](#validate-request)
-* [Change error messages](#change-error-messages)
-* [Add custom rules](#add-custom-rules)
-* [Validation rules](#validation-rules)
-* [Validation functions](#validation-functions)
-* [Contributing](#contributing)
-* [License](#license)
-
-<!--te-->
+to [discover more about valdn](#installation)
 
 ## Installation
 
