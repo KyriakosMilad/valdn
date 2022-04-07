@@ -122,7 +122,7 @@ to [discover more about valdn](#table-of-contents)
 * [Validate Collection](#validate-collection)
     * [Validate Struct](#validate-struct)
     * [Validate Map](#validate-map)
-    * [Validate Array/Slice](#Validate Array/Slice)
+    * [Validate Array/Slice](#validate-array/slice)
 * [Validate JSON](#validate-json)
 * [Validate Request](#validate-request)
 * [Change error messages](#change-error-messages)
@@ -186,8 +186,8 @@ Keep in mind when using valdn.Validate:
 
 ## Validate Collection
 
-Use valdn.ValidateCollection() to validate [struct](#validate-struct), [map](#validate-map), [slice](#Validate Array/Slice)
-and [array](#Validate Array/Slice).
+Use valdn.ValidateCollection() to validate [struct](#validate-struct), [map](#validate-map), [slice](#validate-array/slice)
+and [array](#validate-array/slice).
 
 valdn.ValidateCollection() takes two arguments: `value and rules (valdn.Rules{...})` and returns `valdn.Errors`
 
