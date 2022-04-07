@@ -292,6 +292,53 @@ func Test_ValidateSlice(t *testing.T) {
 	}
 }
 
+func Test_ValidateArray(t *testing.T) {
+	type args struct {
+		val   interface{}
+		rules Rules
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      Errors
+		wantPanic bool
+	}{
+		{
+			name: "test validate nested array",
+			args: args{
+				val:   [1]interface{}{44},
+				rules: Rules{"0": {"kind:int"}},
+			},
+			want:      Errors{},
+			wantPanic: false,
+		},
+		{
+			name: "test validate nested array with unsuitable data",
+			args: args{
+				val:   [1]int{44},
+				rules: Rules{"0": {"kind:string"}},
+			},
+			want: Errors{
+				"0": GetErrMsg("kind", "string", "0", ""),
+			},
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) && !tt.wantPanic {
+					t.Errorf("ValidateSlice() panicEr = %v, wantPanic %v, args %v", e, tt.wantPanic, tt.args)
+				}
+			}()
+			got := ValidateCollection(tt.args.val, tt.args.rules)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ValidateSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_ValidateJSON(t *testing.T) {
 	type args struct {
 		val   string
@@ -625,6 +672,15 @@ func Test_validation_addTagRules(t *testing.T) {
 			want: Rules{"test": {"required"}, "0.Name": {"required", "string"}, "0.Age": {"required", "int"}},
 		},
 		{
+			name: "test add tag rules to struct inside array",
+			args: args{
+				val:     [1]interface{}{Parent{}},
+				rules:   Rules{"test": {"required"}},
+				parName: "",
+			},
+			want: Rules{"test": {"required"}, "0.Name": {"required", "string"}, "0.Age": {"required", "int"}},
+		},
+		{
 			name: "test add tag rules to struct inside slice inside map",
 			args: args{
 				val:     []interface{}{map[string]interface{}{"parent": Parent{}}},
@@ -637,6 +693,15 @@ func Test_validation_addTagRules(t *testing.T) {
 			name: "test add tag rules to struct inside map inside slice",
 			args: args{
 				val:     map[string]interface{}{"parent": []interface{}{Parent{}}},
+				rules:   Rules{"test": {"required"}},
+				parName: "",
+			},
+			want: Rules{"test": {"required"}, "parent.0.Name": {"required", "string"}, "parent.0.Age": {"required", "int"}},
+		},
+		{
+			name: "test add tag rules to struct inside map inside array",
+			args: args{
+				val:     map[string]interface{}{"parent": [1]interface{}{Parent{}}},
 				rules:   Rules{"test": {"required"}},
 				parName: "",
 			},
@@ -968,11 +1033,22 @@ func Test_validation_validateByType(t *testing.T) {
 			want: Errors{"Parent.Name": GetErrMsg("kind", "string", "Parent.Name", 22)},
 		},
 		{
-			name: "test validate by slice - slice with unsuitable data",
+			name: "test validate by type - slice with unsuitable data",
 			args: args{
 				name:        "Parent",
 				typ:         reflect.TypeOf([]interface{}{}),
 				val:         []interface{}{"Pola"},
+				rules:       Rules{"Parent.0": {"kind:int"}},
+				fieldsExist: map[string]bool{"Parent.0": true},
+			},
+			want: Errors{"Parent.0": GetErrMsg("kind", "int", "Parent.0", "")},
+		},
+		{
+			name: "test validate by type - array with unsuitable data",
+			args: args{
+				name:        "Parent",
+				typ:         reflect.TypeOf([]interface{}{}),
+				val:         [1]interface{}{"Pola"},
 				rules:       Rules{"Parent.0": {"kind:int"}},
 				fieldsExist: map[string]bool{"Parent.0": true},
 			},

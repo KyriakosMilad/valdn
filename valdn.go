@@ -57,8 +57,8 @@ func Validate(name string, val interface{}, rules []string) error {
 	return nil
 }
 
-// ValidateCollection validates nested struct, nested map and nested slice by rules and returns Errors.
-// It panics if val is not kind of struct, map or slice.
+// ValidateCollection validates nested struct, nested map, nested slice and nested array by rules and returns Errors.
+// It panics if val is not kind of struct, map, slice or array.
 // Unexported struct fields will be ignored.
 // If an error is found it will not check the rest of the field's rules and continue to the next field.
 // If a parent has error it's nested fields will not be validated.
@@ -67,8 +67,9 @@ func ValidateCollection(val interface{}, rules Rules) Errors {
 	isMap := IsMap(val)
 	isStruct := IsStruct(val)
 	isSlice := IsSlice(val)
-	if !isMap && !isStruct && !isSlice {
-		panic(fmt.Errorf("ValidateCollection: val must be kind of struct, map and slice got %v", reflect.TypeOf(val).Kind()))
+	isArray := IsArray(val)
+	if !isMap && !isStruct && !isSlice && !isArray {
+		panic(fmt.Errorf("ValidateCollection: val must be kind of struct, map, slice and array got %v", reflect.TypeOf(val).Kind()))
 	}
 
 	v := createNewValidation(rules)
@@ -77,7 +78,7 @@ func ValidateCollection(val interface{}, rules Rules) Errors {
 	switch {
 	case isMap:
 		v.validateMap(val, "")
-	case isSlice:
+	case isSlice || isArray:
 		v.validateSlice(val, "")
 	case isStruct:
 		v.validateStruct(val, "")
@@ -148,17 +149,17 @@ func (v *validation) addTagRules(val interface{}, parName string) {
 		for _, key := range reflect.ValueOf(val).MapKeys() {
 			value := reflect.ValueOf(val).MapIndex(key).Interface()
 			switch {
-			case IsStruct(value), IsMap(value), IsSlice(value):
+			case IsStruct(value), IsMap(value), IsSlice(value), IsArray(value):
 				v.addTagRules(value, parName+toString(key))
 			}
 		}
 	}
 
-	if IsSlice(val) {
+	if IsSlice(val) || IsArray(val) {
 		for i := 0; i < reflect.ValueOf(val).Len(); i++ {
 			value := reflect.ValueOf(val).Index(i).Interface()
 			switch {
-			case IsStruct(value), IsMap(value), IsSlice(value):
+			case IsStruct(value), IsMap(value), IsSlice(value), IsArray(val):
 				v.addTagRules(value, parName+toString(i))
 			}
 		}
@@ -179,7 +180,7 @@ func (v *validation) addTagRules(val interface{}, parName string) {
 
 			typ := f.Type
 			switch typ.Kind() {
-			case reflect.Struct, reflect.Map, reflect.Slice:
+			case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 				v.addTagRules(f, name)
 			}
 		}
@@ -228,7 +229,7 @@ func (v *validation) validateByType(name string, t reflect.Type, val interface{}
 		v.validateStruct(val, name)
 	case reflect.Map:
 		v.validateMap(val, name)
-	case reflect.Slice:
+	case reflect.Slice, reflect.Array:
 		v.validateSlice(val, name)
 	default:
 		err := Validate(name, val, rules)
