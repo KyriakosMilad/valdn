@@ -404,6 +404,9 @@ Keep in mind when using valdn.ValidateJSON:
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
 - If parent has error it's nested fields will not be validated.
 - It panics if one of the rules is not registered.
+- You can use * to apply rules to all direct nested fields, example:
+
+``valdn.Rules{"*": "required", "Parent.*": "minLen:5"}``
 
 ## Validate Request
 
@@ -454,6 +457,9 @@ Keep in mind when using valdn.ValidateRequest:
 - If name has many values it will be treated as slice.
 - If name has values in URL params and request body, they will be merged into one slice with that name.
 - If an error is found it will not check the rest of the field's rules and continue to the next field.
+- You can use * to apply rules to all direct nested fields, example:
+
+``valdn.Rules{"*": "required", "Parent.*": "minLen:5"}``
 
 ## Change error messages
 
