@@ -3,6 +3,7 @@ package valdn
 import (
 	"fmt"
 	"mime/multipart"
+	"net/textproto"
 	"os"
 	"reflect"
 	"testing"
@@ -607,7 +608,7 @@ func Test_getFileSize(t *testing.T) {
 		{
 			name: "test getFileSize with multipart.FileHeader",
 			args: args{
-				&multipart.FileHeader{Size: 44},
+				&multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 			},
 			wantErr:  false,
 			wantSize: 44,

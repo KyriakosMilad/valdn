@@ -164,11 +164,14 @@ func getFileSize(v interface{}) (int64, error) {
 		}
 		s, err := f.Stat()
 		if err != nil {
-			return 0, err
+			return 0, errors.New("can't get size from os.File: " + err.Error())
 		}
 		return s.Size(), nil
 	}
 	if f, ok := v.(*multipart.FileHeader); ok {
+		if reflect.ValueOf(f.Size).IsZero() || reflect.ValueOf(f.Filename).IsZero() || reflect.ValueOf(f.Header).IsZero() {
+			return 0, errors.New("can't get size from non-valid multipart.FileHeader")
+		}
 		return f.Size, nil
 	}
 	return 0, fmt.Errorf("%v is not type of *os.File or *multipart.FileHeader", v)

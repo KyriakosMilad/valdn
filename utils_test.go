@@ -2,6 +2,8 @@ package valdn
 
 import (
 	"mime/multipart"
+	"net/textproto"
+	"os"
 	"testing"
 )
 
@@ -1392,10 +1394,9 @@ func Test_IsIPv6(t *testing.T) {
 		s string
 	}
 	tests := []struct {
-		name      string
-		args      args
-		want      bool
-		wantPanic bool
+		name string
+		args args
+		want bool
 	}{
 		{
 			name: "test IsIPv6",
@@ -1532,7 +1533,7 @@ func Test_IsFile(t *testing.T) {
 		{
 			name: "test IsFile",
 			args: args{
-				v: &multipart.FileHeader{Size: 44},
+				v: &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 			},
 			want: true,
 		},
@@ -1540,6 +1541,20 @@ func Test_IsFile(t *testing.T) {
 			name: "test IsFile with unsuitable data",
 			args: args{
 				v: "bla bla",
+			},
+			want: false,
+		},
+		{
+			name: "test IsFile with unsuitable data #2",
+			args: args{
+				v: &multipart.FileHeader{},
+			},
+			want: false,
+		},
+		{
+			name: "test IsFile with unsuitable data #3",
+			args: args{
+				v: &os.File{},
 			},
 			want: false,
 		},

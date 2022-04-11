@@ -2,6 +2,7 @@ package valdn
 
 import (
 	"mime/multipart"
+	"net/textproto"
 	"os"
 	"reflect"
 	"testing"
@@ -3080,7 +3081,7 @@ func Test_fileRule(t *testing.T) {
 			name: "test fileRule with multipart.FileHeaders",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "",
 			},
 			wantErr: false,
@@ -3129,7 +3130,7 @@ func Test_sizeRule(t *testing.T) {
 			name: "test sizeRule",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "44",
 			},
 			wantErr:   false,
@@ -3139,7 +3140,7 @@ func Test_sizeRule(t *testing.T) {
 			name: "test sizeRule with unsuitable data",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "43",
 			},
 			wantErr:   true,
@@ -3196,7 +3197,7 @@ func Test_sizeMinRule(t *testing.T) {
 			name: "test sizeMinRule",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "44",
 			},
 			wantErr:   false,
@@ -3206,7 +3207,7 @@ func Test_sizeMinRule(t *testing.T) {
 			name: "test sizeMinRule with unsuitable data",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "45",
 			},
 			wantErr:   true,
@@ -3263,7 +3264,7 @@ func Test_sizeMaxRule(t *testing.T) {
 			name: "test sizeMaxRule",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "44",
 			},
 			wantErr:   false,
@@ -3273,7 +3274,7 @@ func Test_sizeMaxRule(t *testing.T) {
 			name: "test sizeMaxRule with unsuitable data",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "43",
 			},
 			wantErr:   true,
@@ -3283,7 +3284,7 @@ func Test_sizeMaxRule(t *testing.T) {
 			name: "test sizeMaxRule with non-integer ruleVal",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "forty",
 			},
 			wantErr:   false,
@@ -3330,7 +3331,7 @@ func Test_sizeBetweenRule(t *testing.T) {
 			name: "test sizeBetweenRule",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "44,45",
 			},
 			wantErr:   false,
@@ -3340,7 +3341,7 @@ func Test_sizeBetweenRule(t *testing.T) {
 			name: "test sizeBetweenRule with unsuitable data",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "1,40",
 			},
 			wantErr:   true,
@@ -3350,7 +3351,7 @@ func Test_sizeBetweenRule(t *testing.T) {
 			name: "test sizeBetweenRule with unsuitable ruleVal",
 			args: args{
 				name:    "file",
-				val:     &multipart.FileHeader{Size: 44},
+				val:     &multipart.FileHeader{Size: 44, Filename: "file", Header: textproto.MIMEHeader{}},
 				ruleVal: "66",
 			},
 			wantErr:   false,
