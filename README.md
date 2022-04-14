@@ -635,7 +635,7 @@ this will output:
 | IsFloat            | val interface{}                 | bool    | IsFloat reports weather value is float or not.                                  |
 | IsUnsignedFloat    | val interface{}                 | bool    | IsUnsignedFloat reports weather value is unsigned float or not.                 |
 | IsComplex          | val interface{}                 | bool    | IsComplex reports weather value is complex number or not.                       |
-| IsNumeric          | val interface{}                 | bool    | IsNumeric reports weather value is numeric or not.                              |
+| IsNumeric          | val interface{}                 | bool    | IsNumeric reports weather value is (integer, float, complex) or not.            |
 | IsCollection       | val interface{}                 | bool    | IsCollection reports weather value's kins is one of (Array, Slice, Map) or not. |
 | IsEmail            | val interface{}                 | bool    | IsEmail reports weather value is a valid email address or not.                  |
 | IsJSON             | val interface{}                 | bool    | IsJSON reports weather value is a valid json or not.                            |

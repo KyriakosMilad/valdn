@@ -233,7 +233,7 @@ func IsComplex(val interface{}) bool {
 	}
 }
 
-// IsNumeric reports weather val is numeric or not.
+// IsNumeric reports weather val is (integer, float, complex) or not.
 func IsNumeric(val interface{}) bool {
 	if !IsInteger(val) && !IsFloat(val) && !IsComplex(val) {
 		return false
