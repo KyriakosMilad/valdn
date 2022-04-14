@@ -1,7 +1,9 @@
 package valdn
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -80,7 +82,11 @@ func fhsSliceToInterface(s []*multipart.FileHeader) []interface{} {
 }
 
 func parseJSON(r *http.Request, m map[string]interface{}) {
-	b, err := ioutil.ReadAll(r.Body)
+	// double stream request body, and reassign it at the end, so it can be read later
+	buf := &bytes.Buffer{}
+	tee := io.TeeReader(r.Body, buf)
+
+	b, err := ioutil.ReadAll(tee)
 	if err != nil {
 		panic(err)
 	}
@@ -92,6 +98,8 @@ func parseJSON(r *http.Request, m map[string]interface{}) {
 	for k, v := range m {
 		m[k] = parseJSONVal(v)
 	}
+
+	r.Body = io.NopCloser(bytes.NewReader(buf.Bytes()))
 }
 
 func parseFormData(r *http.Request, rules Rules, m map[string]interface{}) {
