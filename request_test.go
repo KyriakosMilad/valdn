@@ -3,7 +3,6 @@ package valdn
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -243,7 +242,7 @@ func Test_parseReqVal(t *testing.T) {
 }
 
 func Test_parseJSONVal(t *testing.T) {
-	b, err := ioutil.ReadAll(advancedJSONRequest().Body)
+	b, err := io.ReadAll(advancedJSONRequest().Body)
 	if err != nil {
 		panic(err)
 	}

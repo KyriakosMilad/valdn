@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -86,7 +85,7 @@ func parseJSON(r *http.Request, m map[string]interface{}) {
 	buf := &bytes.Buffer{}
 	tee := io.TeeReader(r.Body, buf)
 
-	b, err := ioutil.ReadAll(tee)
+	b, err := io.ReadAll(tee)
 	if err != nil {
 		panic(err)
 	}
