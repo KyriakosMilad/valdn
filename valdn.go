@@ -72,7 +72,6 @@ func ValidateCollection(val interface{}, rules Rules) Errors {
 	v := createNewValidation(rules)
 	v.addTagRules(val, "")
 
-	fmt.Println("added tag rules")
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Map:
 		v.validateMap(val, "")
