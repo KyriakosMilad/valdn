@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_createNewValidation(t *testing.T) {
@@ -101,6 +102,15 @@ func Test_Validate(t *testing.T) {
 }
 
 func Test_ValidateCollection(t *testing.T) {
+	type User struct {
+		ID          int64     `json:"id" db:"id"`
+		Name        string    `json:"name" db:"name" valdn:"required|minLen:5:maxLen:30"`
+		Email       string    `json:"email" db:"email" valdn:"required|email"`
+		Phone       string    `json:"phone" db:"phone" valdn:"required|minLen:5:maxLen:20"`
+		CountryCode string    `json:"country_code" db:"country_code" valdn:"required|len:2"`
+		CreatedAt   time.Time `json:"created_at" db:"created_at"`
+		UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	}
 	type args struct {
 		val   interface{}
 		rules Rules
@@ -119,6 +129,20 @@ func Test_ValidateCollection(t *testing.T) {
 			},
 			want:      nil,
 			wantPanic: true,
+		},
+		{
+			name: "test validate collection with struct",
+			args: args{
+				val: User{
+					Name:        "kyrikos",
+					Email:       "test@test.test",
+					Phone:       "15125125125",
+					CountryCode: "eg",
+				},
+				rules: Rules{},
+			},
+			want:      Errors{},
+			wantPanic: false,
 		},
 	}
 	for _, tt := range tests {

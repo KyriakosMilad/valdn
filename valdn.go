@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 )
 
 type (
@@ -71,6 +72,7 @@ func ValidateCollection(val interface{}, rules Rules) Errors {
 	v := createNewValidation(rules)
 	v.addTagRules(val, "")
 
+	fmt.Println("added tag rules")
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.Map:
 		v.validateMap(val, "")
@@ -172,6 +174,9 @@ func (v *validation) addTagRules(val interface{}, parName string) {
 			}
 
 			typ := f.Type
+			if typ == reflect.TypeOf(time.Time{}) {
+				continue
+			}
 			switch typ.Kind() {
 			case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 				v.addTagRules(f, name)
