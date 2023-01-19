@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"time"
 )
 
 type (
@@ -172,10 +171,11 @@ func (v *validation) addTagRules(val interface{}, parName string) {
 				v.rules[name] = strings.Split(tRules, TagSeparator)
 			}
 
-			typ := f.Type
-			if typ == reflect.TypeOf(time.Time{}) {
+			if v.rules[name][0] == "skip" {
 				continue
 			}
+
+			typ := f.Type
 			switch typ.Kind() {
 			case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 				v.addTagRules(f, name)
@@ -220,6 +220,10 @@ func (v *validation) validateSlice(val interface{}, name string) {
 func (v *validation) validateByType(name string, t reflect.Type, val interface{}) {
 	v.registerField(name)
 	rules := v.getFieldRules(name)
+
+	if rules[0] == "skip" {
+		return
+	}
 
 	switch t.Kind() {
 	case reflect.Struct:
