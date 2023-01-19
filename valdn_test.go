@@ -108,8 +108,8 @@ func Test_ValidateCollection(t *testing.T) {
 		Email       string    `json:"email" db:"email" valdn:"required|email"`
 		Phone       string    `json:"phone" db:"phone" valdn:"required|minLen:5:maxLen:20"`
 		CountryCode string    `json:"country_code" db:"country_code" valdn:"required|len:2"`
-		CreatedAt   time.Time `json:"created_at" db:"created_at"`
-		UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+		CreatedAt   time.Time `json:"created_at" db:"created_at" valdn:"skip"`
+		UpdatedAt   time.Time `json:"updated_at" db:"updated_at" valdn:"skip"`
 	}
 	type args struct {
 		val   interface{}

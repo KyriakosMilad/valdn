@@ -171,7 +171,7 @@ func (v *validation) addTagRules(val interface{}, parName string) {
 				v.rules[name] = strings.Split(tRules, TagSeparator)
 			}
 
-			if v.rules[name][0] == "skip" {
+			if len(v.rules[name]) > 0 && v.rules[name][0] == "skip" {
 				continue
 			}
 
@@ -221,7 +221,7 @@ func (v *validation) validateByType(name string, t reflect.Type, val interface{}
 	v.registerField(name)
 	rules := v.getFieldRules(name)
 
-	if rules[0] == "skip" {
+	if len(rules) > 0 && rules[0] == "skip" {
 		return
 	}
 
