@@ -3609,3 +3609,60 @@ func Test_extNotInRule(t *testing.T) {
 		})
 	}
 }
+
+func Test_uuidRule(t *testing.T) {
+	type args struct {
+		name    string
+		val     interface{}
+		ruleVal string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantPanic bool
+	}{
+		{
+			name: "test uuidRule",
+			args: args{
+				name:    "test",
+				val:     "550e8400-e29b-41d4-a716-446655440000",
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "test uuidRule with non-string value",
+			args: args{
+				name:    "test",
+				val:     1973,
+				ruleVal: "",
+			},
+			wantErr:   false,
+			wantPanic: true,
+		},
+		{
+			name: "test uuidRule with unsuitable data",
+			args: args{
+				name:    "test",
+				val:     "bla",
+				ruleVal: "",
+			},
+			wantErr:   true,
+			wantPanic: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if e := recover(); (e != nil) != tt.wantPanic {
+					t.Errorf("uuidRule() error = %v, wantPanic %v", e, tt.wantErr)
+				}
+			}()
+			if err := uuidRule(tt.args.name, tt.args.val, tt.args.ruleVal); (err != nil) != tt.wantErr {
+				t.Errorf("uuidRule() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

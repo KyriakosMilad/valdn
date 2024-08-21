@@ -2,6 +2,7 @@ package valdn
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"net"
 	"reflect"
 	"regexp"
@@ -314,4 +315,10 @@ func IsFile(v interface{}) bool {
 		return false
 	}
 	return true
+}
+
+// IsUUID reports weather s is a valid UUID or not.
+func IsUUID(s string) bool {
+	_, err := uuid.Parse(s)
+	return err == nil
 }

@@ -832,6 +832,20 @@ func extNotInRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// uuidRule checks if val is a valid UUID.
+// It panics if val is not a string.
+// It returns error if val is not a valid UUID.
+func uuidRule(name string, val interface{}, ruleVal string) error {
+	if !IsString(val) {
+		panic(fmt.Errorf("%v must be a string to be validated with uuidRule", name))
+	}
+	ok := IsUUID(toString(val))
+	if !ok {
+		return errors.New(GetErrMsg("uuid", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -882,4 +896,5 @@ func init() {
 	AddRule("notExt", notExtRule, "[name]'s extension must not be [ruleVal]")
 	AddRule("extIn", extInRule, "[name]'s extension must be one of [ruleVal]")
 	AddRule("extNotIn", extNotInRule, "[name]'s extension must not be one of [ruleVal]")
+	AddRule("uuid", uuidRule, "[name] must be a valid uuid")
 }

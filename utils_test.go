@@ -1567,3 +1567,36 @@ func Test_IsFile(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsUUID(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsUUID",
+			args: args{
+				s: "550e8400-e29b-41d4-a716-446655440000",
+			},
+			want: true,
+		},
+		{
+			name: "test IsUUID with unsuitabel data",
+			args: args{
+				s: "bla",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsUUID(tt.args.s); got != tt.want {
+				t.Errorf("IsUUID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
