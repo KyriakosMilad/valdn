@@ -102,6 +102,23 @@ func Test_Validate(t *testing.T) {
 }
 
 func Test_ValidateCollection(t *testing.T) {
+	type Message struct {
+		Body        string   `json:"body" valdn:"required|kind:string|minLen:1|maxLen:9999999999"`
+		Attachments []string `json:"attachments" valdn:"kind:slice|maxLen:3"`
+	}
+	type Reply struct {
+		Body        string   `json:"body" valdn:"required|kind:string|minLen:1|maxLen:9999999999"`
+		Attachments []string `json:"attachments" valdn:"kind:slice|maxLen:3"`
+	}
+	type Response struct {
+		Title            string    `json:"title" valdn:"required|kind:string|minLen:1|maxLen:60"`
+		RespondToMale    bool      `json:"respond_to_male" valdn:"required|kind:bool"`
+		RespondToFemale  bool      `json:"respond_to_female" valdn:"required|kind:bool"`
+		RespondToUnknown bool      `json:"respond_to_unknown" valdn:"required|kind:bool"`
+		SpecificWords    []string  `json:"specific_words" valdn:"kind:slice|minLen:0|maxLen:1000"`
+		Messages         []Message `json:"messages" valdn:"kind:slice|maxLen:1"`
+		Replies          []Reply   `json:"replies" valdn:"kind:slice|maxLen:1"`
+	}
 	type User struct {
 		ID          int64     `json:"id" db:"id"`
 		Name        string    `json:"name" db:"name" valdn:"required|minLen:5:maxLen:30"`
@@ -138,6 +155,23 @@ func Test_ValidateCollection(t *testing.T) {
 					Email:       "test@test.test",
 					Phone:       "15125125125",
 					CountryCode: "eg",
+				},
+				rules: Rules{},
+			},
+			want:      Errors{},
+			wantPanic: false,
+		},
+		{
+			name: "test validate collection with struct has custom types",
+			args: args{
+				val: Response{
+					Title:            "test",
+					RespondToMale:    false,
+					RespondToFemale:  false,
+					RespondToUnknown: false,
+					SpecificWords:    []string{},
+					Messages:         []Message{},
+					Replies:          []Reply{},
 				},
 				rules: Rules{},
 			},
