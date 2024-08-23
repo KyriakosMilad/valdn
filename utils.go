@@ -19,6 +19,8 @@ func IsEmpty(val interface{}) bool {
 	t := reflect.TypeOf(val)
 	v := reflect.ValueOf(val)
 	switch t.Kind() {
+	case reflect.Bool:
+		return false
 	case reflect.Map, reflect.Slice, reflect.Array:
 		return v.Len() == 0
 	default:
