@@ -175,10 +175,13 @@ func (v *validation) addTagRules(val interface{}, parName string) {
 				continue
 			}
 
-			typ := f.Type
-			switch typ.Kind() {
+			// get struct field value and type
+			fTyp := f.Type
+			fVal := reflect.ValueOf(val).Field(i).Interface()
+
+			switch fTyp.Kind() {
 			case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
-				v.addTagRules(f, name)
+				v.addTagRules(fVal, name)
 			}
 		}
 	}
