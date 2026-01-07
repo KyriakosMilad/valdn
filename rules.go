@@ -839,6 +839,10 @@ func uuidRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
 		panic(fmt.Errorf("%v must be a string to be validated with uuidRule", name))
 	}
+	// validate only if val is not empty string
+	if toString(val) == "" {
+		return nil
+	}
 	ok := IsUUID(toString(val))
 	if !ok {
 		return errors.New(GetErrMsg("uuid", ruleVal, name, val))
