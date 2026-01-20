@@ -2,10 +2,13 @@ package valdn
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
 	"net"
 	"reflect"
 	"regexp"
+	"strings"
+
+	"github.com/google/uuid"
+	"github.com/nyaruka/phonenumbers"
 )
 
 const (
@@ -323,4 +326,19 @@ func IsFile(v interface{}) bool {
 func IsUUID(s string) bool {
 	_, err := uuid.Parse(s)
 	return err == nil
+}
+
+// IsPhoneNumber reports weather s is a valid phone number or not.
+func IsPhoneNumber(s string) bool {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return false
+	}
+
+	num, err := phonenumbers.Parse(s, "ZZ")
+	if err != nil {
+		return false
+	}
+
+	return phonenumbers.IsValidNumber(num)
 }

@@ -1600,3 +1600,36 @@ func Test_IsUUID(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsPhoneNumber(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "test IsPhoneNumber",
+			args: args{
+				s: "+201000000000",
+			},
+			want: true,
+		},
+		{
+			name: "test IsPhoneNumber with unsuitable data",
+			args: args{
+				s: "201000000000",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsPhoneNumber(tt.args.s); got != tt.want {
+				t.Errorf("IsPhoneNumber() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
