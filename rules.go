@@ -850,6 +850,24 @@ func uuidRule(name string, val interface{}, ruleVal string) error {
 	return nil
 }
 
+// phoneNumberRule checks if val is a valid phone number.
+// It panics if val is not a string.
+// It returns error if val is not a valid phone number.
+func phoneNumberRule(name string, val interface{}, ruleVal string) error {
+	if !IsString(val) {
+		panic(fmt.Errorf("%v must be a string to be validated with phoneNumberRule", name))
+	}
+	// validate only if val is not empty string
+	if toString(val) == "" {
+		return nil
+	}
+	ok := IsPhoneNumber(toString(val))
+	if !ok {
+		return errors.New(GetErrMsg("phoneNumber", ruleVal, name, val))
+	}
+	return nil
+}
+
 func init() {
 	AddRule("required", requiredRule, "[name] is required")
 	AddRule("type", typeRule, "[name] must be type of [ruleVal]")
@@ -901,4 +919,5 @@ func init() {
 	AddRule("extIn", extInRule, "[name]'s extension must be one of [ruleVal]")
 	AddRule("extNotIn", extNotInRule, "[name]'s extension must not be one of [ruleVal]")
 	AddRule("uuid", uuidRule, "[name] must be a valid uuid")
+	AddRule("phoneNumber", phoneNumberRule, "[name] must be a valid phone number")
 }
