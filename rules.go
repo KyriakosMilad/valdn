@@ -503,6 +503,10 @@ func emailRule(name string, val interface{}, ruleVal string) error {
 	if !IsString(val) {
 		panic(fmt.Errorf("%v must be a string to be validated with emailRule", name))
 	}
+	// validate only if val is not empty string
+	if toString(val) == "" {
+		return nil
+	}
 	ok := IsEmail(toString(val))
 	if !ok {
 		return errors.New(GetErrMsg("email", ruleVal, name, val))
